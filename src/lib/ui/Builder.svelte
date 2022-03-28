@@ -1,4 +1,6 @@
 <script>
+	import { config } from '$lib/conf/config';
+	import { requirementsMet } from '../interpreter';
 
 	export let pageCount = 0;
 	export let currentPage = 0;
@@ -8,8 +10,34 @@
 	let cost = 0;
 	let costFormatted;
 	let hideCost = false;
+	let error = '';
 
 	$: costFormatted = cost.toFixed(2);
+
+	const gotoNextPage = () => {
+		// TODO Check that required fields have been checked
+
+		for (let i = currentPage + 1; i < config.pages.length; i++) {
+			let next = config.pages[i];
+			console.log('n ' + i + ' ' + next?.meetsRequirements());
+			if (next?.meetsRequirements()) {
+				nextPage = i;
+				break;
+			} else {
+				nextPage = -1;
+			}
+		}
+
+		if (!requirementsMet(config.pages[currentPage])) {
+			// TODO Rerender with bounding borders around items
+			error = 'One or more required items do not have a selection.';
+			return;
+		}
+
+		error = '';
+		if (nextPage !== -1)
+			currentPage = nextPage;
+	};
 </script>
 
 <div id='contentWrapper'>
@@ -37,12 +65,20 @@
 	<div id='configuration'>
 		<slot />
 		<div id='pageFooter'>
-			<div id='error'></div>
+			{#if error !== ""}
+				<div id='error'>{error}</div>
+			{/if}
+			{#if config.pages[currentPage].footer}
+				<hr />
+				<div class='footer'>
+					{@html config.pages[currentPage].footer}
+				</div>
+			{/if}
 			{#if previousPage != -1}
 				<button id='back' on:click={() => currentPage = previousPage}><p>&laquo; Back</p></button>
 			{/if}
 			{#if nextPage != -1}
-				<button id='next' on:click={() => currentPage = nextPage}><p>Next &raquo;</p></button>
+				<button id='next' on:click={gotoNextPage}><p>Next &raquo;</p></button>
 			{/if}
 		</div>
 		<div id='total' class='toggleable-cost' class:hidden={hideCost}>
@@ -196,7 +232,7 @@
 
 
     /** Footer **/
-    #pageFooter, #pagePreFooter {
+    #pageFooter, .footer {
         position: relative;
         margin: 20px;
     }

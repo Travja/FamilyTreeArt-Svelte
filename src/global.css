@@ -63,6 +63,7 @@ a.title {
     width: 100%;
     margin: 5px auto 0 auto !important;
     box-sizing: border-box;
+    background-size: cover;
 }
 
 .imgOption.shrink {

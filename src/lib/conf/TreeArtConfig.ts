@@ -1,3 +1,5 @@
+import { meetsPrereqs } from '../interpreter';
+
 export class TreeArtConfig {
 	imageFormats = <ImageFormats>{
 		tree: '/imgs/Tree Layers/%type% %gen% %couple% %style1% TREE %color%.png',
@@ -55,6 +57,7 @@ export class TreeArtConfig {
 export class TreeArtPage {
 	title: string;
 	intro: string;
+	footer: string;
 	prereq: Prereqs | undefined;
 	options: (ImageOption | ButtonOption | ItemOption | TextOption)[];
 	finalPage: boolean = false;
@@ -62,14 +65,14 @@ export class TreeArtPage {
 	constructor(init: TreeArtPageData) {
 		this.title = init.title;
 		this.intro = init.intro;
+		this.footer = init.footer;
 		this.prereq = init.prereq;
 		this.options = init.options;
 		if (init.finalPage) this.finalPage = init.finalPage;
 	}
 
 	meetsRequirements() {
-		// TODO Flesh this out.
-		return true;
+		return meetsPrereqs(this.prereq);
 	}
 }
 
@@ -77,6 +80,7 @@ export class TreeArtPage {
 export interface TreeArtPageData {
 	title: string,
 	intro: string,
+	footer?: string,
 	prereq?: Prereqs,
 	options: (ImageOption | ButtonOption | ItemOption | TextOption)[],
 	finalPage?: boolean
@@ -84,7 +88,7 @@ export interface TreeArtPageData {
 
 export interface Prereqs {
 	option: string,
-	value?: string[] | number[],
+	value?: string[],
 	not_value?: string[],
 	and?: Prereqs,
 	or?: Prereqs
@@ -121,10 +125,12 @@ export interface BaseOption {
 	type: string,
 	required?: boolean,
 	layer?: number,
+	display?: string,
+	flexCount?: number
 }
 
 export interface ImageOption extends BaseOption {
-	images: (ImageData | GroupData)[];
+	images: (OptionImageData | GroupData)[];
 }
 
 export interface ButtonOption extends BaseOption {
@@ -141,15 +147,17 @@ export interface TextOption extends BaseOption {
 
 export interface BaseData {
 	prereq?: Prereqs,
-	displayText: string,
+	displayText?: string,
 	cost?: number,
 	key?: string,
 	summaryText?: string,
 	default?: boolean,
 	img?: ImageFormatData,
+	placeholder?: string,
+	values?: ValueInformation[]
 }
 
-export interface ImageData extends BaseData {
+export interface OptionImageData extends BaseData {
 	displayImage?: string,
 	background?: string,
 	footer?: string
@@ -186,14 +194,20 @@ export interface ImageFormatData {
 }
 
 export interface GroupData extends BaseData {
-	group?: {
+	group: {
 		id: string,
 		header?: string
-		images: ImageData[]
+		images: OptionImageData[]
 	};
 }
 
 export enum TreeType {
 	ANCESTRY = 'ANCESTRY',
 	DESCENDANT = 'DESCENDANT'
+}
+
+export interface ValueInformation {
+	option: string,
+	value: any[],
+	cost: number
 }

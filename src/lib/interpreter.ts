@@ -1,8 +1,89 @@
-import type { ImageData } from './conf/TreeArtConfig';
+import type { BaseData, ButtonData, OptionImageData, Prereqs, TreeArtPage } from './conf/TreeArtConfig';
 import { config } from './conf/config';
 import { writable } from 'svelte/store';
 
 let selectedValues = writable({});
+export let requirementsNotMet = writable([]);
+let _requirementsNotMet = [];
+
+let _selections = {};
+export let selections = writable(_selections);
+
+export const selectItem = (optId: string, value: any) => {
+	// console.log(`New value for ${optId}: `, value);
+	_selections[optId] = value;
+	// console.log(_selections);
+	_requirementsNotMet = _requirementsNotMet.filter(item => item != optId);
+	requirementsNotMet.set(_requirementsNotMet);
+	selections.set(_selections);
+};
+
+export const unset = (optId: string) => {
+	_selections[optId] = undefined;
+	selections.set(_selections);
+};
+
+export const getValue = (optId: string): OptionImageData | ButtonData | string => {
+	return _selections[optId];
+};
+
+export const getPlaceholderValue = (option: ButtonData) => {
+	let value = '???';
+	if (!option.values)
+		return value;
+
+	for (let check of option.values) {
+		let targetValue = getValue(check.option);
+		// console.log('Target value: ' + targetValue);
+		if (!targetValue) continue;
+
+		if ((typeof targetValue == 'string' && check.value.includes(targetValue))
+			|| check.value.includes(((<BaseData>targetValue).key))) {
+			value = '$' + check.cost.toFixed(2);
+			break;
+		}
+	}
+
+	return value;
+};
+
+export const meetsPrereqs = (prereq: Prereqs): boolean => {
+	if (!prereq) return true;
+
+	let value: BaseData | string = getValue(prereq.option);
+	if (typeof value != 'string')
+		value = (<BaseData>value)?.key;
+
+	if (!value)
+		return false;
+
+	let result = prereq.value
+		// Check if we have an included value
+		? prereq.value.includes(value)
+		// Or that we are properly using an excluded value
+		: (prereq.not_value && !prereq.not_value.includes(value));
+
+	// Check the and recursively
+	if (prereq.and)
+		result = result && meetsPrereqs(prereq.and);
+
+	// Check the or recursively
+	if (prereq.or)
+		result = result || meetsPrereqs(prereq.or);
+
+	// Return our result
+	return result;
+};
+
+export const requirementsMet = (page: TreeArtPage): boolean => {
+	_requirementsNotMet = [];
+	for (let opt of page.options) {
+		if ((!opt.prereq || meetsPrereqs(opt.prereq)) && opt.required && !getValue(opt.id))
+			_requirementsNotMet.push(opt.id);
+	}
+	requirementsNotMet.set(_requirementsNotMet);
+	return _requirementsNotMet.length === 0;
+};
 
 /*
 	imageFormats = <ImageFormats>{
@@ -21,7 +102,7 @@ let selectedValues = writable({});
 	};
  */
 
-export const getImage = (data: ImageData) => {
+export const getImage = (data: OptionImageData) => {
 	if (!data.img.use || data.img.use == 'tree')
 		return getTreeImage(data);
 	else if (data.img.use == 'roots')
@@ -29,7 +110,7 @@ export const getImage = (data: ImageData) => {
 };
 
 // tree: '/imgs/Tree Layers/%type% %gen% %couple% %style1% TREE %color%.png',
-export const getTreeImage = (data: ImageData) => {
+export const getTreeImage = (data: OptionImageData) => {
 	let treeFormat = config.imageFormats.tree
 		.replace('%type%', getOrDefault(data, 'type'))
 		.replace('%gen%', getOrDefault(data, 'gen'))
@@ -38,24 +119,24 @@ export const getTreeImage = (data: ImageData) => {
 		.replace('%color%', getOrDefault(data, 'color'))
 		.replace(/[ ]{2,}/, ' ');
 
-	console.log(treeFormat);
+	// console.log(treeFormat);
 	return treeFormat;
 };
 
 // root: '/imgs/Tree Layers/ROOTS %gen% %type% %color%.png',
-export const getRootsImage = (data: ImageData) => {
+export const getRootsImage = (data: OptionImageData) => {
 	let rootFormat = config.imageFormats.root
 		.replace('%type%', getOrDefault(data, 'type'))
 		.replace('%gen%', getOrDefault(data, 'gen'))
 		.replace('%color%', getOrDefault(data, 'color'))
 		.replace(/[ ]{2,}/, ' ');
 
-	console.log(rootFormat);
+	// console.log(rootFormat);
 	return rootFormat;
 };
 
-const getOrDefault = (data: ImageData, key: string) => {
-	console.log(`Looking for ${key}`);
+const getOrDefault = (data: OptionImageData, key: string) => {
+	// console.log(`Looking for ${key}`);
 
 	// TODO Get already selected values and see if there is a supplied value there
 
@@ -64,21 +145,21 @@ const getOrDefault = (data: ImageData, key: string) => {
 		// Check for the key in the main img data
 		if (key in data.img && data.img[key] != 'reset') {
 			// This value should override the prior retrieved value.
-			console.log(`'${key}' In data`);
+			// console.log(`'${key}' In data`);
 			return data.img[key];
 		} else if (data.img.default && key in data.img.default && data.img.default[key] != 'reset') { // Otherwise, check supplied defaults
-			console.log(`'${key}' In data default`);
-			console.log(data.img);
+			// console.log(`'${key}' In data default`);
+			// console.log(data.img);
 			return data.img.default[key];
 		} else if (data.img.use && data.img.use == 'roots' && data.img.roots[key] != 'reset') {
 			if (key in data.img.roots) {
-				console.log(`'${key}' in roots`);
+				// console.log(`'${key}' in roots`);
 				return data.img.roots[key];
 			}
 		}
 	}
 
 	// Lastly, fallback to the config defaults
-	console.log('Defaulting to ' + config.imageFormats.defaults[key]);
+	// console.log('Defaulting to ' + config.imageFormats.defaults[key]);
 	return config.imageFormats.defaults[key];
 };

@@ -1,39 +1,79 @@
 <script lang='ts'>
-	import type { ButtonOption, GroupData, ImageOption, TreeArtPage } from '$lib/conf/TreeArtConfig';
-	import { TreeArtConfig } from '$lib/conf/TreeArtConfig';
+	import type {
+		BaseData,
+		ButtonData,
+		ButtonOption,
+		GroupData,
+		ImageOption,
+		TreeArtPage
+	} from '$lib/conf/TreeArtConfig';
 	import { onMount } from 'svelte';
-	import { getImage } from '../interpreter';
+	import {
+		getImage,
+		getPlaceholderValue,
+		getValue,
+		meetsPrereqs,
+		requirementsNotMet,
+		selectItem,
+		unset
+	} from '../interpreter';
+	import type { OptionImageData } from '../conf/TreeArtConfig';
 
-	export let config: TreeArtConfig;
 	export let data: TreeArtPage;
 
 	let loading = true;
 	let options: (ImageOption | ButtonOption)[];
-	let groups: any = {};
 	let numOptions: any = {};
 
 	$: {
 		options = <(ImageOption | ButtonOption)[]>data?.options;
 
 		for (let opt: (ImageOption | ButtonOption) of options) {
+			let selected: BaseData | string = getValue(opt.id);
+			let selectedValid = true;
+			if (typeof selected === 'string') continue;
+			if (!meetsPrereqs(selected?.prereq))
+				selectedValid = false;
+
 			let key = 'images' in opt ? 'images' : ('buttons' in opt ? 'buttons' : 'items');
 			if (key in opt) {
-				numOptions[opt.id] = opt[key].length;
-				for (let img: (ImageData | GroupData) of opt[key]) {
-					if ('group' in img) {
-						numOptions[opt.id] += img.group.images.length - 1;
+				numOptions[opt.id] = 0;
+				for (let img: (OptionImageData | ButtonData | GroupData) of opt[key]) {
+					if (!meetsPrereqs(img?.prereq)) continue;
+
+					if ((!selected && 'default' in img && img.default) || (!selectedValid && selected.key == img.key)) {
+						selectItem(opt.id, img);
+						selected = img;
+						selectedValid = true;
 					}
+
+					if ('group' in img) {
+						for (let data: OptionImageData of img.group.images) {
+							if (!meetsPrereqs(data?.prereq)) continue;
+							numOptions[opt.id]++;
+							if ((!selected && 'default' in data && data.default) || (!selectedValid && selected.key == data.key)) {
+								selectItem(opt.id, data);
+								selected = data;
+								selectedValid = true;
+							}
+						}
+					} else
+						numOptions[opt.id]++;
 				}
 			}
+
+			if (!selectedValid) {
+				unset(opt.id);
+			}
 		}
-
-		console.log(numOptions);
-
 	}
 
-	onMount(() => {
-		loading = false;
-	});
+	onMount(() => loading = false);
+
+	const select = (optId, value) => {
+		selectItem(optId, value);
+		options = [...options];
+	};
 
 </script>
 
@@ -51,67 +91,127 @@
 		{/if}
 		<div id='options'>
 			{#each options as opt}
-				<div class='option'>
-					<div class='optionLabel'>{@html opt.name}</div>
+				{#if !opt.prereq || meetsPrereqs(opt.prereq)}
+					<div class='option'>
+						<div class='optionLabel'>{@html opt.name}</div>
 
-					<!-- ImageOption -->
-					{#if opt.images}
-						<div class='imgSelect'>
-							{#each opt.images as img}
-								<!-- Groups! -->
-								{#if img.group}
-									<div id='{img.group.id}' class='grouping flex-2'>
-										<div class='flex-1'>{@html img.group.header}</div>
-										{#each img.group.images as gImg}
-											<div class='imgContainer flex-{Math.min(4, img.group.images.length)}'>
-												<div class='optText'>{@html gImg.displayText}</div>
+
+						<!-- ImageOption -->
+						{#if opt.images}
+							<div class='imgSelect' class:error={$requirementsNotMet.includes(opt.id)}>
+								{#each opt.images as img}
+									{#if !img.prereq || meetsPrereqs(img.prereq)}
+										<!-- Groups! -->
+										{#if img.group}
+											<div id='{img.group.id}' class='grouping flex-2'>
+												<div class='flex-1'>{@html img.group.header}</div>
+												{#each img.group.images as gImg}
+													{#if !gImg.prereq || meetsPrereqs(gImg.prereq)}
+														<div class='imgContainer flex-{Math.min(4, img.group.images.length)}'
+																 on:click={select(opt.id, gImg)}
+																 class:selected={getValue(opt.id) == gImg}>
+															<div class='optText'>
+																{#if gImg.placeholder}
+																	{#if getPlaceholderValue(gImg) == '???'}
+																		{@html gImg.placeholder}
+																	{:else}
+																		{@html gImg.displayText.replace("%value%", getPlaceholderValue(gImg))}
+																	{/if}
+																{:else}
+																	{@html gImg.displayText}
+																{/if}
+															</div>
+															<div class='imgBox'>
+																<img class='imgOption' src='{gImg.displayImage}' alt='{gImg.key}' />
+															</div>
+														</div>
+													{/if}
+												{/each}
+											</div>
+										{:else}
+											<div class='imgContainer flex-{Math.min((opt.flexCount ? opt.flexCount : 4), numOptions[opt.id])}'
+													 on:click={select(opt.id, img)}
+													 class:selected={getValue(opt.id) == img}>
+												<div class='optText'>
+													{#if img.placeholder}
+														{#if getPlaceholderValue(img) == '???'}
+															{@html img.placeholder}
+														{:else}
+															{@html img.displayText.replace("%value%", getPlaceholderValue(img))}
+														{/if}
+													{:else}
+														{@html img.displayText.replace("%value%", getPlaceholderValue(img))}
+													{/if}
+												</div>
 												<div class='imgBox'>
-													<img class='imgOption' src='{gImg.displayImage}' alt='{gImg.key}' />
+													<img class='imgOption'
+															 src='{img.displayImage ? img.displayImage : getImage(img)}'
+															 style='background-image: {img.background}'
+															 alt='{img.key}' />
 												</div>
 											</div>
-										{/each}
-									</div>
-								{:else}
-									<div class='imgContainer flex-{Math.min(4, numOptions[opt.id])}'
-											 class:selected={img.default}>
-										<div class='optText'>{@html img.displayText}</div>
-										<div class='imgBox'>
-											<img class='imgOption'
-													 src='{img.displayImage ? img.displayImage : getImage(img)}'
-													 style='background: {img.background}'
-													 alt='{img.key}' />
+										{/if}
+									{/if}
+								{/each}
+							</div>
+							<!-- ButtonOption -->
+						{:else if opt.buttons}
+							<div class='imgSelect' class:error={$requirementsNotMet.includes(opt.id)}>
+								{#each opt.buttons as button}
+									{#if !button.prereq || meetsPrereqs(button.prereq)}
+										<div
+											class='imgContainer flex-{Math.min((opt.flexCount ? opt.flexCount : 4), numOptions[opt.id])} textButton'
+											on:click={select(opt.id, button)}
+											class:selected={getValue(opt.id) == button}>
+											<div class='optText'>
+												{#if button.placeholder}
+													{#if getPlaceholderValue(button) == '???'}
+														{@html button.placeholder}
+													{:else}
+														{@html button.displayText.replace("%value%", getPlaceholderValue(button))}
+													{/if}
+												{:else}
+													{@html button.displayText.replace("%value%", getPlaceholderValue(button))}
+												{/if}
+											</div>
 										</div>
-									</div>
-								{/if}
-							{/each}
-						</div>
-						<!-- ButtonOption -->
-					{:else if opt.buttons}
-						<div class='imgSelect'>
-							{#each opt.buttons as button}
-								<div class='imgContainer flex-{Math.min(4, numOptions[opt.id])} textButton'
-										 class:selected={button.default}>
-									<div class='optText'>{button.displayText}</div>
-								</div>
-							{/each}
-						</div>
-						<!-- ItemOption -->
-					{:else if opt.items}
-						<select>
-							<option value='-1'></option>
-							{#each opt.items as item, i}
-								<option value='{item}' selected='{item.default}'>{item.displayText}</option>
-							{/each}
-						</select>
-						<!-- Text :D -->
-					{:else if opt.type == 'text'}
-						<input type='text' placeholder='{opt.placeholder}' />
-					{:else if opt.type == 'date'}
-						<input type='date' />
-					{:else if opt.type == 'textLong'}
-						<textarea placeholder='{opt.placeholder}' class='{opt.id}'></textarea>
-					{/if}
-				</div>
+									{/if}
+								{/each}
+							</div>
+							<!-- ItemOption -->
+						{:else if opt.items && (!opt.prereq || meetsPrereqs(opt.prereq))}
+							<select on:change={(e) => select(opt.id, opt.items[e.target.selectedIndex - 1])}
+											class:error={$requirementsNotMet.includes(opt.id)}>
+								<option value='-1'></option>
+								{#each opt.items as item, i}
+									<option value='{i}' selected='{item.default}'>{item.displayText}</option>
+								{/each}
+							</select>
+							<!-- Text :D -->
+						{:else if opt.type == 'text' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+							<input type='text' placeholder='{opt.placeholder}'
+										 class:error={$requirementsNotMet.includes(opt.id)}
+										 on:change={(e) => select(opt.id, e.target.value)}
+										 on:keypress={(e) => select(opt.id, e.target.value)}
+										 on:paste={(e) => select(opt.id, e.target.value)}
+										 on:input={(e) => select(opt.id, e.target.value)}
+							/>
+						{:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+							<input type='date'
+										 class:error={$requirementsNotMet.includes(opt.id)}
+										 on:change={(e) => select(opt.id, e.target.value)} />
+						{:else if opt.type == 'textLong' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+							<textarea placeholder='{opt.placeholder}' class='{opt.id}'
+												class:error={$requirementsNotMet.includes(opt.id)}
+												on:change={(e) => select(opt.id, e.target.value)}
+												on:keypress={(e) => select(opt.id, e.target.value)}
+												on:paste={(e) => select(opt.id, e.target.value)}
+												on:input={(e) => select(opt.id, e.target.value)}>
+							</textarea>
+						{/if}
+						<!-- TODO Figure out stuff for multiselect -->
+					</div>
+				{/if}
 			{/each}
 		</div>
 	{/if}
@@ -202,5 +302,9 @@
     textarea {
         width: 50%;
         resize: none;
+    }
+
+    .error {
+        border: 2px solid red;
     }
 </style>
