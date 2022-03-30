@@ -5,33 +5,123 @@
 		ButtonOption,
 		GroupData,
 		ImageOption,
+		MultiSelectData,
 		TreeArtPage
 	} from '$lib/conf/TreeArtConfig';
 	import { onMount } from 'svelte';
 	import {
+		deleteMulti,
 		getImage,
-		getPlaceholderValue,
+		getQualifiedCost,
 		getValue,
 		meetsPrereqs,
+		multiSelectEntries,
 		requirementsNotMet,
 		selectItem,
+		selectMultiSelect,
 		unset
 	} from '../interpreter';
 	import type { OptionImageData } from '../conf/TreeArtConfig';
 
-	export let data: TreeArtPage;
+	export let data: TreeArtPage = undefined;
 
 	let loading = true;
 	let options: (ImageOption | ButtonOption)[];
 	let numOptions: any = {};
+	let formattedEntries = {};
 
-	$: {
-		options = <(ImageOption | ButtonOption)[]>data?.options;
+	onMount(() => loading = false);
+
+	export const destroyMulti = () => {
+		formattedEntries = {};
+		if (!data.multiselect) return;
+		for (let key of data.multiselect.keys) {
+			unset(key);
+		}
+	};
+
+	const select = (optId, value) => {
+		selectItem(optId, value);
+		options = [...options];
+	};
+
+	const addMultiSelect = (multi: MultiSelectData) => {
+		let data = { id: {} };
+		for (let key of multi.keys) {
+			data[key] = getValue(key);
+			unset(key);
+		}
+		selectMultiSelect(multi.id, data);
+		console.log(data);
+		updateMulti(multi);
+		options = [...options];
+	};
+
+	const updateMulti = (multi: MultiSelectData) => {
+		if (!multi) return;
+
+		let multData = $multiSelectEntries[multi.id];
+		if (!multData) return;
+
+		let rawData = {};
+		let format = multi.format;
+		let matcherFormat = multi.format.replace(`%${multi.quantifier}%`, '');
+
+		let purge = [];
+		let entryData = { id: {}, data: [], costs: [] };
+		for (let multDatum of multData) {
+			let matcher = matcherFormat;
+			let quantifier = 0;
+			for (let key of multi.keys) {
+				let dataValue = multDatum[key];
+				matcher = matcher.replace(`%${key}%`,
+					dataValue.placeholder || dataValue.displayText || dataValue.key || dataValue);
+
+				if (key == multi.quantifier)
+					quantifier = parseInt(dataValue);
+			}
+
+			if (!rawData[matcher])
+				rawData[matcher] = multDatum;
+			else {
+				purge.push(multDatum);
+				rawData[matcher][multi.quantifier] += quantifier;
+			}
+		}
+
+		purge.forEach(dat => deleteMulti(multi.id, dat));
+
+		let formula = multi.formula;
+		for (let multData of $multiSelectEntries[multi.id]) {
+			let formatted = format;
+			console.log(multData);
+			let total = 0;
+			for (let key of multi.keys) {
+				let dataValue = multData[key];
+				formatted = formatted.replace(`%${key}%`,
+					dataValue.placeholder || dataValue.displayText || dataValue.key || dataValue);
+				let cost = dataValue.cost || getQualifiedCost(dataValue, multData);
+				console.log(cost);
+				if (cost != -1)
+					total += cost;
+			}
+
+			total *= multData[multi.quantifier] || 1;
+			entryData.costs.push(total);
+			entryData.data.push(formatted);
+		}
+
+		formattedEntries[multi.id] = entryData;
+		formattedEntries = { ...formattedEntries };
+	};
+
+	$: if (data) {
+		options = <(ImageOption | ButtonOption)[]>data.options;
 
 		for (let opt: (ImageOption | ButtonOption) of options) {
 			let selected: BaseData | string = getValue(opt.id);
 			let selectedValid = true;
-			if (typeof selected === 'string') continue;
+			if (typeof selected === 'string' || typeof selected === 'number') continue;
 			if (!meetsPrereqs(selected?.prereq))
 				selectedValid = false;
 
@@ -60,20 +150,16 @@
 					} else
 						numOptions[opt.id]++;
 				}
-			}
+			} else if (opt.type === 'number' && !selected)
+				selectItem(opt.id, 1);
 
 			if (!selectedValid) {
 				unset(opt.id);
 			}
 		}
+
+		updateMulti(data.multiselect);
 	}
-
-	onMount(() => loading = false);
-
-	const select = (optId, value) => {
-		selectItem(optId, value);
-		options = [...options];
-	};
 
 </script>
 
@@ -112,10 +198,10 @@
 																 class:selected={getValue(opt.id) == gImg}>
 															<div class='optText'>
 																{#if gImg.placeholder}
-																	{#if getPlaceholderValue(gImg) == '???'}
+																	{#if getQualifiedCost(gImg) == -1}
 																		{@html gImg.placeholder}
 																	{:else}
-																		{@html gImg.displayText.replace("%value%", getPlaceholderValue(gImg))}
+																		{@html gImg.displayText.replace("%value%", '$' + getQualifiedCost(gImg).toFixed(2))}
 																	{/if}
 																{:else}
 																	{@html gImg.displayText}
@@ -134,13 +220,13 @@
 													 class:selected={getValue(opt.id) == img}>
 												<div class='optText'>
 													{#if img.placeholder}
-														{#if getPlaceholderValue(img) == '???'}
+														{#if getQualifiedCost(img) == -1}
 															{@html img.placeholder}
 														{:else}
-															{@html img.displayText.replace("%value%", getPlaceholderValue(img))}
+															{@html img.displayText.replace("%value%", '$' + getQualifiedCost(img).toFixed(2))}
 														{/if}
 													{:else}
-														{@html img.displayText.replace("%value%", getPlaceholderValue(img))}
+														{@html img.displayText.replace("%value%", '$' + getQualifiedCost(img).toFixed(2))}
 													{/if}
 												</div>
 												<div class='imgBox'>
@@ -165,13 +251,13 @@
 											class:selected={getValue(opt.id) == button}>
 											<div class='optText'>
 												{#if button.placeholder}
-													{#if getPlaceholderValue(button) == '???'}
+													{#if getQualifiedCost(button) == -1}
 														{@html button.placeholder}
 													{:else}
-														{@html button.displayText.replace("%value%", getPlaceholderValue(button))}
+														{@html button.displayText.replace("%value%", '$' + getQualifiedCost(button).toFixed(2))}
 													{/if}
 												{:else}
-													{@html button.displayText.replace("%value%", getPlaceholderValue(button))}
+													{@html button.displayText.replace("%value%", '$' + getQualifiedCost(button).toFixed(2))}
 												{/if}
 											</div>
 										</div>
@@ -196,6 +282,14 @@
 										 on:paste={(e) => select(opt.id, e.target.value)}
 										 on:input={(e) => select(opt.id, e.target.value)}
 							/>
+						{:else if opt.type == 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+							<input type='number' value='1' min='1' placeholder='{opt.placeholder}'
+										 class:error={$requirementsNotMet.includes(opt.id)}
+										 on:change={(e) => select(opt.id, e.target.value)}
+										 on:keypress={(e) => select(opt.id, e.target.value)}
+										 on:paste={(e) => select(opt.id, e.target.value)}
+										 on:input={(e) => select(opt.id, e.target.value)}
+							/>
 						{:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
 							<input type='date'
 										 class:error={$requirementsNotMet.includes(opt.id)}
@@ -209,12 +303,23 @@
 												on:input={(e) => select(opt.id, e.target.value)}>
 							</textarea>
 						{/if}
-						<!-- TODO Figure out stuff for multiselect -->
 					</div>
 				{/if}
 			{/each}
 		</div>
 	{/if}
+	{#if data.multiselect}
+		<button class='button add' on:click={addMultiSelect(data.multiselect)}><p>Add Item</p></button>
+	{/if}
+	{#each Object.keys(formattedEntries) as key (formattedEntries[key].id)}
+		{#each formattedEntries[key].data as entry, i}
+			<div class='multi'>
+				{entry}
+				<div class='summaryPrice'>${formattedEntries[key].costs[i]}</div>
+				<div class='delete material-icons' title='Delete'>delete</div>
+			</div>
+		{/each}
+	{/each}
 </container>
 
 <style>
@@ -306,5 +411,40 @@
 
     .error {
         border: 2px solid red;
+    }
+
+    .add {
+        float: right;
+        margin-right: 20px;
+    }
+
+    .multi {
+        display: inline-flex;
+        background-color: #999;
+        border-left: 4px solid #77a34f;
+        margin: 3px;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .multi:hover .delete {
+        opacity: 1;
+    }
+
+    .delete {
+        display: inline-block;
+        opacity: 0;
+        transition: 0.3s opacity;
+    }
+
+    .delete:hover {
+        cursor: pointer;
+    }
+
+    .summaryPrice {
+        float: right;
+        margin: 0 0.4em 0 1.25em;
+        color: #555;
     }
 </style>

@@ -1,4 +1,11 @@
-import type { BaseData, ButtonData, OptionImageData, Prereqs, TreeArtPage } from './conf/TreeArtConfig';
+import type {
+	BaseData,
+	ButtonData,
+	MultiSelectData,
+	OptionImageData,
+	Prereqs,
+	TreeArtPage
+} from './conf/TreeArtConfig';
 import { config } from './conf/config';
 import { writable } from 'svelte/store';
 
@@ -8,6 +15,8 @@ let _requirementsNotMet = [];
 
 let _selections = {};
 export let selections = writable(_selections);
+let _multiSelectEntries = {};
+export let multiSelectEntries = writable(_multiSelectEntries);
 
 export const selectItem = (optId: string, value: any) => {
 	// console.log(`New value for ${optId}: `, value);
@@ -23,23 +32,39 @@ export const unset = (optId: string) => {
 	selections.set(_selections);
 };
 
-export const getValue = (optId: string): OptionImageData | ButtonData | string => {
-	return _selections[optId];
+export const getValue = (optId: string, sourceData?: any): OptionImageData | ButtonData | string => {
+	return sourceData && sourceData[optId] ? sourceData[optId] : _selections[optId];
 };
 
-export const getPlaceholderValue = (option: ButtonData) => {
-	let value = '???';
+export const selectMultiSelect = (optId: string, value: any) => {
+	if (!_multiSelectEntries[optId])
+		_multiSelectEntries[optId] = [];
+	_multiSelectEntries[optId].push(value);
+	multiSelectEntries.set(_multiSelectEntries);
+};
+
+export const getMultiSelect = (optId: string) => {
+	return _multiSelectEntries[optId];
+};
+
+export const deleteMulti = (optId: string, multi: MultiSelectData) => {
+	_multiSelectEntries[optId] = _multiSelectEntries[optId].filter(data => data != multi);
+	multiSelectEntries.set(_multiSelectEntries);
+};
+
+export const getQualifiedCost = (option: BaseData, sourceData?: any): number => {
+	let value = -1;
 	if (!option.values)
 		return value;
 
 	for (let check of option.values) {
-		let targetValue = getValue(check.option);
+		let targetValue = getValue(check.option, sourceData);
 		// console.log('Target value: ' + targetValue);
 		if (!targetValue) continue;
 
 		if ((typeof targetValue == 'string' && check.value.includes(targetValue))
 			|| check.value.includes(((<BaseData>targetValue).key))) {
-			value = '$' + check.cost.toFixed(2);
+			value = check.cost;
 			break;
 		}
 	}

@@ -1,11 +1,14 @@
 <script>
 	import { config } from '$lib/conf/config';
 	import { requirementsMet } from '../interpreter';
+	import { createEventDispatcher } from 'svelte';
 
-	export let pageCount = 0;
+	export const pageCount = 0;
 	export let currentPage = 0;
 	export let nextPage = -1;
 	export let previousPage = -1;
+
+	const dispatch = createEventDispatcher();
 
 	let cost = 0;
 	let costFormatted;
@@ -17,7 +20,7 @@
 	const gotoNextPage = () => {
 		// TODO Check that required fields have been checked
 
-		for (let i = currentPage + 1; i < config.pages.length; i++) {
+		for (let i = currentPage + 1; i < pageCount; i++) {
 			let next = config.pages[i];
 			console.log('n ' + i + ' ' + next?.meetsRequirements());
 			if (next?.meetsRequirements()) {
@@ -37,6 +40,13 @@
 		error = '';
 		if (nextPage !== -1)
 			currentPage = nextPage;
+		dispatch('change-page', currentPage);
+	};
+
+	const gotoPreviousPage = () => {
+		console.log('Going back.');
+		currentPage = previousPage;
+		dispatch('change-page', currentPage);
 	};
 </script>
 
@@ -64,6 +74,7 @@
 	</div>
 	<div id='configuration'>
 		<slot />
+		<div class='clear' />
 		<div id='pageFooter'>
 			{#if error !== ""}
 				<div id='error'>{error}</div>
@@ -75,7 +86,7 @@
 				</div>
 			{/if}
 			{#if previousPage != -1}
-				<button id='back' on:click={() => currentPage = previousPage}><p>&laquo; Back</p></button>
+				<button id='back' on:click={gotoPreviousPage}><p>&laquo; Back</p></button>
 			{/if}
 			{#if nextPage != -1}
 				<button id='next' on:click={gotoNextPage}><p>Next &raquo;</p></button>
@@ -237,34 +248,8 @@
         margin: 20px;
     }
 
-    button {
-        float: right;
-        border: 2px solid #77a34f;
-        border-radius: 8px;
-        padding: 10px;
-        font-family: Lato;
-        font-size: 20px;
-        margin: 5px 0;
-        user-select: none;
-    }
-
-    button:hover, .item:hover {
-        background-color: rgba(0, 0, 0, 0.15) !important;
-    }
-
-    button:active, .item:active {
-        background-color: rgba(0, 0, 0, 0.25) !important;
-    }
-
-    button > p {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        margin: 10px 0;
-        user-select: none;
-    }
-
     #next {
+        float: right;
         margin-left: 20px;
     }
 

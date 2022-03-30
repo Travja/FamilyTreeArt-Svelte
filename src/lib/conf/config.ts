@@ -1508,6 +1508,7 @@ config.addPage(new TreeArtPage({
 	intro: '<b>If you are outside the CONTINENTAL U.S. please select the Digital Copy option. Shipping costs are too high to ship prints internationally.</b><br/>' +
 		'With the digital JPG file you will be able to have your tree printed locally as many times as you want.<br/>' +
 		'<br/><b>Learn more about each print type <a target=\'_blank\' href=\'http://customfamilytreeart.com/prints\'>here</a></b><br/>',
+	multiselect: true,
 	// intro: "Please select at least one.",
 	options: [
 		{
@@ -1515,7 +1516,6 @@ config.addPage(new TreeArtPage({
 			id: 'printType',
 			type: 'image',
 			required: true,
-			// multiselect: true,
 			images: [
 				{
 					displayText: '<b>Standard Print</b>',
@@ -2123,13 +2123,17 @@ config.addPage(new TreeArtPage({
 	//Page 14
 	title: 'Do you want any additional prints?',
 	intro: '',
-	multiselect: true,
-	format: '%addQty%x %addPrintType% - %addPrintSize%',
-	formula: '%addQty% * %total%',
 	prereq: {
 		option: 'printType',
 		// value: ["print", "both"]
 		value: ['standard', 'm&t', 'canvas']
+	},
+	multiselect: {
+		id: 'additionalPrints',
+		keys: ['addPrintType', 'addPrintSize', 'addQty'],
+		quantifier: 'addQty',
+		format: '%addQty%x %addPrintType% - %addPrintSize%',
+		formula: '%addQty% * %total%'
 	},
 	options: [
 		{
@@ -2169,16 +2173,17 @@ config.addPage(new TreeArtPage({
 				{
 					displayText: '&nbsp; 8x10 &nbsp;(%value%)',
 					placeholder: '8x10',
+					key: '8x10',
 					values: [
 						{
 							option: 'addPrintType',
 							value: ['standard'], //Std
-							cost: 0
+							cost: 1
 						},
 						{
 							option: 'addPrintType',
 							value: ['m&t'], //M&T
-							cost: 0
+							cost: 1
 						},
 						{
 							option: 'addPrintType',
@@ -2190,6 +2195,7 @@ config.addPage(new TreeArtPage({
 				{
 					displayText: '11x14 (%value%)',
 					placeholder: '11x14',
+					key: '11x14',
 					values: [
 						{
 							option: 'addPrintType',
@@ -2211,6 +2217,7 @@ config.addPage(new TreeArtPage({
 				{
 					displayText: '16x20 (%value%)',
 					placeholder: '16x20',
+					key: '16x20',
 					values: [
 						{
 							option: 'addPrintType',
@@ -2232,6 +2239,7 @@ config.addPage(new TreeArtPage({
 				{
 					displayText: '20x24 (%value%)',
 					placeholder: '20x24',
+					key: '20x24',
 					values: [
 						{
 							option: 'addPrintType',
@@ -2253,6 +2261,7 @@ config.addPage(new TreeArtPage({
 				{
 					displayText: '24x30 (%value%)',
 					placeholder: '24x30',
+					key: '24x30',
 					values: [
 						{
 							option: 'addPrintType',

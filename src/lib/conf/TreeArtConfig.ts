@@ -19,7 +19,6 @@ export class TreeArtConfig {
 	};
 
 	builderFooter: string = '';
-
 	pages: TreeArtPage[] = [];
 
 	constructor(data: TreeArtConfigData = {}) {
@@ -60,7 +59,8 @@ export class TreeArtPage {
 	footer: string;
 	prereq: Prereqs | undefined;
 	options: (ImageOption | ButtonOption | ItemOption | TextOption)[];
-	finalPage: boolean = false;
+	finalPage = false;
+	multiselect: MultiSelectData | undefined = undefined;
 
 	constructor(init: TreeArtPageData) {
 		this.title = init.title;
@@ -68,6 +68,7 @@ export class TreeArtPage {
 		this.footer = init.footer;
 		this.prereq = init.prereq;
 		this.options = init.options;
+		this.multiselect = init.multiselect;
 		if (init.finalPage) this.finalPage = init.finalPage;
 	}
 
@@ -83,7 +84,8 @@ export interface TreeArtPageData {
 	footer?: string,
 	prereq?: Prereqs,
 	options: (ImageOption | ButtonOption | ItemOption | TextOption)[],
-	finalPage?: boolean
+	finalPage?: boolean,
+	multiselect?: MultiSelectData
 }
 
 export interface Prereqs {
@@ -94,6 +96,13 @@ export interface Prereqs {
 	or?: Prereqs
 }
 
+export interface MultiSelectData {
+	id: string,
+	keys: string[],
+	quantifier: string,
+	format: string,
+	formula: string
+}
 
 export interface TreeArtConfigData {
 	imageFormats?: ImageFormats,
