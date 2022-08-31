@@ -1,6 +1,7 @@
 <script>
 	import { config } from '$lib/conf/config';
-	import { requirementsMet } from '../interpreter';
+	import { canv, requirementsMet, selections, customSvg, composite } from '$lib/interpreter';
+	import { svgStyle } from '$lib/conf/fonts';
 	import { createEventDispatcher } from 'svelte';
 
 	export const pageCount = 0;
@@ -18,8 +19,6 @@
 	$: costFormatted = cost.toFixed(2);
 
 	const gotoNextPage = () => {
-		// TODO Check that required fields have been checked
-
 		for (let i = currentPage + 1; i < pageCount; i++) {
 			let next = config.pages[i];
 			console.log('n ' + i + ' ' + next?.meetsRequirements());
@@ -32,7 +31,6 @@
 		}
 
 		if (!requirementsMet(config.pages[currentPage])) {
-			// TODO Rerender with bounding borders around items
 			error = 'One or more required items do not have a selection.';
 			return;
 		}
@@ -53,23 +51,43 @@
 <div id='contentWrapper'>
 	<div id='item-wrapper'>
 		<div id='item-builder'>
-			<div class='resize' id='familyWrapper'>
-				<div class='resize' id='familyText'></div>
-				<div id='lineTwo'></div>
-			</div>
-			<div class='resize' id='quoteText'></div>
-			<svg id='svgBox' height='100%' width='100%' viewBox='0 0 100 100' preserveAspectRatio='none'>
-				<path id='curve' d='M0,71.5
-                  C0,71.5 25,74 50,72 S
-                  85,71 100,72.5'></path>
+			<canvas id='builder-canvas' width='1280' height='1638' bind:this={$canv}>
+			</canvas>
+			<svg id='svgBox' height='100%' width='100%' viewBox='0 0 100 100' preserveAspectRatio='none'
+					 xmlns='http://www.w3.org/2000/svg'
+					 bind:this={$customSvg}>
+				<defs>{@html svgStyle}</defs>
+
+				<foreignObject width='100%' height='100%'>
+					<div xmlns='http://www.w3.org/1999/xhtml'
+							 class='resize left {$composite?.color?.toLowerCase()}'
+							 class:shift={$composite?.show == 'roots'}
+							 id='familyWrapper'>
+						<div class='resize' id='familyText'>Family Name</div>
+						<div id='lineTwo'>Est. 2022</div>
+					</div>
+					<div xmlns='http://www.w3.org/1999/xhtml'
+							 class='resize right {$composite?.color?.toLowerCase()}'
+							 class:shift={$composite?.show == 'roots'}
+							 id='quoteText'>Quote Text
+					</div>
+				</foreignObject>
+
+				<!-- Path should be shifted if we are not showing roots -->
+				<path id='curve' class:shift={$composite?.show != 'roots'} d='M0,71.5
+	C0,71.5 25,74 50,72 S
+	85,71 100,72.5' fill='transparent'></path>
 				<text x='50%'>
-					<textPath class='resize resizeGround' id='groundText' xlink:href='#curve'></textPath>
+					<textPath class='resize resizeGround {$composite?.color?.toLowerCase()}' id='groundText' href='#curve'
+										font-family='{$selections.groundFont ? $selections.groundFont.font : `MType`}, sans-serif'>
+						{$selections.ground ? $selections.ground : 'asdfasdfas'}
+					</textPath>
 				</text>
 			</svg>
 		</div>
 		<div class='clear'></div>
 		<div id='item-footer'>This is only a representation to help you select design elements. Your tree, like your family,
-			will be unique!
+			will be unique! {$composite?.show}
 		</div>
 	</div>
 	<div id='configuration'>
@@ -138,6 +156,14 @@
         display: inline-block;
     }
 
+    #builder-canvas {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
     #configuration {
         position: relative;
         display: block;
@@ -165,7 +191,7 @@
 
     #familyWrapper, #quoteText {
         font-family: MType, serif;
-        font-size: 1.3vw;
+        font-size: 0.21rem;
         position: absolute;
         word-wrap: normal;
         height: 10%;
@@ -177,6 +203,10 @@
 
     #lineTwo {
         font-size: 0.87em;
+    }
+
+    #familyWrapper, #quoteText, #groundText {
+        display: none;
     }
 
     @media screen and (max-width: 900px) {
@@ -213,7 +243,6 @@
         color: black;
         font-size: 0.2em;
         position: absolute;
-        top: 0.5%;
         left: 0;
         z-index: 100;
     }
@@ -222,19 +251,13 @@
     /*    top: 19%;*/
     /*}*/
 
-    path {
-        fill: transparent;
-        /*stroke: rgb(255, 0, 0);*/
-        /*stroke-width: 0.1;*/
-    }
-
     text {
         text-anchor: middle;
         /*fill: #FF9800;*/
     }
 
     #groundText {
-        font-family: "MType", serif;
+        /*font-family: "MType", serif;*/
     }
 
     textPath {

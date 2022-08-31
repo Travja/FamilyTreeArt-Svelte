@@ -5,11 +5,12 @@ export class TreeArtConfig {
 		tree: '/imgs/Tree Layers/%type% %gen% %couple% %style1% TREE %color%.png',
 		root: '/imgs/Tree Layers/ROOTS %gen% %type% %color%.png',
 		leaf: '/imgs/Tree Layers/%type% %gen% %couple% %style1% LEAVES%chalk%.png',
+		background_layer: 1,
 		tree_layer: 2,
 		root_layer: 3,
 		leaf_layer: 4,
 		defaults: {
-			type: 'DESCENDANT',
+			type: TreeType.DESCENDANT,
 			gen: '3 Gen',
 			couple: '',
 			style1: 'Style 1',
@@ -163,7 +164,8 @@ export interface BaseData {
 	default?: boolean,
 	img?: ImageFormatData,
 	placeholder?: string,
-	values?: ValueInformation[]
+	values?: ValueInformation[],
+	reset?: string[]
 }
 
 export interface OptionImageData extends BaseData {
@@ -188,6 +190,7 @@ export interface ImageFormatData {
 	chalk?: string,
 	gen?: string,
 	style1?: string,
+	background?: string,
 	roots?: {
 		type?: string,
 		gen?: string,
@@ -219,4 +222,10 @@ export interface ValueInformation {
 	option: string,
 	value: any[],
 	cost: number
+}
+
+export interface ShopPage {
+	destroyMulti(): void,
+
+	data: TreeArtPage
 }

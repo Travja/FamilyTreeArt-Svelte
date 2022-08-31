@@ -34,7 +34,7 @@
 
 	export const destroyMulti = () => {
 		formattedEntries = {};
-		if (!data.multiselect) return;
+		if (!data.multiselect || !data.multiselect.keys) return;
 		for (let key of data.multiselect.keys) {
 			unset(key);
 		}
@@ -208,7 +208,7 @@
 																{/if}
 															</div>
 															<div class='imgBox'>
-																<img class='imgOption' src='{gImg.displayImage}' alt='{gImg.key}' />
+																<img class='imgOption' src='{gImg.displayImage ? gImg.displayImage : getImage(gImg)}' alt='{gImg.key}' />
 															</div>
 														</div>
 													{/if}

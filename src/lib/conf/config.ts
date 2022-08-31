@@ -17,16 +17,13 @@ config.addPage(new TreeArtPage({
 				{
 					displayText: '<h3>Ancestors</h3><br/>The Trunk is a Couple or Individual, and the Branches are their Ancestors',
 					displayImage: '/imgs/Option Examples/ANCESTRY Example.jpg',
-					img: { show: 'reset' },
-					reset: ['roots', 'generations'],
-					addClass: [{
-						id: ['svgBox'],
-						value: 'shifted'
-					}],
-					set: {
-						id: 'groundText',
-						value: ''
+					img: {
+						type: TreeType.ANCESTRY,
+						default: {
+							couple: 'Couple'
+						}
 					},
+					reset: ['roots', 'generations'],
 					key: 'ancestry'
 				},
 				{
@@ -34,10 +31,10 @@ config.addPage(new TreeArtPage({
 					displayImage: '/imgs/Option Examples/DESCENDANT Example.jpg',
 					key: 'descendant',
 					img: {
-						type: TreeType.DESCENDANT
-						// couple: 'reset',
-						// show: 'reset'
-					}
+						type: TreeType.DESCENDANT,
+						couple: 'reset'
+					},
+					reset: ['roots', 'generations']
 					// reset: ['roots', 'ancType', 'generations'],
 					// resetOption: ['couple'],
 					// addClass: [{
@@ -59,8 +56,8 @@ config.addPage(new TreeArtPage({
 								displayImage: '/imgs/Option Examples/DESCENDANT TREE with 2 Gen ANCESTOR ROOTS.jpg',
 								key: 'descendant_roots',
 								img: {
-									type: TreeType.DESCENDANT
-									// couple: 'reset'
+									type: TreeType.DESCENDANT,
+									couple: 'reset'
 								}
 								// reset: ['ancType'],
 								// resetOption: ['couple'],
@@ -70,7 +67,10 @@ config.addPage(new TreeArtPage({
 								displayImage: '/imgs/Option Examples/Ancestry Tree with Descendant Roots.jpg',
 								key: 'ancestry_roots',
 								img: {
-									type: TreeType.ANCESTRY
+									type: TreeType.ANCESTRY,
+									default: {
+										couple: 'Couple'
+									}
 								}
 							}
 						]
@@ -105,9 +105,10 @@ config.addPage(new TreeArtPage({
 						type: TreeType.ANCESTRY,
 						couple: 'Couple',
 						default: {
-							gen: '4 Gen'
+							gen: '3 Gen'
 						}
-					}
+					},
+					reset: ['generations']
 				},
 				{
 					displayText: '<h3>Individual</h3><br/><span>The trunk is an individual' +
@@ -117,7 +118,8 @@ config.addPage(new TreeArtPage({
 					img: {
 						type: TreeType.ANCESTRY,
 						couple: 'Individual'
-					}
+					},
+					reset: ['generations']
 				}
 			]
 		}
@@ -687,7 +689,8 @@ config.addPage(new TreeArtPage({
 						chalk: ' CHALK',
 						roots: {
 							color: 'CHALK'
-						}
+						},
+						background: '/imgs/Backgrounds/Chalk 1.jpg'
 					}
 					// addClass: [
 					// 	{
@@ -731,6 +734,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Sky & Ground',
 					displayImage: '/imgs/Backgrounds/Sky & Ground No Roots.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Sky & Ground No Roots.jpg'
+					},
 					key: 's&g'
 				},
 				{
@@ -744,6 +750,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Sky & Ground',
 					displayImage: '/imgs/Backgrounds/Sky & Ground w Roots.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Sky & Ground w Roots.jpg'
+					},
 					key: 's&g'
 				},
 				{
@@ -757,6 +766,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Sky & Ground 2',
 					displayImage: '/imgs/Backgrounds/Sky & Ground No Roots 2.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Sky & Ground No Roots 2.jpg'
+					},
 					key: 's&g2'
 				},
 				{
@@ -770,6 +782,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Sky & Ground 2',
 					displayImage: '/imgs/Backgrounds/Sky & Ground w Roots 2.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Sky & Ground w Roots 2.jpg'
+					},
 					key: 's&g2'
 				},
 				{
@@ -779,6 +794,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Sky Blue 1',
 					displayImage: '/imgs/Backgrounds/Sky Blue 1.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Sky Blue 1.jpg'
+					},
 					key: 'sky_blue 1'
 				},
 				{
@@ -788,6 +806,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Sky Blue 2',
 					displayImage: '/imgs/Backgrounds/Sky Blue 2.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Sky Blue 2.jpg'
+					},
 					key: 'sky_blue 2'
 				},
 				{
@@ -797,6 +818,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 1',
 					displayImage: '/imgs/Backgrounds/Tan 1.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 1.jpg'
+					},
 					key: 't1'
 				},
 				{
@@ -806,6 +830,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 2',
 					displayImage: '/imgs/Backgrounds/Tan 2.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 2.jpg'
+					},
 					key: 't2'
 				},
 				{
@@ -815,6 +842,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 3',
 					displayImage: '/imgs/Backgrounds/Tan 3.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 3.jpg'
+					},
 					key: 't3'
 				},
 				{
@@ -824,6 +854,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 4',
 					displayImage: '/imgs/Backgrounds/Tan 4.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 4.jpg'
+					},
 					key: 't4'
 				},
 				{
@@ -833,6 +866,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 5',
 					displayImage: '/imgs/Backgrounds/Tan 5.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 5.jpg'
+					},
 					key: 't5'
 				},
 				{
@@ -842,6 +878,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 6',
 					displayImage: '/imgs/Backgrounds/Tan 6.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 6.jpg'
+					},
 					key: 't6'
 				},
 				{
@@ -851,6 +890,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 7',
 					displayImage: '/imgs/Backgrounds/Tan 7.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 7.jpg'
+					},
 					key: 't7'
 				},
 				{
@@ -860,6 +902,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 8',
 					displayImage: '/imgs/Backgrounds/Tan 8.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 8.jpg'
+					},
 					key: 't8'
 				},
 				{
@@ -869,6 +914,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Tan 9',
 					displayImage: '/imgs/Backgrounds/Tan 9.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Tan 9.jpg'
+					},
 					key: 't9'
 				},
 				{
@@ -878,6 +926,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Kraft Paper',
 					displayImage: '/imgs/Backgrounds/Kraft Paper.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Kraft Paper.jpg'
+					},
 					key: 'Kraft'
 				},
 				{
@@ -892,7 +943,8 @@ config.addPage(new TreeArtPage({
 						color: 'white',
 						roots: {
 							color: 'white'
-						}
+						},
+						background: '/imgs/Backgrounds/Sky & Ground No Roots.jpg'
 					}
 					// addClass: [
 					// 	{
@@ -918,7 +970,8 @@ config.addPage(new TreeArtPage({
 						color: 'white',
 						roots: {
 							color: 'white'
-						}
+						},
+						background: '/imgs/Backgrounds/Sky & Ground No Roots.jpg'
 					}
 					// addClass: [
 					// 	{
@@ -939,6 +992,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Gray',
 					displayImage: '/imgs/Backgrounds/Gray.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Gray.jpg'
+					},
 					key: 'gray'
 					// thumb: ''
 				},
@@ -949,6 +1005,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Green 1',
 					displayImage: '/imgs/Backgrounds/Green 1.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Green 1.jpg'
+					},
 					key: 'green1'
 				},
 				{
@@ -958,6 +1017,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Green 2',
 					displayImage: '/imgs/Backgrounds/Green 2.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Green 2.jpg'
+					},
 					key: 'green2'
 				},
 				{
@@ -967,6 +1029,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Green-Blue',
 					displayImage: '/imgs/Backgrounds/Green-Blue.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Green-Blue.jpg'
+					},
 					key: 'greenblue'
 				},
 				{
@@ -981,7 +1046,8 @@ config.addPage(new TreeArtPage({
 						color: 'white',
 						roots: {
 							color: 'white'
-						}
+						},
+						background: '/imgs/Backgrounds/Sky & Ground No Roots.jpg'
 					}
 					// addClass: [
 					// 	{
@@ -1007,7 +1073,8 @@ config.addPage(new TreeArtPage({
 						color: 'white',
 						roots: {
 							color: 'white'
-						}
+						},
+						background: '/imgs/Backgrounds/Sky & Ground No Roots.jpg'
 					}
 					// addClass: [
 					// 	{
@@ -1028,6 +1095,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Black',
 					displayImage: '/imgs/Backgrounds/Black.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Black.jpg'
+					},
 					key: 'black'
 					// addClass: [
 					// 	{
@@ -1045,8 +1115,12 @@ config.addPage(new TreeArtPage({
 						option: 'style2',
 						value: ['chalk']
 					},
+					default: true,
 					displayText: 'Chalkboard 1',
 					displayImage: '/imgs/Backgrounds/Chalk 1.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Chalk 1.jpg'
+					},
 					key: 'chalk1'
 				},
 				{
@@ -1056,6 +1130,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Chalkboard 2',
 					displayImage: '/imgs/Backgrounds/Chalk 2.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Chalk 2.jpg'
+					},
 					key: 'chalk2'
 				},
 				{
@@ -1065,6 +1142,9 @@ config.addPage(new TreeArtPage({
 					},
 					displayText: 'Chalkboard 3',
 					displayImage: '/imgs/Backgrounds/Chalk 3.jpg',
+					img: {
+						background: '/imgs/Backgrounds/Chalk 3.jpg'
+					},
 					key: 'chalk3'
 				}
 			],
@@ -1441,26 +1521,21 @@ config.addPage(new TreeArtPage({
 			items: [
 				{
 					displayText: 'Monotype Corsiva',
-					setFont: {
-						id: 'groundText',
-						value: 'MType'
-					},
+					font: 'MType',
 					default: true
 				},
 				{
 					displayText: 'Amazone',
-					setFont: {
-						id: 'groundText',
-						value: 'Amaze'
-					}
+					font: 'Amaze'
 				},
 				{
 					displayText: 'Papyrus',
-					setFont: {
-						id: 'groundText',
-						value: 'Papyrus'//,
-						// size: "0.9vw"
-					}
+					font: 'Papyrus'
+					// setFont: {
+					// 	id: 'groundText',
+					// 	value: 'Papyrus'//,
+					// 	// size: "0.9vw"
+					// }
 				}
 			]
 		}

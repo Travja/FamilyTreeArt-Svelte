@@ -1,13 +1,50 @@
 import type {
 	BaseData,
 	ButtonData,
+	ImageFormatData,
 	MultiSelectData,
 	OptionImageData,
 	Prereqs,
 	TreeArtPage
-} from './conf/TreeArtConfig';
-import { config } from './conf/config';
+} from '$lib/conf/TreeArtConfig';
+import { TreeType } from '$lib/conf/TreeArtConfig';
+import { config } from '$lib/conf/config';
+import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
+
+// const svg = `
+// <svg id='svgBox' height='100%' width='100%' viewBox='0 0 100 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'>
+// 	<defs>
+// 		<style>
+// 			@font-face {
+// 				font-family: 'MType';
+// 				font-style: normal;
+// 				font-weight: normal;
+// 				src: url('${mtypeUri}') format('woff');
+// 			}
+//
+// 			svg {
+// 				font-size: 0.2em;
+// 			}
+//
+// 			text {
+// 				text-anchor: middle;
+// 			}
+//
+// 			textPath {
+// 				font-family: 'MType', serif;
+// 				alignment-baseline: hanging;
+// 			}
+// 		</style>
+// 	</defs>
+//
+// 	<path id='curve' d='M0,71.5
+// 	C0,71.5 25,74 50,72 S
+// 	85,71 100,72.5' fill='transparent'></path>
+// 	<text x='50%'>
+// 		<textPath class='resize resizeGround' id='groundText' href='#curve'>{selection}</textPath>
+// 	</text>
+// </svg>`;
 
 let selectedValues = writable({});
 export let requirementsNotMet = writable([]);
@@ -18,13 +55,44 @@ export let selections = writable(_selections);
 let _multiSelectEntries = {};
 export let multiSelectEntries = writable(_multiSelectEntries);
 
+let myCanvas: HTMLCanvasElement;
+export let canv: Writable<HTMLCanvasElement> = writable();
+canv.subscribe(val => myCanvas = val);
+
+let _svg: SVGElement;
+export let customSvg: Writable<SVGElement> = writable();
+customSvg.subscribe(val => _svg = val);
+
+export let composite: Writable<any> = writable();
+
+const drawSvg = () => {
+	if (!_svg || !myCanvas) return;
+	let ctx = myCanvas.getContext('2d');
+	let txt = _svg.outerHTML;
+	// Convert the SVG to an object url
+	let url = URL.createObjectURL(new Blob([txt], { type: 'image/svg+xml' }));
+	let img = document.createElement('img');
+	img.src = url;
+	console.log(url);
+	img.onload = () => {
+		ctx.drawImage(img, 0, 0, myCanvas.width, myCanvas.height);
+		// URL.revokeObjectURL(url);
+	};
+};
+
 export const selectItem = (optId: string, value: any) => {
-	// console.log(`New value for ${optId}: `, value);
+	console.log(`New value for ${optId}: `, value);
 	_selections[optId] = value;
-	// console.log(_selections);
+	if (value.reset) {
+		for (let res of value.reset) {
+			delete _selections[res];
+		}
+	}
+	console.log(_selections);
 	_requirementsNotMet = _requirementsNotMet.filter(item => item != optId);
 	requirementsNotMet.set(_requirementsNotMet);
 	selections.set(_selections);
+	processImg();
 };
 
 export const unset = (optId: string) => {
@@ -43,9 +111,7 @@ export const selectMultiSelect = (optId: string, value: any) => {
 	multiSelectEntries.set(_multiSelectEntries);
 };
 
-export const getMultiSelect = (optId: string) => {
-	return _multiSelectEntries[optId];
-};
+export const getMultiSelect = (optId: string) => _multiSelectEntries[optId];
 
 export const deleteMulti = (optId: string, multi: MultiSelectData) => {
 	_multiSelectEntries[optId] = _multiSelectEntries[optId].filter(data => data != multi);
@@ -142,7 +208,7 @@ export const getTreeImage = (data: OptionImageData) => {
 		.replace('%couple%', getOrDefault(data, 'couple'))
 		.replace('%style1%', getOrDefault(data, 'style1'))
 		.replace('%color%', getOrDefault(data, 'color'))
-		.replace(/[ ]{2,}/, ' ');
+		.replace(/ {2,}/, ' ');
 
 	// console.log(treeFormat);
 	return treeFormat;
@@ -154,37 +220,137 @@ export const getRootsImage = (data: OptionImageData) => {
 		.replace('%type%', getOrDefault(data, 'type'))
 		.replace('%gen%', getOrDefault(data, 'gen'))
 		.replace('%color%', getOrDefault(data, 'color'))
-		.replace(/[ ]{2,}/, ' ');
+		.replace(/ {2,}/, ' ');
 
 	// console.log(rootFormat);
 	return rootFormat;
 };
 
-const getOrDefault = (data: OptionImageData, key: string) => {
-	// console.log(`Looking for ${key}`);
-
-	// TODO Get already selected values and see if there is a supplied value there
-
-
-	if (data.img) {
-		// Check for the key in the main img data
-		if (key in data.img && data.img[key] != 'reset') {
-			// This value should override the prior retrieved value.
-			// console.log(`'${key}' In data`);
-			return data.img[key];
-		} else if (data.img.default && key in data.img.default && data.img.default[key] != 'reset') { // Otherwise, check supplied defaults
-			// console.log(`'${key}' In data default`);
-			// console.log(data.img);
-			return data.img.default[key];
-		} else if (data.img.use && data.img.use == 'roots' && data.img.roots[key] != 'reset') {
-			if (key in data.img.roots) {
-				// console.log(`'${key}' in roots`);
-				return data.img.roots[key];
-			}
+const getImageData = (data: ImageFormatData, key: string) => {
+	// Check for the key in the main img data
+	if (key in data && data[key] != 'reset') {
+		// This value should override the prior retrieved value.
+		// console.log(`'${key}' In data`);
+		return data[key];
+	} else if (data.default && key in data.default && data.default[key] != 'reset') { // Otherwise, check supplied defaults
+		// console.log(`'${key}' In data default`);
+		// console.log(data.img);
+		return data.default[key];
+	} else if (data.use && data.use == 'roots' && data.roots) {
+		if (key in data.roots && data.roots[key] != 'reset') {
+			// console.log(`'${key}' in roots`);
+			return data.roots[key];
 		}
 	}
 
+	return null;
+};
+
+const getOrDefault = (preData: OptionImageData | ImageFormatData, key: string) => {
+	// TODO Get already selected values and see if there is a supplied value there
+
+	let data: ImageFormatData = 'img' in preData
+		? preData.img
+		: preData as ImageFormatData;
+
+	let val = getImageData(data, key);
+	if (!val) val = getImageData(getComposite(), key);
+	if (val) return val;
+
 	// Lastly, fallback to the config defaults
-	// console.log('Defaulting to ' + config.imageFormats.defaults[key]);
 	return config.imageFormats.defaults[key];
+};
+
+export const getComposite = () => {
+	let comp = {};
+	for (let key in _selections) {
+		if (!(key in _selections) || !_selections[key].img) continue;
+
+		let obj = _selections[key].img;
+		// console.log(key + ': ', _selections[key]);
+		for (let imgKey in obj) {
+			if (typeof obj[imgKey] == 'object') {
+				if (!comp[imgKey]) comp[imgKey] = {};
+				for (let subKey in obj[imgKey]) {
+					let val = obj[imgKey][subKey];
+					if (val == 'reset')
+						delete comp[imgKey][subKey];
+					else
+						comp[imgKey][subKey] = val;
+				}
+			} else {
+				let val = obj[imgKey];
+				if (val == 'reset')
+					delete comp[imgKey];
+				else
+					comp[imgKey] = val;
+			}
+		}
+
+		// console.log('Composite', comp);
+	}
+
+	composite.set(comp);
+	return comp;
+};
+
+const processImg = () => {
+	let composite = getComposite();
+	setTimeout(() => renderCanvas(composite), 500);
+};
+
+const renderCanvas = (composite) => {
+	delete composite.use;
+	let rootsExist = !!composite.roots && 'type' in composite.roots;
+
+	let treeImg = getTreeImage(composite);
+	composite.use = 'roots';
+	let rootsImg = getRootsImage(composite);
+
+	console.log(treeImg);
+	console.log(myCanvas);
+
+	let ctx = myCanvas.getContext('2d');
+
+	let images = [];
+
+	if (composite.background) {
+		let background = new Image();
+		background.src = composite.background;
+		background.width = myCanvas.width;
+		background.height = myCanvas.height;
+		images.push(background);
+	}
+
+	let tree = new Image();
+	tree.src = treeImg;
+	let tenW = myCanvas.width * 0.1;
+	let tenH = myCanvas.height * 0.1;
+	tree.width = myCanvas.width - (rootsExist ? (tenW * 2) : 0);
+	tree.height = myCanvas.height - (rootsExist ? (tenH * 2) : 0);
+
+	images.push(tree);
+
+	if (rootsExist) {
+		let roots = new Image();
+		roots.src = rootsImg;
+		roots.width = myCanvas.width;
+		roots.height = myCanvas.height;
+		images.push(roots);
+	}
+
+	drawImages(ctx, images);
+	drawSvg();
+};
+
+const drawImages = (ctx: CanvasRenderingContext2D, images: HTMLImageElement[]) => {
+	ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+	images.forEach(img => {
+		img.onload = () => {
+			let offset = 0;
+			if (img.width < myCanvas.width)
+				offset = (myCanvas.width - img.width) / 2;
+			ctx.drawImage(img, offset, 0, img.width, img.height);
+		};
+	});
 };
