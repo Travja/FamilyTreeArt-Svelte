@@ -1,32 +1,29 @@
-<script lang='ts'>
-	import Builder from '$lib/ui/Builder.svelte';
-	import { page, PageHelper } from '$lib/pages';
-	import ShopPage from '$lib/pages/ShopPage.svelte';
-	import { multiSelectEntries } from '$lib/interpreter';
-	import { onDestroy, onMount } from 'svelte';
+<script lang="ts">
+  import Builder from '$lib/ui/Builder.svelte';
+  import { page, PageHelper } from '$lib/pages';
+  import ShopPage from '$lib/pages/ShopPage.svelte';
+  import { multiSelectEntries } from '$lib/interpreter';
+  import { onDestroy, onMount } from 'svelte';
 
-	let shopComponent: ShopPage;
-	let pageHelper: PageHelper = new PageHelper();
+  let shopComponent: ShopPage;
+  let pageHelper: PageHelper = new PageHelper();
 
-	onMount(() => {
-	});
+  onMount(() => {});
 
-	onDestroy(() => {
-		pageHelper.destroy();
-	});
+  onDestroy(() => {
+    pageHelper.destroy();
+  });
 
-	const resetMultiSelect = () => {
-		shopComponent?.destroyMulti();
-		console.log($multiSelectEntries);
-	};
+  const resetMultiSelect = () => {
+    shopComponent?.destroyMulti();
+    console.log($multiSelectEntries);
+  };
 </script>
 
-<Builder on:change-page={resetMultiSelect}
-				 {pageHelper}>
-	{#if $page}
-		<ShopPage data='{$page}' bind:this={shopComponent} />
-	{/if}
-	<!--<svelte:component this='{pageElement}'></svelte:component>-->
-	<!--<button on:click={() => pageElement = pageElement == Page1 ? Page2 : Page1}>Click Me</button>-->
+<Builder on:change-page={resetMultiSelect} {pageHelper}>
+  {#if $page}
+    <ShopPage data={$page} bind:this={shopComponent} />
+  {/if}
+  <!--<svelte:component this='{pageElement}'></svelte:component>-->
+  <!--<button on:click={() => pageElement = pageElement == Page1 ? Page2 : Page1}>Click Me</button>-->
 </Builder>
-
