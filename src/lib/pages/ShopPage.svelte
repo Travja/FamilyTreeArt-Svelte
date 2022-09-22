@@ -1,3 +1,4 @@
+<!--suppress XmlDuplicatedId -->
 <script lang='ts'>
 	import type {
 		BaseData,
@@ -6,22 +7,26 @@
 		GroupData,
 		ImageOption,
 		MultiSelectData,
+		OptionImageData,
 		TreeArtPage
 	} from '$lib/conf/TreeArtConfig';
-	import { onMount } from 'svelte';
 	import {
+		calculateTotal,
 		deleteMulti,
 		getImage,
+		getMultiSelect,
 		getQualifiedCost,
 		getValue,
 		meetsPrereqs,
 		multiSelectEntries,
 		requirementsNotMet,
+		selections,
 		selectItem,
 		selectMultiSelect,
 		unset
-	} from '../interpreter';
-	import type { OptionImageData } from '../conf/TreeArtConfig';
+	} from '$lib/interpreter';
+	import { onMount } from 'svelte';
+	import { config } from '$lib/conf/config';
 
 	export let data: TreeArtPage = undefined;
 
@@ -29,6 +34,9 @@
 	let options: (ImageOption | ButtonOption)[];
 	let numOptions: any = {};
 	let formattedEntries = {};
+
+	let localOpt: any;
+	let currentData: MultiSelectData;
 
 	onMount(() => loading = false);
 
@@ -57,11 +65,19 @@
 		options = [...options];
 	};
 
+	const purgeMulti = (multiId: string, index: number) => {
+		let datum: any = getMultiSelect(multiId)[index];
+		deleteMulti(multiId, datum);
+		updateMulti(data.multiselect);
+	};
+
 	const updateMulti = (multi: MultiSelectData) => {
 		if (!multi) return;
 
-		let multData = $multiSelectEntries[multi.id];
-		if (!multData) return;
+		console.log('multi', multi);
+
+		let multiData = $multiSelectEntries[multi.id];
+		if (!multiData) return;
 
 		let rawData = {};
 		let format = multi.format;
@@ -69,29 +85,30 @@
 
 		let purge = [];
 		let entryData = { id: {}, data: [], costs: [] };
-		for (let multDatum of multData) {
+		for (let multiDatum of multiData) {
 			let matcher = matcherFormat;
 			let quantifier = 0;
 			for (let key of multi.keys) {
-				let dataValue = multDatum[key];
+				let dataValue = multiDatum[key];
 				matcher = matcher.replace(`%${key}%`,
 					dataValue.placeholder || dataValue.displayText || dataValue.key || dataValue);
 
-				if (key == multi.quantifier)
+				if (key == multi.quantifier) {
 					quantifier = parseInt(dataValue);
+					multiDatum[multi.quantifier] = quantifier;
+				}
 			}
 
 			if (!rawData[matcher])
-				rawData[matcher] = multDatum;
+				rawData[matcher] = multiDatum;
 			else {
-				purge.push(multDatum);
+				purge.push(multiDatum);
 				rawData[matcher][multi.quantifier] += quantifier;
 			}
 		}
 
 		purge.forEach(dat => deleteMulti(multi.id, dat));
 
-		let formula = multi.formula;
 		for (let multData of $multiSelectEntries[multi.id]) {
 			let formatted = format;
 			console.log(multData);
@@ -113,6 +130,7 @@
 
 		formattedEntries[multi.id] = entryData;
 		formattedEntries = { ...formattedEntries };
+		console.log(formattedEntries);
 	};
 
 	$: if (data) {
@@ -184,7 +202,7 @@
 
 						<!-- ImageOption -->
 						{#if opt.images}
-							<div class='imgSelect' class:error={$requirementsNotMet.includes(opt.id)}>
+							<div id='{opt.id}' class='imgSelect' class:error={$requirementsNotMet.includes(opt.id)}>
 								{#each opt.images as img}
 									{#if !img.prereq || meetsPrereqs(img.prereq)}
 										<!-- Groups! -->
@@ -208,7 +226,8 @@
 																{/if}
 															</div>
 															<div class='imgBox'>
-																<img class='imgOption' src='{gImg.displayImage ? gImg.displayImage : getImage(gImg)}' alt='{gImg.key}' />
+																<img class='imgOption' src='{gImg.displayImage ? gImg.displayImage : getImage(gImg)}'
+																		 alt='{gImg.key}' />
 															</div>
 														</div>
 													{/if}
@@ -242,7 +261,7 @@
 							</div>
 							<!-- ButtonOption -->
 						{:else if opt.buttons}
-							<div class='imgSelect' class:error={$requirementsNotMet.includes(opt.id)}>
+							<div id='{opt.id}' class='imgSelect' class:error={$requirementsNotMet.includes(opt.id)}>
 								{#each opt.buttons as button}
 									{#if !button.prereq || meetsPrereqs(button.prereq)}
 										<div
@@ -266,42 +285,57 @@
 							</div>
 							<!-- ItemOption -->
 						{:else if opt.items && (!opt.prereq || meetsPrereqs(opt.prereq))}
-							<select on:change={(e) => select(opt.id, opt.items[e.target.selectedIndex - 1])}
+							<select id='{opt.id}'
+											on:change={(e) => select(opt.id, opt.items[e.target.selectedIndex - (opt.items.filter(itm => itm.default).length == 0 ? 1 : 0)])}
 											class:error={$requirementsNotMet.includes(opt.id)}>
-								<option value='-1'></option>
+								{#if opt.items.filter(itm => itm.default).length == 0}
+									<option value='-1'></option>
+								{/if}
 								{#each opt.items as item, i}
-									<option value='{i}' selected='{item.default}'>{item.displayText}</option>
+									<option value='{i}'
+													selected='{item.default || $selections[opt.id] == item}'>{item.displayText}</option>
 								{/each}
 							</select>
 							<!-- Text :D -->
 						{:else if opt.type == 'text' && (!opt.prereq || meetsPrereqs(opt.prereq))}
-							<input type='text' placeholder='{opt.placeholder}'
+							<input type='text'
+										 id='{opt.id}'
+										 placeholder='{opt.placeholder}'
 										 class:error={$requirementsNotMet.includes(opt.id)}
 										 on:change={(e) => select(opt.id, e.target.value)}
 										 on:keypress={(e) => select(opt.id, e.target.value)}
 										 on:paste={(e) => select(opt.id, e.target.value)}
 										 on:input={(e) => select(opt.id, e.target.value)}
+										 value='{$selections[opt.id] || ``}'
 							/>
 						{:else if opt.type == 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
-							<input type='number' value='1' min='1' placeholder='{opt.placeholder}'
+							<input type='number' min='1'
+										 id='{opt.id}'
+										 placeholder='{opt.placeholder}'
 										 class:error={$requirementsNotMet.includes(opt.id)}
 										 on:change={(e) => select(opt.id, e.target.value)}
 										 on:keypress={(e) => select(opt.id, e.target.value)}
 										 on:paste={(e) => select(opt.id, e.target.value)}
 										 on:input={(e) => select(opt.id, e.target.value)}
+										 value='{$selections[opt.id] || `1`}'
 							/>
 						{:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
 							<input type='date'
+										 id='{opt.id}'
 										 class:error={$requirementsNotMet.includes(opt.id)}
-										 on:change={(e) => select(opt.id, e.target.value)} />
+										 on:change={(e) => select(opt.id, e.target.value)}
+										 value='{$selections[opt.id] || ``}' />
 						{:else if opt.type == 'textLong' && (!opt.prereq || meetsPrereqs(opt.prereq))}
-							<textarea placeholder='{opt.placeholder}' class='{opt.id}'
+							<textarea id='{opt.id}'
+												placeholder='{opt.placeholder}'
+												class='{opt.id}'
 												class:error={$requirementsNotMet.includes(opt.id)}
 												on:change={(e) => select(opt.id, e.target.value)}
 												on:keypress={(e) => select(opt.id, e.target.value)}
 												on:paste={(e) => select(opt.id, e.target.value)}
-												on:input={(e) => select(opt.id, e.target.value)}>
-							</textarea>
+												on:input={(e) => select(opt.id, e.target.value)}
+												value='{$selections[opt.id] || ``}'
+							/>
 						{/if}
 					</div>
 				{/if}
@@ -316,13 +350,50 @@
 			<div class='multi'>
 				{entry}
 				<div class='summaryPrice'>${formattedEntries[key].costs[i]}</div>
-				<div class='delete material-icons' title='Delete'>delete</div>
+				<div class='delete material-icons no-select' title='Delete' on:click={purgeMulti(key, i)}>delete</div>
 			</div>
 		{/each}
 	{/each}
+
+	{#if data.finalPage}
+		<div id='summary'>
+			{#each Object.entries($selections) as [key, entry]}
+				{#if entry && (entry.summaryText || (typeof (entry) == 'string' && (localOpt = config.getOption(key))?.display))}
+					<div id='preview-{key}' class='summaryItem'>
+						{#if entry.summaryText}
+							{entry.summaryText || entry.key || entry.displayText || JSON.stringify(entry)}
+							<div class='summaryPrice' class:hidden={!entry.cost && !entry.values}>
+								${calculateTotal(entry).toFixed(2).replace(/[.,]00$/, '')}
+							</div>
+						{:else if typeof (entry) == 'string' && (localOpt = config.getOption(key))?.display}
+							{localOpt.display || ''}{entry}
+						{/if}
+					</div>
+				{/if}
+			{/each}
+
+			{#each Object.entries($multiSelectEntries) as [key, entry]}
+				<span>
+					{(currentData = config.getMultiSelectData(key)).display}
+					{#each entry as multi}
+						<div class='summaryItem'>
+							{currentData.parseText(multi)}
+							<div class='summaryPrice' class:hidden={!currentData.total(multi)}>
+								${currentData.total(multi)?.toFixed(2).replace(/[.,]00$/, '')}
+							</div>
+						</div>
+					{/each}
+				</span>
+			{/each}
+		</div>
+	{/if}
 </container>
 
 <style>
+    #options {
+        user-select: none;
+    }
+
     .option {
         position: relative;
         /*display: flex;*/
@@ -442,9 +513,24 @@
         cursor: pointer;
     }
 
+    .summaryItem {
+        background-color: #bbb;
+        border-left: 4px solid #77a34f;
+        margin: 3px;
+        padding: 10px;
+    }
+
+    span > .summaryItem {
+        margin-left: 1.5em;
+    }
+
     .summaryPrice {
         float: right;
         margin: 0 0.4em 0 1.25em;
         color: #555;
+    }
+
+    .no-select {
+        user-select: none;
     }
 </style>

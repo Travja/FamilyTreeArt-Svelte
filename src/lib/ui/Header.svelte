@@ -3,13 +3,13 @@
 </script>
 
 <header>
-    <div id="mainHead"><a href="http://customfamilytreeart.com">
+    <div id="mainHead"><a href="https://customfamilytreeart.com">
         <img alt="Logo"
              src="/imgs/Homestead Images/2020 Logo Web.png"
              id="logo">
     </a>
         <div id="headText">Turn Your Family History Into Art!</div>
-        <a href="http://customfamilytreeart.com/gift-certificates">
+        <a href="https://customfamilytreeart.com/gift-certificates">
             <img alt="Gift"
                  src="/imgs/Homestead Images/Gift Certificates Available for Custom Family Tree Art.jpg"
                  id="gift">
@@ -17,31 +17,31 @@
     </div>
     <nav>
         <ul>
-            <li><a href="http://customfamilytreeart.com/">HOME</a></li>
+            <li><a href="https://customfamilytreeart.com/">HOME</a></li>
             <li class="hidden-items">
-                <a href="http://customfamilytreeart.com/order"
+                <a href="https://customfamilytreeart.com/order"
                    class:active={isOrder}>ORDER<i class="material-icons drop">expand_more</i></a>
                 <div class="items"><a href="https://shop.customfamilytreeart.com">Order a Tree</a><a
-                        href="http://customfamilytreeart.com/updates">Update a Tree</a><a
-                        href="http://customfamilytreeart.com/gift-certificates">Gift Certificates</a></div>
+                        href="https://customfamilytreeart.com/updates">Update a Tree</a><a
+                        href="https://customfamilytreeart.com/gift-certificates">Gift Certificates</a></div>
             </li>
-            <li><a href="http://customfamilytreeart.com/faq">FAQ</a></li>
-            <li class="hidden-items"><a href="http://customfamilytreeart.com/trees">TREES<i class="material-icons drop">expand_more</i></a>
-                <div class="items"><a href="http://customfamilytreeart.com/ancestry-trees">Ancestry Trees</a><a
-                        href="http://customfamilytreeart.com/descendant-trees">Descendant Trees</a><a
-                        href="http://customfamilytreeart.com/additional-designs">Additional Designs</a><a
-                        href="http://customfamilytreeart.com/updates">Updates</a><a
-                        href="http://customfamilytreeart.com/gallery">Gallery</a></div>
+            <li><a href="https://customfamilytreeart.com/faq">FAQ</a></li>
+            <li class="hidden-items"><a href="https://customfamilytreeart.com/trees">TREES<i class="material-icons drop">expand_more</i></a>
+                <div class="items"><a href="https://customfamilytreeart.com/ancestry-trees">Ancestry Trees</a><a
+                        href="https://customfamilytreeart.com/descendant-trees">Descendant Trees</a><a
+                        href="https://customfamilytreeart.com/additional-designs">Additional Designs</a><a
+                        href="https://customfamilytreeart.com/updates">Updates</a><a
+                        href="https://customfamilytreeart.com/gallery">Gallery</a></div>
             </li>
-            <li class="hidden-items"><a href="http://customfamilytreeart.com/info">INFO<i class="material-icons drop">expand_more</i></a>
-                <div class="items"><a href="http://customfamilytreeart.com/how-it-works">How It Works</a><a
-                        href="http://customfamilytreeart.com/name-forms">Name Forms</a><a
-                        href="http://customfamilytreeart.com/prints">Prints</a><a
-                        href="http://customfamilytreeart.com/frames">Frames</a><a
-                        href="http://customfamilytreeart.com/prices">Prices</a><a
-                        href="http://customfamilytreeart.com/shipping">Shipping</a></div>
+            <li class="hidden-items"><a href="https://customfamilytreeart.com/info">INFO<i class="material-icons drop">expand_more</i></a>
+                <div class="items"><a href="https://customfamilytreeart.com/how-it-works">How It Works</a><a
+                        href="https://customfamilytreeart.com/name-forms">Name Forms</a><a
+                        href="https://customfamilytreeart.com/prints">Prints</a><a
+                        href="https://customfamilytreeart.com/frames">Frames</a><a
+                        href="https://customfamilytreeart.com/prices">Prices</a><a
+                        href="https://customfamilytreeart.com/shipping">Shipping</a></div>
             </li>
-            <li><a href="http://customfamilytreeart.com/contact">CONTACT</a></li>
+            <li><a href="https://customfamilytreeart.com/contact">CONTACT</a></li>
         </ul>
     </nav>
     <div id="banner">

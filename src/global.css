@@ -106,3 +106,23 @@ button > p {
     margin: 10px 0;
     user-select: none;
 }
+
+#quote, #ground {
+    width: 70%;
+}
+
+.center {
+    text-align: center;
+}
+
+.center tr {
+    display: flex;
+}
+
+.center tr td {
+    flex: 1;
+}
+
+.hidden {
+    display: none;
+}

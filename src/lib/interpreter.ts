@@ -2,92 +2,103 @@ import type {
 	BaseData,
 	ButtonData,
 	ImageFormatData,
-	MultiSelectData,
 	OptionImageData,
 	Prereqs,
+	RootData,
 	TreeArtPage
 } from '$lib/conf/TreeArtConfig';
-import { TreeType } from '$lib/conf/TreeArtConfig';
 import { config } from '$lib/conf/config';
 import type { Writable } from 'svelte/store';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
-// const svg = `
-// <svg id='svgBox' height='100%' width='100%' viewBox='0 0 100 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'>
-// 	<defs>
-// 		<style>
-// 			@font-face {
-// 				font-family: 'MType';
-// 				font-style: normal;
-// 				font-weight: normal;
-// 				src: url('${mtypeUri}') format('woff');
-// 			}
-//
-// 			svg {
-// 				font-size: 0.2em;
-// 			}
-//
-// 			text {
-// 				text-anchor: middle;
-// 			}
-//
-// 			textPath {
-// 				font-family: 'MType', serif;
-// 				alignment-baseline: hanging;
-// 			}
-// 		</style>
-// 	</defs>
-//
-// 	<path id='curve' d='M0,71.5
-// 	C0,71.5 25,74 50,72 S
-// 	85,71 100,72.5' fill='transparent'></path>
-// 	<text x='50%'>
-// 		<textPath class='resize resizeGround' id='groundText' href='#curve'>{selection}</textPath>
-// 	</text>
-// </svg>`;
-
-let selectedValues = writable({});
 export let requirementsNotMet = writable([]);
 let _requirementsNotMet = [];
 
 let _selections = {};
-export let selections = writable(_selections);
+export const selections: Writable<any> = writable(_selections);
 let _multiSelectEntries = {};
-export let multiSelectEntries = writable(_multiSelectEntries);
-
-let myCanvas: HTMLCanvasElement;
-export let canv: Writable<HTMLCanvasElement> = writable();
-canv.subscribe(val => myCanvas = val);
+export const multiSelectEntries = writable(_multiSelectEntries);
+export const myCanvas: Writable<HTMLCanvasElement> = writable();
 
 let _svg: SVGElement;
-export let customSvg: Writable<SVGElement> = writable();
+export const customSvg: Writable<SVGElement> = writable();
 customSvg.subscribe(val => _svg = val);
 
 export let composite: Writable<any> = writable();
+export let loading: Writable<boolean> = writable(false);
+
+export let totalCost: Writable<number> = writable(0);
+
+export const calculateTotal = (option: BaseData): number => {
+	if ('cost' in option) {
+		return option.cost;
+	} else if ('values' in option) {
+		for (const val of option.values) {
+			let selected = _selections[val.option];
+			if (!selected) continue;
+
+			if (val.value.includes(selected.key)) {
+				return val.cost;
+			}
+		}
+	} else {
+		return 0;
+	}
+};
+
+const updateTotal = () => {
+	let total = 0;
+	Object.values(_selections).forEach((val: BaseData) => {
+		console.log('val: ', val);
+		if (typeof (val) == 'object')
+			total += calculateTotal(val);
+	});
+
+	Object.entries<any>(_multiSelectEntries).forEach(([key, entry]) => {
+		console.log('mult: ', entry);
+		let currentData = config.getMultiSelectData(key);
+		console.log('current: ', currentData);
+		entry.forEach(multi => total += currentData.total(multi));
+	});
+
+	totalCost.set(total);
+};
+
+selections.subscribe(updateTotal);
+multiSelectEntries.subscribe(updateTotal);
 
 const drawSvg = () => {
-	if (!_svg || !myCanvas) return;
-	let ctx = myCanvas.getContext('2d');
+	let canvas = get(myCanvas);
+	if (!_svg || !canvas) return;
+	let ctx = canvas.getContext('2d');
 	let txt = _svg.outerHTML;
 	// Convert the SVG to an object url
 	let url = URL.createObjectURL(new Blob([txt], { type: 'image/svg+xml' }));
 	let img = document.createElement('img');
-	img.src = url;
 	console.log(url);
 	img.onload = () => {
-		ctx.drawImage(img, 0, 0, myCanvas.width, myCanvas.height);
-		// URL.revokeObjectURL(url);
+		ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+		URL.revokeObjectURL(url);
 	};
+	img.src = url;
 };
 
-export const selectItem = (optId: string, value: any) => {
+export const selectItem = (optId: string, value: BaseData | number | string) => {
 	console.log(`New value for ${optId}: `, value);
 	_selections[optId] = value;
-	if (value.reset) {
-		for (let res of value.reset) {
-			delete _selections[res];
+	if (typeof (value) == 'object') {
+		if ('reset' in value) {
+			for (let res of value.reset) {
+				delete _selections[res];
+			}
+		}
+
+		if (value.disable) {
+			// TODO Implement disabling
+
 		}
 	}
+
 	console.log(_selections);
 	_requirementsNotMet = _requirementsNotMet.filter(item => item != optId);
 	requirementsNotMet.set(_requirementsNotMet);
@@ -111,9 +122,10 @@ export const selectMultiSelect = (optId: string, value: any) => {
 	multiSelectEntries.set(_multiSelectEntries);
 };
 
-export const getMultiSelect = (optId: string) => _multiSelectEntries[optId];
+export const getMultiSelect = (optId: string): any => _multiSelectEntries[optId];
 
-export const deleteMulti = (optId: string, multi: MultiSelectData) => {
+export const deleteMulti = (optId: string, multi: any) => {
+	console.log(optId, multi);
 	_multiSelectEntries[optId] = _multiSelectEntries[optId].filter(data => data != multi);
 	multiSelectEntries.set(_multiSelectEntries);
 };
@@ -198,6 +210,8 @@ export const getImage = (data: OptionImageData) => {
 		return getTreeImage(data);
 	else if (data.img.use == 'roots')
 		return getRootsImage(data);
+	else if (data.img.use == 'leaves')
+		return getLeavesImage(data);
 };
 
 // tree: '/imgs/Tree Layers/%type% %gen% %couple% %style1% TREE %color%.png',
@@ -214,6 +228,20 @@ export const getTreeImage = (data: OptionImageData) => {
 	return treeFormat;
 };
 
+// leaf: '/imgs/Tree Layers/%type% %gen% %couple% %style1% LEAVES%chalk%.png',
+export const getLeavesImage = (data: OptionImageData) => {
+	let format = config.imageFormats.leaf
+		.replace('%type%', getOrDefault(data, 'type'))
+		.replace('%gen%', getOrDefault(data, 'gen'))
+		.replace('%couple%', getOrDefault(data, 'couple'))
+		.replace('%style1%', getOrDefault(data, 'style1'))
+		.replace('%color%', getOrDefault(data, 'color'))
+		.replace('%chalk%', getOrDefault(data, 'color') == 'CHALK' ? ' CHALK' : '')
+		.replace(/ {2,}/, ' ');
+
+	return format;
+};
+
 // root: '/imgs/Tree Layers/ROOTS %gen% %type% %color%.png',
 export const getRootsImage = (data: OptionImageData) => {
 	let rootFormat = config.imageFormats.root
@@ -228,7 +256,7 @@ export const getRootsImage = (data: OptionImageData) => {
 
 const getImageData = (data: ImageFormatData, key: string) => {
 	// Check for the key in the main img data
-	if (key in data && data[key] != 'reset') {
+	if (key in data) {
 		// This value should override the prior retrieved value.
 		// console.log(`'${key}' In data`);
 		return data[key];
@@ -237,7 +265,7 @@ const getImageData = (data: ImageFormatData, key: string) => {
 		// console.log(data.img);
 		return data.default[key];
 	} else if (data.use && data.use == 'roots' && data.roots) {
-		if (key in data.roots && data.roots[key] != 'reset') {
+		if (key in data.roots) {
 			// console.log(`'${key}' in roots`);
 			return data.roots[key];
 		}
@@ -246,7 +274,9 @@ const getImageData = (data: ImageFormatData, key: string) => {
 	return null;
 };
 
-const getOrDefault = (preData: OptionImageData | ImageFormatData, key: string) => {
+const getOrDefault = (preData: OptionImageData | ImageFormatData | RootData, key: string): string => {
+	if (!preData) return '';
+
 	// TODO Get already selected values and see if there is a supplied value there
 
 	let data: ImageFormatData = 'img' in preData
@@ -255,16 +285,16 @@ const getOrDefault = (preData: OptionImageData | ImageFormatData, key: string) =
 
 	let val = getImageData(data, key);
 	if (!val) val = getImageData(getComposite(), key);
-	if (val) return val;
 
-	// Lastly, fallback to the config defaults
-	return config.imageFormats.defaults[key];
+	// Fallback to the config defaults
+	if (!val || val == 'reset') return config.imageFormats.defaults[key];
+	else if (val) return val;
 };
 
 export const getComposite = () => {
 	let comp = {};
 	for (let key in _selections) {
-		if (!(key in _selections) || !_selections[key].img) continue;
+		if (!(key in _selections) || !_selections[key]?.img) continue;
 
 		let obj = _selections[key].img;
 		// console.log(key + ': ', _selections[key]);
@@ -294,62 +324,85 @@ export const getComposite = () => {
 	return comp;
 };
 
+
+let lastUpdate = 0;
 const processImg = () => {
-	let composite = getComposite();
-	setTimeout(() => renderCanvas(composite), 500);
+	loading.set(true);
+	lastUpdate = new Date().getTime();
+	setTimeout(() => {
+		if (new Date().getTime() - lastUpdate < 400) return;
+
+		let composite = getComposite();
+		renderCanvas(composite).then(() => {
+		});
+		loading.set(false);
+	}, 500);
 };
 
-const renderCanvas = (composite) => {
+const renderCanvas = async (composite) => {
+	let canvas = get(myCanvas);
 	delete composite.use;
 	let rootsExist = !!composite.roots && 'type' in composite.roots;
 
 	let treeImg = getTreeImage(composite);
-	composite.use = 'roots';
-	let rootsImg = getRootsImage(composite);
+	let rootsImg = getRootsImage(composite.roots);
+	let leavesImg = getLeavesImage(composite);
 
-	console.log(treeImg);
-	console.log(myCanvas);
+	console.log(leavesImg);
+	console.log(canvas);
 
-	let ctx = myCanvas.getContext('2d');
+	let ctx = canvas.getContext('2d');
 
 	let images = [];
 
 	if (composite.background) {
 		let background = new Image();
 		background.src = composite.background;
-		background.width = myCanvas.width;
-		background.height = myCanvas.height;
+		background.width = canvas.width;
+		background.height = canvas.height;
 		images.push(background);
 	}
 
 	let tree = new Image();
 	tree.src = treeImg;
-	let tenW = myCanvas.width * 0.1;
-	let tenH = myCanvas.height * 0.1;
-	tree.width = myCanvas.width - (rootsExist ? (tenW * 2) : 0);
-	tree.height = myCanvas.height - (rootsExist ? (tenH * 2) : 0);
+	let tenW = canvas.width * 0.1;
+	let tenH = canvas.height * 0.1;
+	tree.width = canvas.width
+		- (rootsExist ? (tenW * 2) : 0);
+	tree.height = canvas.height
+		- (rootsExist ? (tenH * 2) : 0)
+		- (_selections['nameLoc']?.position == 'center' ? tenH / 2 : 0);
 
 	images.push(tree);
 
 	if (rootsExist) {
 		let roots = new Image();
 		roots.src = rootsImg;
-		roots.width = myCanvas.width;
-		roots.height = myCanvas.height;
+		roots.width = canvas.width;
+		roots.height = canvas.height;
 		images.push(roots);
 	}
 
+	if (composite.leaves) {
+		let leaves = new Image();
+		leaves.src = leavesImg;
+		leaves.width = tree.width;
+		leaves.height = tree.height;
+		images.push(leaves);
+	}
+
 	drawImages(ctx, images);
-	drawSvg();
+	setTimeout(drawSvg, 50);
 };
 
 const drawImages = (ctx: CanvasRenderingContext2D, images: HTMLImageElement[]) => {
-	ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+	let canvas = get(myCanvas);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	images.forEach(img => {
 		img.onload = () => {
 			let offset = 0;
-			if (img.width < myCanvas.width)
-				offset = (myCanvas.width - img.width) / 2;
+			if (img.width < canvas.width)
+				offset = (canvas.width - img.width) / 2;
 			ctx.drawImage(img, offset, 0, img.width, img.height);
 		};
 	});

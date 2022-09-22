@@ -1,57 +1,34 @@
-<script>
+<script lang='ts'>
+	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { config } from '$lib/conf/config';
-	import { canv, requirementsMet, selections, customSvg, composite } from '$lib/interpreter';
+	import { composite, customSvg, loading, myCanvas, selections, totalCost } from '$lib/interpreter';
+	import { currentPage, PageHelper } from '$lib/pages';
 	import { svgStyle } from '$lib/conf/fonts';
-	import { createEventDispatcher } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
+	import { fade } from 'svelte/transition';
 
-	export const pageCount = 0;
-	export let currentPage = 0;
-	export let nextPage = -1;
-	export let previousPage = -1;
+	export let pageHelper: PageHelper;
 
 	const dispatch = createEventDispatcher();
 
-	let cost = 0;
-	let costFormatted;
 	let hideCost = false;
-	let error = '';
 
-	$: costFormatted = cost.toFixed(2);
+	let unsub: Unsubscriber;
 
-	const gotoNextPage = () => {
-		for (let i = currentPage + 1; i < pageCount; i++) {
-			let next = config.pages[i];
-			console.log('n ' + i + ' ' + next?.meetsRequirements());
-			if (next?.meetsRequirements()) {
-				nextPage = i;
-				break;
-			} else {
-				nextPage = -1;
-			}
-		}
+	onMount(() => unsub = currentPage.subscribe(page => {
+		dispatch('change-page', page);
+		setTimeout(() => window.scrollTo(0, document.getElementById('contentWrapper').offsetTop), 250);
+	}));
 
-		if (!requirementsMet(config.pages[currentPage])) {
-			error = 'One or more required items do not have a selection.';
-			return;
-		}
-
-		error = '';
-		if (nextPage !== -1)
-			currentPage = nextPage;
-		dispatch('change-page', currentPage);
-	};
-
-	const gotoPreviousPage = () => {
-		console.log('Going back.');
-		currentPage = previousPage;
-		dispatch('change-page', currentPage);
-	};
+	onDestroy(() => {
+		if (unsub) unsub();
+	});
 </script>
 
 <div id='contentWrapper'>
 	<div id='item-wrapper'>
 		<div id='item-builder'>
-			<canvas id='builder-canvas' width='1280' height='1638' bind:this={$canv}>
+			<canvas id='builder-canvas' width='640' height='819' bind:this={$myCanvas}>
 			</canvas>
 			<svg id='svgBox' height='100%' width='100%' viewBox='0 0 100 100' preserveAspectRatio='none'
 					 xmlns='http://www.w3.org/2000/svg'
@@ -60,58 +37,76 @@
 
 				<foreignObject width='100%' height='100%'>
 					<div xmlns='http://www.w3.org/1999/xhtml'
-							 class='resize left {$composite?.color?.toLowerCase()}'
-							 class:shift={$composite?.show == 'roots'}
+							 class='resize
+							        {$selections[`nameLoc`]?.position || `left`}
+                      {$composite?.color?.toLowerCase()}
+                      {$composite?.color?.toLowerCase() != `chalk` ? $selections[`familyFont`]?.font?.toLowerCase() || `mtype` : ``}'
+							 class:shift={!!$composite?.roots}
 							 id='familyWrapper'>
-						<div class='resize' id='familyText'>Family Name</div>
-						<div id='lineTwo'>Est. 2022</div>
+						<div class='resize'
+								 id='familyText'>{$selections['familyName'] || ''}</div>
+						<div id='lineTwo'>{$selections['lineTwo'] || ''}</div>
 					</div>
 					<div xmlns='http://www.w3.org/1999/xhtml'
-							 class='resize right {$composite?.color?.toLowerCase()}'
-							 class:shift={$composite?.show == 'roots'}
-							 id='quoteText'>Quote Text
+							 class='resize
+							        {$selections[`quoteLoc`]?.position || `right`}
+                      {$composite?.color?.toLowerCase()}
+										  {$composite?.color?.toLowerCase() != `chalk` ? $selections[`quoteFont`]?.font?.toLowerCase() || `mtype` : ``}'
+							 class:shift={!!$composite?.roots}
+							 id='quoteText'>{$selections['quote'] || ''}
 					</div>
 				</foreignObject>
 
 				<!-- Path should be shifted if we are not showing roots -->
-				<path id='curve' class:shift={$composite?.show != 'roots'} d='M0,71.5
-	C0,71.5 25,74 50,72 S
-	85,71 100,72.5' fill='transparent'></path>
+				<path id='curve' class:shift={!$composite?.roots}
+							d='M0,71.5
+								 C0,71.5 25,74 50,72 S
+								 85,71 100,72.5'
+							fill='transparent'></path>
 				<text x='50%'>
-					<textPath class='resize resizeGround {$composite?.color?.toLowerCase()}' id='groundText' href='#curve'
-										font-family='{$selections.groundFont ? $selections.groundFont.font : `MType`}, sans-serif'>
-						{$selections.ground ? $selections.ground : 'asdfasdfas'}
+					<textPath class='resize
+													 resizeGround
+													 {$composite?.color?.toLowerCase()}
+													 {$selections[`groundFont`]?.font?.toLowerCase() || `mtype`}'
+										id='groundText' href='#curve'
+										font-family=', sans-serif'>
+						{$selections['ground'] || ($composite?.roots ? 'This is the ground. It can be a quote, family names, scripture, or favorite saying.' : '')}
 					</textPath>
 				</text>
 			</svg>
+			{#if $loading}
+				<div class='loading' transition:fade='{{duration: 200}}'>
+					<span>Loading...</span>
+				</div>
+			{/if}
 		</div>
 		<div class='clear'></div>
 		<div id='item-footer'>This is only a representation to help you select design elements. Your tree, like your family,
-			will be unique! {$composite?.show}
+			will be unique!
 		</div>
 	</div>
 	<div id='configuration'>
 		<slot />
 		<div class='clear' />
 		<div id='pageFooter'>
-			{#if error !== ""}
-				<div id='error'>{error}</div>
+			{#if pageHelper.error !== ""}
+				<div id='error'>{pageHelper.error}</div>
 			{/if}
-			{#if config.pages[currentPage].footer}
+			{#if config.pages[$currentPage].footer}
 				<hr />
 				<div class='footer'>
-					{@html config.pages[currentPage].footer}
+					{@html config.pages[$currentPage].footer}
 				</div>
 			{/if}
-			{#if previousPage != -1}
-				<button id='back' on:click={gotoPreviousPage}><p>&laquo; Back</p></button>
+			{#if pageHelper.previousPage != -1}
+				<button id='back' on:click={pageHelper.gotoPreviousPage}><p>&laquo; Back</p></button>
 			{/if}
-			{#if nextPage != -1}
-				<button id='next' on:click={gotoNextPage}><p>Next &raquo;</p></button>
+			{#if pageHelper.nextPage != -1}
+				<button id='next' on:click={pageHelper.gotoNextPage}><p>Next &raquo;</p></button>
 			{/if}
 		</div>
 		<div id='total' class='toggleable-cost' class:hidden={hideCost}>
-			<h3>Total: ${costFormatted}</h3>
+			<h3>Total: ${$totalCost.toFixed(2)}</h3>
 		</div>
 	</div>
 </div>
@@ -190,7 +185,6 @@
     }
 
     #familyWrapper, #quoteText {
-        font-family: MType, serif;
         font-size: 0.21rem;
         position: absolute;
         word-wrap: normal;
@@ -290,11 +284,21 @@
     }
 
     .toggleable-cost.hidden, .toggleable-cost.hidden * {
-        display: none;
         height: 0;
         width: 0;
         padding: 0;
         margin: 0;
+    }
+
+    .loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        backdrop-filter: blur(5px);
+        background: rgba(255, 255, 255, 0.4);
     }
 
 </style>

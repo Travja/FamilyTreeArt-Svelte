@@ -41,6 +41,41 @@ export const svgStyle = `
 		src: url('${amazoneUri}') format('woff');
 	}
 	
+	.mtype {
+		font-family: 'MType', sans-serif;
+	}
+	
+	.papyrus {
+		font-family: 'Papyrus';
+		font-size: 1rem;
+	}
+	
+	.papyrus8 {
+		font-family: 'Papyrus';
+		font-size: 0.8rem;
+	}
+	
+	.papyrus9 {
+		font-family: 'Papyrus';
+		font-size: 0.9rem;
+	}
+	
+	.amaze {
+		font-family: 'Amaze';
+	}
+	
+	.script {
+		font-family: 'Script';
+	}
+
+	.mtype-script > div:first-child {
+		font-family: 'Script';
+	}
+	
+	.mtype-script > div:nth-child(2) {
+		font-family: 'MType';
+	}
+	
 	svg {
 		font-size: 0.2em;
 		top: 0.5%;
@@ -62,7 +97,6 @@ export const svgStyle = `
 	}
 
 	#familyWrapper, #quoteText {
-		font-family: MType, serif;
 		font-size: 1.1rem;
 		position: absolute;
 		word-wrap: normal;
@@ -93,6 +127,15 @@ export const svgStyle = `
 	  right: 8%;
 	}
 	
+	.center {
+		bottom: 7%;
+    left: 30%;
+	}
+	
+	.mtype-script.center {
+		bottom: 6%;
+	}
+	
 	#curve.shift {
 		position: relative;
     transform: translateY(19%);
@@ -106,5 +149,20 @@ export const svgStyle = `
 	
 	.chalk#familyWrapper, .chalk#quoteText {
     font-size: 0.8rem;
+	}
+	
+	.white {
+		color: white;
+		fill: white;
+	}
+	
+	.black {
+		color: black;
+		fill: black;
+	}
+	
+	.brown {
+		color: #563312;
+		fill: #563312;
 	}
 </style>`;

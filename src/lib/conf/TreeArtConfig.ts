@@ -5,17 +5,12 @@ export class TreeArtConfig {
 		tree: '/imgs/Tree Layers/%type% %gen% %couple% %style1% TREE %color%.png',
 		root: '/imgs/Tree Layers/ROOTS %gen% %type% %color%.png',
 		leaf: '/imgs/Tree Layers/%type% %gen% %couple% %style1% LEAVES%chalk%.png',
-		background_layer: 1,
-		tree_layer: 2,
-		root_layer: 3,
-		leaf_layer: 4,
 		defaults: {
 			type: TreeType.DESCENDANT,
 			gen: '3 Gen',
 			couple: '',
 			style1: 'Style 1',
-			color: 'black',
-			chalk: ''
+			color: 'black'
 		}
 	};
 
@@ -45,13 +40,32 @@ export class TreeArtConfig {
 		}
 	}
 
-	setPages(pages: TreeArtPage[]) {
+	setPages = (pages: TreeArtPage[]): void => {
 		this.pages = pages;
-	}
+	};
 
-	addPage(page: TreeArtPage) {
+	addPage = (page: TreeArtPage): void => {
 		this.pages.push(page);
-	}
+	};
+
+	getOption = (id: string): BaseOption => {
+		for (const page of this.pages) {
+			for (const opt of page.options) {
+				if (opt.id == id) return opt;
+			}
+		}
+
+		return null;
+	};
+
+	getMultiSelectData = (id: string): MultiSelectData => {
+		for (const page of this.pages) {
+			if (page.multiselect && page.multiselect.id == id)
+				return page.multiselect;
+		}
+
+		return null;
+	};
 }
 
 export class TreeArtPage {
@@ -97,12 +111,60 @@ export interface Prereqs {
 	or?: Prereqs
 }
 
-export interface MultiSelectData {
+export interface MultiSelectCreate {
+	display: string,
 	id: string,
 	keys: string[],
 	quantifier: string,
 	format: string,
-	formula: string
+}
+
+export class MultiSelectData {
+	display: string;
+	id: string;
+	keys: string[];
+	quantifier: string;
+	format: string;
+
+	constructor(data: MultiSelectCreate) {
+		this.display = data.display;
+		this.id = data.id;
+		this.keys = data.keys;
+		this.quantifier = data.quantifier;
+		this.format = data.format;
+	}
+
+	parseText = (data: any): string => {
+		let final = this.format;
+		for (const text of this.keys) {
+			let obj = data[text];
+			if (typeof (obj) == 'number')
+				final = final.replace(`%${text}%`, obj + '');
+			else {
+				final = final.replace(`%${text}%`, obj.placeholder || obj.summaryText || obj.displayText || obj.key);
+			}
+		}
+
+		return final;
+	};
+
+	total = (data: any) => {
+		let quant = data[this.quantifier];
+		let cost = 0;
+		for (let [key, val] of Object.entries<any>(data)) {
+			if (typeof (val) == 'object' && 'values' in val) {
+				for (const obj of val.values) { // Pick up here
+					console.log(obj.value);
+					if (!obj.value.includes(data[obj.option].key)) continue;
+					console.log(obj);
+					if ('cost' in obj && obj.cost) {
+						cost += obj.cost * quant;
+					}
+				}
+			}
+		}
+		return cost;
+	};
 }
 
 export interface TreeArtConfigData {
@@ -136,7 +198,7 @@ export interface BaseOption {
 	required?: boolean,
 	layer?: number,
 	display?: string,
-	flexCount?: number
+	flexCount?: number,
 }
 
 export interface ImageOption extends BaseOption {
@@ -165,7 +227,10 @@ export interface BaseData {
 	img?: ImageFormatData,
 	placeholder?: string,
 	values?: ValueInformation[],
-	reset?: string[]
+	reset?: string[],
+	disable?: string[],
+	font?: 'MType' | 'MType-Script' | 'Amaze' | 'Script' | 'Papyrus' | 'Papyrus8' | 'Papyrus9',
+	position?: 'left' | 'right' | 'center'
 }
 
 export interface OptionImageData extends BaseData {
@@ -178,12 +243,11 @@ export interface ButtonData extends BaseData {
 }
 
 export interface ItemData extends BaseData {
-	formDisplay: string;
+	formDisplay?: string,
 }
 
 export interface ImageFormatData {
 	use?: string,
-	show?: string,
 	type?: TreeType,
 	couple?: string,
 	color?: string,
@@ -191,11 +255,8 @@ export interface ImageFormatData {
 	gen?: string,
 	style1?: string,
 	background?: string,
-	roots?: {
-		type?: string,
-		gen?: string,
-		color?: string
-	},
+	roots?: RootData,
+	leaves?: boolean,
 	default?: {
 		type?: TreeType,
 		couple?: string,
@@ -203,6 +264,11 @@ export interface ImageFormatData {
 		gen?: string,
 		style1?: string,
 	}
+}
+
+export interface RootData {
+	type?: string,
+	gen?: string,
 }
 
 export interface GroupData extends BaseData {
