@@ -3,7 +3,6 @@
 	import { page, PageHelper } from '$lib/pages';
 	import ShopPage from '$lib/pages/ShopPage.svelte';
 	import { multiSelectEntries } from '$lib/interpreter';
-	import type { ShopPage } from '$lib/conf/TreeArtConfig';
 	import { onDestroy, onMount } from 'svelte';
 
 	let shopComponent: ShopPage;
@@ -16,8 +15,7 @@
 		pageHelper.destroy();
 	});
 
-	const resetMultiSelect = (e) => {
-		// console.log('Changed page: ' + e.detail);
+	const resetMultiSelect = () => {
 		shopComponent?.destroyMulti();
 		console.log($multiSelectEntries);
 	};

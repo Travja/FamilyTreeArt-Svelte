@@ -233,7 +233,6 @@
 
     /**SVG**/
     svg {
-        /*font-family: 'Luckiest Guy', cursive;*/
         color: black;
         font-size: 0.2em;
         position: absolute;
@@ -241,23 +240,13 @@
         z-index: 100;
     }
 
-    /*svg.shifted {*/
-    /*    top: 19%;*/
-    /*}*/
-
     text {
         text-anchor: middle;
-        /*fill: #FF9800;*/
-    }
-
-    #groundText {
-        /*font-family: "MType", serif;*/
     }
 
     textPath {
         alignment-baseline: hanging;
     }
-
 
     /** Footer **/
     #pageFooter, .footer {
