@@ -31,5 +31,8 @@
     "bracketSpacing": true,
     "arrowParens": "avoid",
     "tabWidth": 2
+  },
+  "dependencies": {
+    "@paypal/paypal-js": "^5.1.1"
   }
 }
