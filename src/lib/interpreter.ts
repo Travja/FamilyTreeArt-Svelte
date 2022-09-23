@@ -51,7 +51,6 @@ const updateTotal = () => {
 };
 
 selections.subscribe(selections => {
-  console.log(selections);
   updateTotal();
   saveSelections(selections);
 });
@@ -100,8 +99,10 @@ export const selectItem = (
 
 export const unset = (optId: string) => {
   let sel = get(selections);
-  sel[optId] = undefined;
-  selections.set(sel);
+  if (sel[optId]) {
+    sel[optId] = undefined;
+    selections.set(sel);
+  }
 };
 
 export const getValue = (

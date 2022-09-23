@@ -2,7 +2,6 @@
 <script lang="ts">
   import type {
     BaseData,
-    ButtonData,
     ButtonOption,
     GroupData,
     ImageOption,
@@ -25,26 +24,36 @@
     selectMultiSelect,
     unset
   } from '$lib/interpreter';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
   import { currentPage, page } from '../pages';
+  import type { Unsubscriber } from 'svelte/store';
 
   let loading = true;
   let options: (ImageOption | ButtonOption)[];
   let numOptions: any = {};
   let formattedEntries = {};
+  let failsafe = 0;
   let previousPage = -1;
   let cPage = -1;
+  let destroyed = false;
+  let checked = false;
 
   let localOpt: any;
   let currentData: MultiSelectData;
 
+  let unOne: Unsubscriber;
+  let unTwo: Unsubscriber;
+
   onMount(() => {
-    currentPage.subscribe(p => {
+    unOne = currentPage.subscribe(p => {
+      failsafe = 0;
       previousPage = cPage;
       cPage = p;
+      checked = false;
+      destroyed = false;
     });
-    page.subscribe((pg) => {
+    unTwo = page.subscribe((pg) => {
       if (!pg) return;
       checkSelections(pg);
       destroyMulti(pg);
@@ -52,12 +61,21 @@
     loading = false;
   });
 
+  onDestroy(() => {
+    if (unOne) unOne();
+    if (unTwo) unTwo();
+  });
+
   export const destroyMulti = (page: TreeArtPage) => {
+    if(destroyed) return;
+    destroyed = true;
     formattedEntries = {};
     if (!page.multiselect || !page.multiselect.keys) return;
     for (let key of page.multiselect.keys) {
       unset(key);
     }
+
+    updateMulti(page.multiselect);
   };
 
   const select = (optId, value) => {
@@ -72,7 +90,6 @@
       unset(key);
     }
     selectMultiSelect(multi.id, data);
-    console.log(data);
     updateMulti(multi);
     options = [...options];
   };
@@ -125,7 +142,6 @@
 
     for (let multData of $multiSelectEntries[multi.id]) {
       let formatted = format;
-      console.log(multData);
       let total = 0;
       for (let key of multi.keys) {
         let dataValue = multData[key];
@@ -136,8 +152,7 @@
           dataValue.key ||
           dataValue
         );
-        let cost = dataValue.cost || getQualifiedCost(dataValue, multData);
-        console.log(cost);
+        const cost = dataValue.cost || getQualifiedCost(dataValue, multData);
         if (cost != -1) total += cost;
       }
 
@@ -148,12 +163,17 @@
 
     formattedEntries[multi.id] = entryData;
     formattedEntries = { ...formattedEntries };
-    console.log(formattedEntries);
   };
 
   const checkSelections = (page) => {
-    if (previousPage == cPage) return;
-    previousPage = cPage;
+    if (checked) return;
+    checked = true;
+    failsafe++;
+
+    if (failsafe > 10) {
+      failsafe = 0;
+      return;
+    }
 
     options = <(ImageOption | ButtonOption)[]>page.options;
     let toSelect: { string: any } = {};
@@ -209,8 +229,6 @@
     Object.entries<any>(toSelect).forEach(([key, entry]) => {
       selectItem(key, entry);
     });
-
-    updateMulti(page.multiselect);
   };
 </script>
 
@@ -545,7 +563,7 @@
     box-sizing: border-box;
     transition: background-color 0.5s;
     border-radius: 8px;
-    min-width: 100px;
+    min-width: 95px;
   }
 
   .imgContainer:hover {

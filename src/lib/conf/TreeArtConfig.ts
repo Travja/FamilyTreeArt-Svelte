@@ -21,7 +21,6 @@ export class TreeArtConfig {
     //Load in and set our image formats, overriding the defaults if they are present.
     if (data.imageFormats) {
       for (let key in data.imageFormats) {
-        console.log(typeof data.imageFormats[key]);
         if (typeof data.imageFormats[key] != 'object')
           this.imageFormats[key] = data.imageFormats[key];
         else {

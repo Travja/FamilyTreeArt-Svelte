@@ -1,9 +1,12 @@
 import { multiSelectEntries, selections } from './interpreter';
+import { get } from 'svelte/store';
+import { currentPage } from './pages';
 
 export const saveSelections = (selections): void => {
   if (typeof window == 'undefined' || Object.keys(selections).length == 0)
     return;
   localStorage.setItem('tree-selections', btoa(JSON.stringify(selections)));
+  localStorage.setItem('furthest-page', get(currentPage).toString());
 };
 
 export const saveMultiData = (entries): void => {
@@ -18,6 +21,7 @@ export const hasPreviousSelections = (): boolean => {
 
 export const loadPrevious = (): void => {
   if (typeof window == 'undefined') return;
+  currentPage.set(parseInt(localStorage.getItem('furthest-page')) || 0);
   selections.set(JSON.parse(atob(localStorage.getItem('tree-selections'))));
   multiSelectEntries.set(JSON.parse(atob(localStorage.getItem('tree-multi'))));
 };
@@ -25,4 +29,5 @@ export const loadPrevious = (): void => {
 export const deleteCache = (): void => {
   localStorage.removeItem('tree-selections');
   localStorage.removeItem('tree-multi');
+  localStorage.removeItem('furthest-page');
 };

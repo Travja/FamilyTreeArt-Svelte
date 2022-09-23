@@ -54,6 +54,10 @@ a.title {
   flex-basis: 25%;
 }
 
+.flex-5 {
+  flex-basis: 20%;
+}
+
 .textButton.flex-1 {
   flex-basis: calc(100% - 10px);
 }
@@ -68,6 +72,10 @@ a.title {
 
 .textButton.flex-4 {
   flex-basis: calc(25% - 10px);
+}
+
+.textButton.flex-5 {
+  flex-basis: calc(20% - 10px);
 }
 
 .clear {

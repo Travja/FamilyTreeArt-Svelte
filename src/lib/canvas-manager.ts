@@ -35,13 +35,10 @@ class CanvasManager {
 
     delete composite.use;
     let rootsExist = !!composite.roots && 'type' in composite.roots;
-    console.log(composite);
 
     let treeImg = getTreeImage(composite);
     let rootsImg = getRootsImage(composite.roots);
     let leavesImg = getLeavesImage(composite);
-
-    console.log(treeImg);
 
     let ctx = canvas.getContext('2d');
 

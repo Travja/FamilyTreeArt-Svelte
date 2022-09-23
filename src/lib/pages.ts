@@ -18,8 +18,8 @@ export class PageHelper {
 
   constructor() {
     this.pageCount = config.pages.length;
-    this.unsubIdx = currentPage.subscribe(this.initPages);
-    this.selSub = selections.subscribe(this.initPages);
+    this.unsubIdx = currentPage.subscribe(idx => this.initPages(idx));
+    this.selSub = selections.subscribe(() => this.initPages(get(currentPage)));
   }
 
   destroy = (): void => {
@@ -27,8 +27,8 @@ export class PageHelper {
     this.selSub();
   };
 
-  private initPages = (): void => {
-    const idx = get(currentPage);
+  private initPages = (idx): void => {
+    if (idx == -1) return;
     const pg = config.pages[idx];
     if (pg.finalPage) visitedLast.set(true);
     page.set(pg);
