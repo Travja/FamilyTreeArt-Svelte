@@ -1,47 +1,68 @@
 <footer>
   <hr />
   <div class="footerBlock" id="treeFooter">
-    <h2><a href="http://customfamilytreeart.com/trees">TREES</a></h2>
+    <h2><a href="https://customfamilytreeart.com/trees">TREES</a></h2>
     <div class="footerItem">
-      <a href="http://customfamilytreeart.com/ancestry-trees">Ancestry</a>
+      <a href="https://customfamilytreeart.com/ancestry-trees">Ancestry</a>
     </div>
     <div class="footerItem">
-      <a href="http://customfamilytreeart.com/descendant-trees">Descendant</a>
+      <a href="https://customfamilytreeart.com/descendant-trees">Descendant</a>
     </div>
     <div class="footerItem">
-      <a href="http://customfamilytreeart.com/additional-designs">Additional Designs</a>
+      <a href="https://customfamilytreeart.com/additional-designs"
+        >Additional Designs</a
+      >
     </div>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/updates">Updates</a></div>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/gallery">Gallery</a></div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/updates">Updates</a>
+    </div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/gallery">Gallery</a>
+    </div>
   </div>
   <div class="footerBlock" id="productsFooter">
     <h2>PRODUCTS</h2>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/prints">Prints</a></div>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/frames">Frames</a></div>
     <div class="footerItem">
-      <a href="http://customfamilytreeart.com/gift-certificates">Gift Certificates</a>
+      <a href="https://customfamilytreeart.com/prints">Prints</a>
+    </div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/frames">Frames</a>
+    </div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/gift-certificates"
+        >Gift Certificates</a
+      >
     </div>
   </div>
   <div class="footerBlock" id="infoFooter">
     <h2>INFO</h2>
     <div class="footerItem">
-      <a href="http://customfamilytreeart.com/how-it-works">How It Works</a>
+      <a href="https://customfamilytreeart.com/how-it-works">How It Works</a>
     </div>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/name-forms">Name Forms</a></div>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/prices">Prices</a></div>
-    <div class="footerItem"><a href="http://customfamilytreeart.com/shipping">Shipping</a></div>
     <div class="footerItem">
-      <a href="http://customfamilytreeart.com/privacy-policy">Privacy Policy</a>
+      <a href="https://customfamilytreeart.com/name-forms">Name Forms</a>
+    </div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/prices">Prices</a>
+    </div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/shipping">Shipping</a>
+    </div>
+    <div class="footerItem">
+      <a href="https://customfamilytreeart.com/privacy-policy">Privacy Policy</a
+      >
     </div>
   </div>
   <div class="footerBlock" id="otherFooter">
-    <h2><a href="http://customfamilytreeart.com/order">ORDER</a></h2>
-    <h2><a href="http://customfamilytreeart.com/faq">FAQ</a></h2>
-    <h2><a href="http://customfamilytreeart.com/contact">CONTACT</a></h2>
+    <h2><a href="https://customfamilytreeart.com/order">ORDER</a></h2>
+    <h2><a href="https://customfamilytreeart.com/faq">FAQ</a></h2>
+    <h2><a href="https://customfamilytreeart.com/contact">CONTACT</a></h2>
   </div>
   <div id="bottom">
     <div id="email">
-      Email:<a href="mailto:order@customfamilytreeart.com">Order@CustomFamilyTreeArt.com</a>
+      Email:<a href="mailto:order@customfamilytreeart.com"
+        >Order@CustomFamilyTreeArt.com</a
+      >
     </div>
     <div id="copy">&copy;2020 Custom Family Tree Art. All rights reserved.</div>
   </div>

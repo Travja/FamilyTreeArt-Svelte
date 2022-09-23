@@ -22,5 +22,14 @@
     "typescript": "^4.8.3",
     "vite": "^3.1.3"
   },
-  "type": "module"
+  "type": "module",
+  "prettier": {
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "arrowParens": "avoid",
+    "tabWidth": 2
+  }
 }

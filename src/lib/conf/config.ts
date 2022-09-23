@@ -1,4 +1,9 @@
-import { MultiSelectData, TreeArtConfig, TreeArtPage, TreeType } from './TreeArtConfig';
+import {
+  MultiSelectData,
+  TreeArtConfig,
+  TreeArtPage,
+  TreeType
+} from './TreeArtConfig';
 
 const config: TreeArtConfig = new TreeArtConfig();
 
@@ -7,7 +12,7 @@ config.addPage(
   new TreeArtPage({
     title: 'Who do you want your custom family tree art to feature?',
     intro:
-      '<a href="http://customfamilytreeart.com/updates"><strong>*Do you want to update an existing tree?</strong></a>',
+      '<a href="https://customfamilytreeart.com/updates"><strong>*Do you want to update an existing tree?</strong></a>',
     options: [
       {
         name: '',
@@ -58,7 +63,8 @@ config.addPage(
                 },
                 {
                   displayText: 'Ancestor Tree with Descendant Roots',
-                  displayImage: '/imgs/Option Examples/Ancestry Tree with Descendant Roots.jpg',
+                  displayImage:
+                    '/imgs/Option Examples/Ancestry Tree with Descendant Roots.jpg',
                   key: 'ancestry_roots',
                   img: {
                     type: TreeType.ANCESTRY,
@@ -128,7 +134,7 @@ config.addPage(
     //Page 2
     title: 'How many generations do you want to include in your tree?',
     intro:
-      "If you want to include more generations, or if you want a different arrangement click <a target='_blank' href='http://customfamilytreeart.com/additional-designs'>here.</a>",
+      'If you want to include more generations, or if you want a different arrangement click <a target="_blank" href="https://customfamilytreeart.com/additional-designs">here.</a>',
     footer: '<b>*You will choose a print type and size in a later step</b>',
     options: [
       {
@@ -304,7 +310,7 @@ config.addPage(
             },
             displayText:
               '<h3>2 Generations</h3><br/>1st Roots: Parents<br/>2nd Roots: Grandparents',
-            footer: "<h4 class='nomargin'>$10</h4>",
+            footer: '<h4 class="nomargin">$10</h4>',
             summaryText: 'Roots: Ancestry - 2 Generations',
             cost: 10,
             key: '2gen_ancestor',
@@ -324,7 +330,7 @@ config.addPage(
             displayText:
               '<h3>3 Generations</h3><br/>1st Roots: Parents<br/>2nd Roots: Grandparents' +
               '<br/>3rd Roots: Great-Grandparents',
-            footer: "<h4 class='nomargin'>$20</h4>",
+            footer: '<h4 class="nomargin">$20</h4>',
             summaryText: 'Roots: Ancestry - 3 Generations',
             cost: 20,
             key: '3gen_ancestor',
@@ -343,7 +349,7 @@ config.addPage(
             },
             displayText:
               '<h3>2 Generations</h3><br/>1st Roots: Children<br/>2nd Roots: Grandchildren',
-            footer: "<h4 class='nomargin'>$10</h4>",
+            footer: '<h4 class="nomargin">$10</h4>',
             summaryText: 'Roots: Descendant - 2 Generations',
             cost: 10,
             key: '2gen_descendant',
@@ -363,7 +369,7 @@ config.addPage(
             displayText:
               '<h3>3 Generations</h3><br/>1st Roots: Children<br/>2nd Roots: Grandchildren' +
               '<br/>3rd Roots: Great-Grandchildren',
-            footer: "<h4 class='nomargin'>$20</h4>",
+            footer: '<h4 class="nomargin">$20</h4>',
             summaryText: 'Roots: Descendant - 3 Generations',
             cost: 20,
             key: '3gen_descendant',
@@ -390,11 +396,11 @@ config.addPage(
       '<table class="center"><tr>' +
       '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>' +
       '</tr><tr>' +
-      "<td><img class='imgOption' src='/imgs/Option Examples/Small Family.jpg'/></td>" +
-      "<td><img class='imgOption' src='/imgs/Option Examples/Small Family With Dates.jpg'/></td>" +
-      "<td><img class='imgOption' src='/imgs/Option Examples/Small Family With Leaves.jpg'/></td>" +
-      "<td><img class='imgOption' src='/imgs/Option Examples/Small Family With Dates and Leaves.jpg'/></td>" +
-      "</tr><tr><td colspan='2'></td><td colspan='2'>*Leaves can be added in a later step.</p></td></table><br/>",
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family.jpg"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates.jpg"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Leaves.jpg"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates and Leaves.jpg"/></td>' +
+      '</tr><tr><td colspan="2"></td><td colspan="2">*Leaves can be added in a later step.</p></td></table><br/>',
     prereq: {
       option: 'generations',
       value: ['ancestry_4gen', 'descendant_2gen', 'descendant_3gen'],
@@ -518,7 +524,7 @@ config.addPage(
     //Page 6
     title: 'Which style of tree do you prefer?',
     intro:
-      "Need help deciding? Check out more examples <a target='_blank' href='http://customfamilytreeart.com/gallery'>here.</a>",
+      'Need help deciding? Check out more examples <a target="_blank" href="https://customfamilytreeart.com/gallery">here.</a>',
     options: [
       {
         name: '',
@@ -528,7 +534,7 @@ config.addPage(
         images: [
           {
             displayText: 'Classic',
-            background: "url('/imgs/Backgrounds/Tan 1.jpg')",
+            background: 'url("/imgs/Backgrounds/Tan 1.jpg")',
             default: true,
             key: 'classic',
             img: {
@@ -540,7 +546,7 @@ config.addPage(
           {
             displayText: 'Chalk',
             key: 'chalk',
-            background: "url('/imgs/Backgrounds/Chalk 1.jpg')",
+            background: 'url("/imgs/Backgrounds/Chalk 1.jpg")',
             img: {
               color: 'CHALK',
               chalk: ' CHALK',
@@ -784,18 +790,8 @@ config.addPage(
             img: {
               color: 'white',
               background: '/imgs/Backgrounds/Brown 1.jpg'
-            }
-            // addClass: [
-            // 	{
-            // 		id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 		value: 'white'
-            // 	}
-            // ],
-            // removeClass: {
-            // 	id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 	value: ['black', 'brown']
-            // },
-            // constant: true,
+            },
+            reset: ['fontColor']
           },
           {
             prereq: {
@@ -808,18 +804,8 @@ config.addPage(
             img: {
               color: 'white',
               background: '/imgs/Backgrounds/Brown 2.jpg'
-            }
-            // addClass: [
-            // 	{
-            // 		id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 		value: 'white'
-            // 	}
-            // ],
-            // removeClass: {
-            // 	id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 	value: ['black', 'brown']
-            // },
-            // constant: true,
+            },
+            reset: ['fontColor']
           },
           {
             prereq: {
@@ -832,7 +818,6 @@ config.addPage(
               background: '/imgs/Backgrounds/Gray.jpg'
             },
             key: 'gray'
-            // thumb: ''
           },
           {
             prereq: {
@@ -881,18 +866,8 @@ config.addPage(
             img: {
               color: 'white',
               background: '/imgs/Backgrounds/Red.jpg'
-            }
-            // addClass: [
-            // 	{
-            // 		id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 		value: 'white'
-            // 	}
-            // ],
-            // removeClass: {
-            // 	id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 	value: ['black', 'brown']
-            // },
-            // constant: true,
+            },
+            reset: ['fontColor']
           },
           {
             displayText: 'Black',
@@ -905,18 +880,8 @@ config.addPage(
             img: {
               color: 'white',
               background: '/imgs/Backgrounds/Black.jpg'
-            }
-            // addClass: [
-            // 	{
-            // 		id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 		value: 'white'
-            // 	}
-            // ],
-            // removeClass: {
-            // 	id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 	value: ['black', 'brown']
-            // },
-            // constant: true,
+            },
+            reset: ['fontColor']
           },
           {
             prereq: {
@@ -929,16 +894,6 @@ config.addPage(
               background: '/imgs/Backgrounds/Black.jpg'
             },
             key: 'black'
-            // addClass: [
-            // 	{
-            // 		id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 		value: 'white'
-            // 	}
-            // ],
-            // removeClass: {
-            // 	id: ['familyWrapper', 'quoteText', 'groundText'],
-            // 	value: ['black', 'brown']
-            // },
           },
           {
             prereq: {
@@ -1071,7 +1026,8 @@ config.addPage(
   new TreeArtPage({
     //Page 10
     title: 'Do you want to add additional text?',
-    intro: '*Optional text can be added to make your tree just the way you want it.<br/><br>',
+    intro:
+      '*Optional text can be added to make your tree just the way you want it.<br/><br>',
     footer: '',
     options: [
       {
@@ -1144,30 +1100,13 @@ config.addPage(
             },
             position: 'center',
             reset: ['ground']
-            // addClass: [
-            // 	{
-            // 		id: ['familyWrapper'],
-            // 		value: 'center'
-            // 	},
-            // 	{
-            // 		id: ['imgLayer2'],
-            // 		value: 'shrinkCenter'
-            // 	},
-            // 	{
-            // 		id: ['imgLayer4'],
-            // 		value: 'shrinkCenter'
-            // 	}
-            // ],
-            // disable: {
-            // 	id: ['ground']
-            // }
           }
         ]
       },
       {
         name:
           '<br><strong>Quote or Saying:  </strong> &nbsp;&nbsp;' +
-          "</tr><tr><td colspan='2'></td><td colspan='2'>Need some quote ideas? Click <a target='_blank' href='http://customfamilytreeart.com/quotes'>here</a>",
+          '</tr><tr><td colspan="2"></td><td colspan="2">Need some quote ideas? Click <a target="_blank" href="https://customfamilytreeart.com/quotes">here</a>',
         type: 'text',
         id: 'quote',
         placeholder: 'Place a quote or saying here.'
@@ -1317,7 +1256,7 @@ config.addPage(
     intro:
       '<b>If you are outside the CONTINENTAL U.S. please select the Digital Copy option. Shipping costs are too high to ship prints internationally.</b><br/>' +
       'With the digital JPG file you will be able to have your tree printed locally as many times as you want.<br/>' +
-      "<br/><b>Learn more about each print type <a target='_blank' href='http://customfamilytreeart.com/prints'>here</a></b><br/>",
+      '<br/><b>Learn more about each print type <a target="_blank" href="https://customfamilytreeart.com/prints">here</a></b><br/>',
     options: [
       {
         name: '',
@@ -1538,7 +1477,7 @@ config.addPage(
     //Page 13       Don't show if they selected JPG
     title: 'Do you want a frame for your tree?',
     intro:
-      "<b>Learn more about frames <a target='_blank' href='http://customfamilytreeart.com/frames'>here</a></b>",
+      '<b>Learn more about frames <a target="_blank" href="https://customfamilytreeart.com/frames">here</a></b>',
     prereq: {
       option: 'printType',
       // value: ["print", "both"]
@@ -1898,7 +1837,7 @@ config.addPage(
             ]
           },
           {
-            displayText: 'Pewter Scoop ~ 2"" (%value%)',
+            displayText: 'Pewter Scoop ~ 2" (%value%)',
             key: 'pewter_scoop',
             placeholder: 'Pewter Scoop ~ 2"',
             displayImage: '/imgs/Products/Pewter Scoop Corner.jpg',
@@ -2118,9 +2057,9 @@ config.addPage(
 config.addPage(
   new TreeArtPage({
     //Page 15
-    title: "Do you want your tree by a certain date? We'll do our best!",
+    title: `Do you want your tree by a certain date? We'll do our best!`,
     intro:
-      "<b>Find out more about turnaround and shipping times <a target='_blank' href='http://customfamilytreeart.com/shipping'>here</a></b>",
+      '<b>Find out more about turnaround and shipping times <a target="_blank" href="https://customfamilytreeart.com/shipping">here</a></b>',
     options: [
       {
         display: 'Request Date: ',

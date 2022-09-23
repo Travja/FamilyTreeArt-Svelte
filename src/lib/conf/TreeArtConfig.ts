@@ -59,7 +59,8 @@ export class TreeArtConfig {
 
   getMultiSelectData = (id: string): MultiSelectData => {
     for (const page of this.pages) {
-      if (page.multiselect && page.multiselect.id == id) return page.multiselect;
+      if (page.multiselect && page.multiselect.id == id)
+        return page.multiselect;
     }
 
     return null;
@@ -155,9 +156,7 @@ export class MultiSelectData {
       if (typeof val == 'object' && 'values' in val) {
         for (const obj of val.values) {
           // Pick up here
-          console.log(obj.value);
           if (!obj.value.includes(data[obj.option].key)) continue;
-          console.log(obj);
           if ('cost' in obj && obj.cost) {
             cost += obj.cost * quant;
           }
@@ -230,7 +229,14 @@ export interface BaseData {
   values?: ValueInformation[];
   reset?: string[];
   disable?: string[];
-  font?: 'MType' | 'MType-Script' | 'Amaze' | 'Script' | 'Papyrus' | 'Papyrus8' | 'Papyrus9';
+  font?:
+    | 'MType'
+    | 'MType-Script'
+    | 'Amaze'
+    | 'Script'
+    | 'Papyrus'
+    | 'Papyrus8'
+    | 'Papyrus9';
   position?: 'left' | 'right' | 'center';
 }
 

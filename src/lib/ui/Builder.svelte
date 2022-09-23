@@ -1,11 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
-  import { composite, customSvg, loading, myCanvas, selections, totalCost } from '$lib/interpreter';
+  import { composite, selections, totalCost } from '$lib/interpreter';
   import { currentPage, PageHelper } from '$lib/pages';
   import { svgStyle } from '$lib/conf/fonts';
   import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
+  import { customSvg, loading, myCanvas } from '$lib/canvas-manager';
 
   export let pageHelper: PageHelper;
 
@@ -17,10 +18,14 @@
 
   onMount(
     () =>
-      (unsub = currentPage.subscribe((page) => {
+      (unsub = currentPage.subscribe(page => {
         dispatch('change-page', page);
         setTimeout(
-          () => window.scrollTo(0, document.getElementById('contentWrapper').offsetTop),
+          () =>
+            window.scrollTo(
+              0,
+              document.getElementById('contentWrapper').offsetTop
+            ),
           250
         );
       }))
@@ -29,12 +34,29 @@
   onDestroy(() => {
     if (unsub) unsub();
   });
+
+  let saveTree = () => {
+    let link = document.createElement('a');
+    link.setAttribute('download', 'MyTree.png');
+    link.setAttribute(
+      'href',
+      $myCanvas
+        .toDataURL('image/png')
+        .replace('image/png', 'image/octet-stream')
+    );
+    link.click();
+  };
 </script>
 
 <div id="contentWrapper">
   <div id="item-wrapper">
     <div id="item-builder">
-      <canvas id="builder-canvas" width="640" height="819" bind:this={$myCanvas} />
+      <canvas
+        id="builder-canvas"
+        width="640"
+        height="819"
+        bind:this={$myCanvas}
+      />
       <svg
         id="svgBox"
         height="100%"
@@ -58,7 +80,9 @@
             class:shift={!!$composite?.roots}
             id="familyWrapper"
           >
-            <div class="resize" id="familyText">{$selections['familyName'] || ''}</div>
+            <div class="resize" id="familyText">
+              {$selections['familyName'] || ''}
+            </div>
             <div id="lineTwo">{$selections['lineTwo'] || ''}</div>
           </div>
           <div
@@ -96,9 +120,9 @@
             font-family=", sans-serif"
           >
             {$selections['ground'] ||
-              ($composite?.roots
-                ? 'This is the ground. It can be a quote, family names, scripture, or favorite saying.'
-                : '')}
+            ($composite?.roots
+              ? 'This is the ground. It can be a quote, family names, scripture, or favorite saying.'
+              : '')}
           </textPath>
         </text>
       </svg>
@@ -110,8 +134,11 @@
     </div>
     <div class="clear" />
     <div id="item-footer">
-      This is only a representation to help you select design elements. Your tree, like your family,
-      will be unique!
+      This is only a representation to help you select design elements. Your
+      tree, like your family, will be unique!
+      {#if $selections['background']}
+        <button on:click={saveTree}>Save Preview</button>
+      {/if}
     </div>
   </div>
   <div id="configuration">
@@ -128,10 +155,14 @@
         </div>
       {/if}
       {#if pageHelper.previousPage != -1}
-        <button id="back" on:click={pageHelper.gotoPreviousPage}><p>&laquo; Back</p></button>
+        <button id="back" on:click={pageHelper.gotoPreviousPage}
+        ><p>&laquo; Back</p></button
+        >
       {/if}
       {#if pageHelper.nextPage != -1}
-        <button id="next" on:click={pageHelper.gotoNextPage}><p>Next &raquo;</p></button>
+        <button id="next" on:click={pageHelper.gotoNextPage}
+        ><p>Next &raquo;</p></button
+        >
       {/if}
     </div>
     <div id="total" class="toggleable-cost" class:hidden={hideCost}>

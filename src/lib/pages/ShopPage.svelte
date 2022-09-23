@@ -92,7 +92,10 @@
         let dataValue = multiDatum[key];
         matcher = matcher.replace(
           `%${key}%`,
-          dataValue.placeholder || dataValue.displayText || dataValue.key || dataValue
+          dataValue.placeholder ||
+          dataValue.displayText ||
+          dataValue.key ||
+          dataValue
         );
 
         if (key == multi.quantifier) {
@@ -108,7 +111,7 @@
       }
     }
 
-    purge.forEach((dat) => deleteMulti(multi.id, dat));
+    purge.forEach(dat => deleteMulti(multi.id, dat));
 
     for (let multData of $multiSelectEntries[multi.id]) {
       let formatted = format;
@@ -118,7 +121,10 @@
         let dataValue = multData[key];
         formatted = formatted.replace(
           `%${key}%`,
-          dataValue.placeholder || dataValue.displayText || dataValue.key || dataValue
+          dataValue.placeholder ||
+          dataValue.displayText ||
+          dataValue.key ||
+          dataValue
         );
         let cost = dataValue.cost || getQualifiedCost(dataValue, multData);
         console.log(cost);
@@ -141,10 +147,12 @@
     for (let opt: ImageOption | ButtonOption of options) {
       let selected: BaseData | string = getValue(opt.id);
       let selectedValid = true;
-      if (typeof selected === 'string' || typeof selected === 'number') continue;
+      if (typeof selected === 'string' || typeof selected === 'number')
+        continue;
       if (!meetsPrereqs(selected?.prereq)) selectedValid = false;
 
-      let key = 'images' in opt ? 'images' : 'buttons' in opt ? 'buttons' : 'items';
+      let key =
+        'images' in opt ? 'images' : 'buttons' in opt ? 'buttons' : 'items';
       if (key in opt) {
         numOptions[opt.id] = 0;
         for (let img: OptionImageData | ButtonData | GroupData of opt[key]) {
@@ -189,8 +197,8 @@
   {#if loading || !data}
     <h2 id="optionTitle">Hold tight!</h2>
     <div class="instructions">
-      The webpage is loading! If it doesn't load in a few seconds, please refresh the page. If it
-      still doesn't load, email us and let us know!
+      The webpage is loading! If it doesn't load in a few seconds, please
+      refresh the page. If it still doesn't load, email us and let us know!
     </div>
   {:else}
     <h2 class="optionTitle">{@html data.title}</h2>
@@ -205,7 +213,11 @@
 
             <!-- ImageOption -->
             {#if opt.images}
-              <div id={opt.id} class="imgSelect" class:error={$requirementsNotMet.includes(opt.id)}>
+              <div
+                id={opt.id}
+                class="imgSelect"
+                class:error={$requirementsNotMet.includes(opt.id)}
+              >
                 {#each opt.images as img}
                   {#if !img.prereq || meetsPrereqs(img.prereq)}
                     <!-- Groups! -->
@@ -215,7 +227,10 @@
                         {#each img.group.images as gImg}
                           {#if !gImg.prereq || meetsPrereqs(gImg.prereq)}
                             <div
-                              class="imgContainer flex-{Math.min(4, img.group.images.length)}"
+                              class="imgContainer flex-{Math.min(
+                                4,
+                                img.group.images.length
+                              )}"
                               on:click={select(opt.id, gImg)}
                               class:selected={getValue(opt.id) == gImg}
                             >
@@ -236,7 +251,9 @@
                               <div class="imgBox">
                                 <img
                                   class="imgOption"
-                                  src={gImg.displayImage ? gImg.displayImage : getImage(gImg)}
+                                  src={gImg.displayImage
+                                    ? gImg.displayImage
+                                    : getImage(gImg)}
                                   alt={gImg.key}
                                 />
                               </div>
@@ -273,7 +290,9 @@
                         <div class="imgBox">
                           <img
                             class="imgOption"
-                            src={img.displayImage ? img.displayImage : getImage(img)}
+                            src={img.displayImage
+                              ? img.displayImage
+                              : getImage(img)}
                             style="background-image: {img.background}"
                             alt={img.key}
                           />
@@ -285,7 +304,11 @@
               </div>
               <!-- ButtonOption -->
             {:else if opt.buttons}
-              <div id={opt.id} class="imgSelect" class:error={$requirementsNotMet.includes(opt.id)}>
+              <div
+                id={opt.id}
+                class="imgSelect"
+                class:error={$requirementsNotMet.includes(opt.id)}
+              >
                 {#each opt.buttons as button}
                   {#if !button.prereq || meetsPrereqs(button.prereq)}
                     <div
@@ -321,22 +344,26 @@
             {:else if opt.items && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <select
                 id={opt.id}
-                on:change={(e) =>
+                on:change={e =>
                   select(
                     opt.id,
                     opt.items[
                       e.target.selectedIndex -
-                        (opt.items.filter((itm) => itm.default).length == 0 ? 1 : 0)
+                        (opt.items.filter(itm => itm.default).length == 0
+                          ? 1
+                          : 0)
                     ]
                   )}
                 class:error={$requirementsNotMet.includes(opt.id)}
               >
-                {#if opt.items.filter((itm) => itm.default).length == 0}
+                {#if opt.items.filter(itm => itm.default).length == 0}
                   <option value="-1" />
                 {/if}
                 {#each opt.items as item, i}
-                  <option value={i} selected={item.default || $selections[opt.id] == item}
-                    >{item.displayText}</option
+                  <option
+                    value={i}
+                    selected={item.default || $selections[opt.id] == item}
+                  >{item.displayText}</option
                   >
                 {/each}
               </select>
@@ -347,10 +374,10 @@
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={(e) => select(opt.id, e.target.value)}
-                on:keypress={(e) => select(opt.id, e.target.value)}
-                on:paste={(e) => select(opt.id, e.target.value)}
-                on:input={(e) => select(opt.id, e.target.value)}
+                on:change={e => select(opt.id, e.target.value)}
+                on:keypress={e => select(opt.id, e.target.value)}
+                on:paste={e => select(opt.id, e.target.value)}
+                on:input={e => select(opt.id, e.target.value)}
                 value={$selections[opt.id] || ``}
               />
             {:else if opt.type == 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
@@ -360,10 +387,10 @@
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={(e) => select(opt.id, e.target.value)}
-                on:keypress={(e) => select(opt.id, e.target.value)}
-                on:paste={(e) => select(opt.id, e.target.value)}
-                on:input={(e) => select(opt.id, e.target.value)}
+                on:change={e => select(opt.id, e.target.value)}
+                on:keypress={e => select(opt.id, e.target.value)}
+                on:paste={e => select(opt.id, e.target.value)}
+                on:input={e => select(opt.id, e.target.value)}
                 value={$selections[opt.id] || `1`}
               />
             {:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
@@ -371,7 +398,7 @@
                 type="date"
                 id={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={(e) => select(opt.id, e.target.value)}
+                on:change={e => select(opt.id, e.target.value)}
                 value={$selections[opt.id] || ``}
               />
             {:else if opt.type == 'textLong' && (!opt.prereq || meetsPrereqs(opt.prereq))}
@@ -380,10 +407,10 @@
                 placeholder={opt.placeholder}
                 class={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={(e) => select(opt.id, e.target.value)}
-                on:keypress={(e) => select(opt.id, e.target.value)}
-                on:paste={(e) => select(opt.id, e.target.value)}
-                on:input={(e) => select(opt.id, e.target.value)}
+                on:change={e => select(opt.id, e.target.value)}
+                on:keypress={e => select(opt.id, e.target.value)}
+                on:paste={e => select(opt.id, e.target.value)}
+                on:input={e => select(opt.id, e.target.value)}
                 value={$selections[opt.id] || ``}
               />
             {/if}
@@ -393,14 +420,20 @@
     </div>
   {/if}
   {#if data.multiselect}
-    <button class="button add" on:click={addMultiSelect(data.multiselect)}><p>Add Item</p></button>
+    <button class="button add" on:click={addMultiSelect(data.multiselect)}
+    ><p>Add Item</p></button
+    >
   {/if}
   {#each Object.keys(formattedEntries) as key (formattedEntries[key].id)}
     {#each formattedEntries[key].data as entry, i}
       <div class="multi">
         {entry}
         <div class="summaryPrice">${formattedEntries[key].costs[i]}</div>
-        <div class="delete material-icons no-select" title="Delete" on:click={purgeMulti(key, i)}>
+        <div
+          class="delete material-icons no-select"
+          title="Delete"
+          on:click={purgeMulti(key, i)}
+        >
           delete
         </div>
       </div>
@@ -413,11 +446,17 @@
         {#if entry && (entry.summaryText || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
           <div id="preview-{key}" class="summaryItem">
             {#if entry.summaryText}
-              {entry.summaryText || entry.key || entry.displayText || JSON.stringify(entry)}
-              <div class="summaryPrice" class:hidden={!entry.cost && !entry.values}>
+              {entry.summaryText ||
+              entry.key ||
+              entry.displayText ||
+              JSON.stringify(entry)}
+              <div
+                class="summaryPrice"
+                class:hidden={!entry.cost && !entry.values}
+              >
                 ${calculateTotal(entry)
-                  .toFixed(2)
-                  .replace(/[.,]00$/, '')}
+                .toFixed(2)
+                .replace(/[.,]00$/, '')}
               </div>
             {:else if typeof entry == 'string' && (localOpt = config.getOption(key))?.display}
               {localOpt.display || ''}{entry}
@@ -432,11 +471,14 @@
           {#each entry as multi}
             <div class="summaryItem">
               {currentData.parseText(multi)}
-              <div class="summaryPrice" class:hidden={!currentData.total(multi)}>
+              <div
+                class="summaryPrice"
+                class:hidden={!currentData.total(multi)}
+              >
                 ${currentData
-                  .total(multi)
-                  ?.toFixed(2)
-                  .replace(/[.,]00$/, '')}
+                .total(multi)
+                ?.toFixed(2)
+                .replace(/[.,]00$/, '')}
               </div>
             </div>
           {/each}

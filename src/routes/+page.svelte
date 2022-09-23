@@ -2,7 +2,6 @@
   import Builder from '$lib/ui/Builder.svelte';
   import { page, PageHelper } from '$lib/pages';
   import ShopPage from '$lib/pages/ShopPage.svelte';
-  import { multiSelectEntries } from '$lib/interpreter';
   import { onDestroy, onMount } from 'svelte';
 
   let shopComponent: ShopPage;
@@ -14,10 +13,7 @@
     pageHelper.destroy();
   });
 
-  const resetMultiSelect = () => {
-    shopComponent?.destroyMulti();
-    console.log($multiSelectEntries);
-  };
+  const resetMultiSelect = () => shopComponent?.destroyMulti();
 </script>
 
 <Builder on:change-page={resetMultiSelect} {pageHelper}>

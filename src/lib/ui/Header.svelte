@@ -5,7 +5,11 @@
 <header>
   <div id="mainHead">
     <a href="https://customfamilytreeart.com">
-      <img alt="Logo" src="/imgs/Homestead Images/2020 Logo Web.png" id="logo" />
+      <img
+        alt="Logo"
+        src="/imgs/Homestead Images/2020 Logo Web.png"
+        id="logo"
+      />
     </a>
     <div id="headText">Turn Your Family History Into Art!</div>
     <a href="https://customfamilytreeart.com/gift-certificates">
@@ -26,7 +30,9 @@
         <div class="items">
           <a href="https://shop.customfamilytreeart.com">Order a Tree</a><a
             href="https://customfamilytreeart.com/updates">Update a Tree</a
-          ><a href="https://customfamilytreeart.com/gift-certificates">Gift Certificates</a>
+          ><a href="https://customfamilytreeart.com/gift-certificates"
+            >Gift Certificates</a
+          >
         </div>
       </li>
       <li><a href="https://customfamilytreeart.com/faq">FAQ</a></li>
@@ -35,11 +41,15 @@
           >TREES<i class="material-icons drop">expand_more</i></a
         >
         <div class="items">
-          <a href="https://customfamilytreeart.com/ancestry-trees">Ancestry Trees</a><a
-            href="https://customfamilytreeart.com/descendant-trees">Descendant Trees</a
-          ><a href="https://customfamilytreeart.com/additional-designs">Additional Designs</a><a
-            href="https://customfamilytreeart.com/updates">Updates</a
-          ><a href="https://customfamilytreeart.com/gallery">Gallery</a>
+          <a href="https://customfamilytreeart.com/ancestry-trees"
+            >Ancestry Trees</a
+          ><a href="https://customfamilytreeart.com/descendant-trees"
+            >Descendant Trees</a
+          ><a href="https://customfamilytreeart.com/additional-designs"
+            >Additional Designs</a
+          ><a href="https://customfamilytreeart.com/updates">Updates</a><a
+            href="https://customfamilytreeart.com/gallery">Gallery</a
+          >
         </div>
       </li>
       <li class="hidden-items">
@@ -47,13 +57,12 @@
           >INFO<i class="material-icons drop">expand_more</i></a
         >
         <div class="items">
-          <a href="https://customfamilytreeart.com/how-it-works">How It Works</a><a
-            href="https://customfamilytreeart.com/name-forms">Name Forms</a
-          ><a href="https://customfamilytreeart.com/prints">Prints</a><a
-            href="https://customfamilytreeart.com/frames">Frames</a
-          ><a href="https://customfamilytreeart.com/prices">Prices</a><a
-            href="https://customfamilytreeart.com/shipping">Shipping</a
-          >
+          <a href="https://customfamilytreeart.com/how-it-works">How It Works</a
+          ><a href="https://customfamilytreeart.com/name-forms">Name Forms</a><a
+            href="https://customfamilytreeart.com/prints">Prints</a
+          ><a href="https://customfamilytreeart.com/frames">Frames</a><a
+            href="https://customfamilytreeart.com/prices">Prices</a
+          ><a href="https://customfamilytreeart.com/shipping">Shipping</a>
         </div>
       </li>
       <li><a href="https://customfamilytreeart.com/contact">CONTACT</a></li>

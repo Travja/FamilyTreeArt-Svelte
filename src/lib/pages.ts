@@ -1,4 +1,4 @@
-import type { Subscriber, Unsubscriber, Writable } from 'svelte/store';
+import type { Unsubscriber, Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
 import type { TreeArtPage } from './conf/TreeArtConfig';
 import { config } from './conf/config';
@@ -16,11 +16,7 @@ export class PageHelper {
   selSub: Unsubscriber;
 
   constructor() {
-    this.unsubIdx = currentPage.subscribe((idx) => {
-      console.log('Current Page: ' + idx);
-      this.initPages();
-    });
-
+    this.unsubIdx = currentPage.subscribe(idx => this.initPages());
     this.selSub = selections.subscribe(this.initPages);
   }
 
@@ -65,11 +61,10 @@ export class PageHelper {
   };
 
   gotoNextPage = () => {
-    console.log(';(');
     let current = get(currentPage);
     for (let i = current + 1; i < this.pageCount; i++) {
       let next = config.pages[i];
-      console.log('n ' + i + ' ' + next?.meetsRequirements());
+      // console.log('n ' + i + ' ' + next?.meetsRequirements());
       if (next?.meetsRequirements()) {
         this.nextPage = i;
         break;
