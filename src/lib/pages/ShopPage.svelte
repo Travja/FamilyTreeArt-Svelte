@@ -511,7 +511,6 @@
   }
 
   .imgContainer {
-    /*flex-grow: 1;*/
     display: flex;
     position: relative;
     flex-direction: column;
@@ -569,9 +568,9 @@
 
   .textButton {
     background-color: #bbb;
-    border: 5px solid #ccc;
     box-sizing: border-box;
     border-radius: 12px;
+    margin: 5px;
   }
 
   textarea {

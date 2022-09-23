@@ -1,4 +1,3 @@
 - Integrate PayPal
 - Make quote swapping work
-- Make button to save Canvas
 - TEST, TEST, TEST (Probably write some unit tests if possible)

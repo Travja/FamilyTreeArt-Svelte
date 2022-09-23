@@ -54,6 +54,22 @@ a.title {
   flex-basis: 25%;
 }
 
+.textButton.flex-1 {
+  flex-basis: calc(100% - 10px);
+}
+
+.textButton.flex-2 {
+  flex-basis: calc(50% - 10px);
+}
+
+.textButton.flex-3 {
+  flex-basis: calc(33% - 10px);
+}
+
+.textButton.flex-4 {
+  flex-basis: calc(25% - 10px);
+}
+
 .clear {
   clear: both;
   margin: 0 !important;
@@ -93,6 +109,7 @@ button {
 }
 
 button:hover {
+  cursor: pointer;
   background-color: rgba(0, 0, 0, 0.15) !important;
 }
 
