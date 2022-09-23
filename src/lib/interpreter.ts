@@ -9,16 +9,13 @@ import type {
 } from '$lib/conf/TreeArtConfig';
 import { config } from '$lib/conf/config';
 import type { Writable } from 'svelte/store';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { canvasManager } from './canvas-manager';
-
-let _requirementsNotMet = [];
-let _selections = {};
-let _multiSelectEntries = {};
+import { saveMultiData, saveSelections } from './data-store';
 
 export const requirementsNotMet = writable([]);
-export const selections: Writable<any> = writable(_selections);
-export const multiSelectEntries: Writable<any> = writable(_multiSelectEntries);
+export const selections: Writable<any> = writable({});
+export const multiSelectEntries: Writable<any> = writable({});
 export const composite: Writable<any> = writable();
 export const totalCost: Writable<number> = writable(0);
 
@@ -27,7 +24,7 @@ export const calculateTotal = (option: BaseData): number => {
     return option.cost;
   } else if ('values' in option) {
     for (const val of option.values) {
-      let selected = _selections[val.option];
+      let selected = get(selections)[val.option];
       if (!selected) continue;
 
       if (val.value.includes(selected.key)) {
@@ -41,11 +38,11 @@ export const calculateTotal = (option: BaseData): number => {
 
 const updateTotal = () => {
   let total = 0;
-  Object.values(_selections).forEach((val: BaseData) => {
+  Object.values(get(selections)).forEach((val: BaseData) => {
     if (typeof val == 'object') total += calculateTotal(val);
   });
 
-  Object.entries<any>(_multiSelectEntries).forEach(([key, entry]) => {
+  Object.entries<any>(get(multiSelectEntries)).forEach(([key, entry]) => {
     let currentData = config.getMultiSelectData(key);
     entry.forEach(multi => (total += currentData.total(multi)));
   });
@@ -53,19 +50,28 @@ const updateTotal = () => {
   totalCost.set(total);
 };
 
-selections.subscribe(updateTotal);
-multiSelectEntries.subscribe(updateTotal);
+selections.subscribe(selections => {
+  console.log(selections);
+  updateTotal();
+  saveSelections(selections);
+});
+multiSelectEntries.subscribe(entries => {
+  updateTotal();
+  saveMultiData(entries);
+});
 
 export const selectItem = (
   optId: string,
   value: BaseData | number | string
 ) => {
+  let sel = get(selections);
   // console.log(`New value for ${optId}: `, value);
-  _selections[optId] = value;
+  const prev = sel[optId];
+  sel[optId] = value;
   if (typeof value == 'object') {
-    if ('reset' in value) {
+    if (prev && 'key' in value && prev.key != value.key && 'reset' in value) {
       for (let res of value.reset) {
-        delete _selections[res];
+        delete sel[res];
       }
     }
 
@@ -74,9 +80,9 @@ export const selectItem = (
     }
   }
 
-  _requirementsNotMet = _requirementsNotMet.filter(item => item != optId);
-  requirementsNotMet.set(_requirementsNotMet);
-  selections.set(_selections);
+  let reqs = get(requirementsNotMet).filter(item => item != optId);
+  requirementsNotMet.set(reqs);
+  selections.set(sel);
 
   const force = [
     'familyName',
@@ -93,8 +99,9 @@ export const selectItem = (
 };
 
 export const unset = (optId: string) => {
-  _selections[optId] = undefined;
-  selections.set(_selections);
+  let sel = get(selections);
+  sel[optId] = undefined;
+  selections.set(sel);
 };
 
 export const getValue = (
@@ -103,23 +110,23 @@ export const getValue = (
 ): OptionImageData | ButtonData | string => {
   return sourceData && sourceData[optId]
     ? sourceData[optId]
-    : _selections[optId];
+    : get(selections)[optId];
 };
 
 export const selectMultiSelect = (optId: string, value: any) => {
-  if (!_multiSelectEntries[optId]) _multiSelectEntries[optId] = [];
-  _multiSelectEntries[optId].push(value);
-  multiSelectEntries.set(_multiSelectEntries);
+  let entries = get(multiSelectEntries);
+  if (!entries[optId]) entries[optId] = [];
+  entries[optId].push(value);
+  multiSelectEntries.set(entries);
 };
 
 export const getMultiSelect = (optId: string): any =>
-  _multiSelectEntries[optId];
+  get(multiSelectEntries)[optId];
 
 export const deleteMulti = (optId: string, multi: any) => {
-  _multiSelectEntries[optId] = _multiSelectEntries[optId].filter(
-    data => data != multi
-  );
-  multiSelectEntries.set(_multiSelectEntries);
+  let entries = get(multiSelectEntries);
+  entries[optId] = entries[optId].filter(data => data != multi);
+  multiSelectEntries.set(entries);
 };
 
 export const getQualifiedCost = (
@@ -130,13 +137,16 @@ export const getQualifiedCost = (
   if (!option.values) return value;
 
   for (let check of option.values) {
-    let targetValue = getValue(check.option, sourceData);
+    let targetValue: OptionImageData | ButtonData | string = getValue(
+      check.option,
+      sourceData
+    );
     // console.log('Target value: ' + targetValue);
     if (!targetValue) continue;
 
     if (
       (typeof targetValue == 'string' && check.value.includes(targetValue)) ||
-      check.value.includes((<BaseData>targetValue).key)
+      (typeof targetValue == 'object' && check.value.includes(targetValue.key))
     ) {
       value = check.cost;
       break;
@@ -149,16 +159,16 @@ export const getQualifiedCost = (
 export const meetsPrereqs = (prereq: Prereqs): boolean => {
   if (!prereq) return true;
 
-  let value: BaseData | string = getValue(prereq.option);
-  if (typeof value != 'string') value = (<BaseData>value)?.key;
+  let value: OptionImageData | ButtonData | string = getValue(prereq.option);
+  if (typeof value != 'string') value = value?.key;
 
   if (!value) return false;
 
   let result = prereq.value
     ? // Check if we have an included value
-      prereq.value.includes(value)
+    prereq.value.includes(value)
     : // Or that we are properly using an excluded value
-      prereq.not_value && !prereq.not_value.includes(value);
+    prereq.not_value && !prereq.not_value.includes(value);
 
   // Check the and recursively
   if (prereq.and) result = result && meetsPrereqs(prereq.and);
@@ -171,17 +181,17 @@ export const meetsPrereqs = (prereq: Prereqs): boolean => {
 };
 
 export const requirementsMet = (page: TreeArtPage): boolean => {
-  _requirementsNotMet = [];
+  let reqs = [];
   for (let opt of page.options) {
     if (
       (!opt.prereq || meetsPrereqs(opt.prereq)) &&
       opt.required &&
       !getValue(opt.id)
     )
-      _requirementsNotMet.push(opt.id);
+      reqs.push(opt.id);
   }
-  requirementsNotMet.set(_requirementsNotMet);
-  return _requirementsNotMet.length === 0;
+  requirementsNotMet.set(reqs);
+  return reqs.length === 0;
 };
 
 /*
@@ -283,11 +293,12 @@ const getOrDefault = (
 };
 
 export const getComposite = () => {
+  let sel = get(selections);
   let comp = {};
-  for (let key in _selections) {
-    if (!(key in _selections) || !_selections[key]?.img) continue;
+  for (let key in sel) {
+    if (!(key in sel) || !sel[key]?.img) continue;
 
-    let obj = _selections[key].img;
+    let obj = sel[key].img;
     for (let imgKey in obj) {
       if (typeof obj[imgKey] == 'object') {
         if (!comp[imgKey]) comp[imgKey] = {};

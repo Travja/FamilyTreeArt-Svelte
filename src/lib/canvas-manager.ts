@@ -1,12 +1,6 @@
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
-import {
-  getComposite,
-  getLeavesImage,
-  getRootsImage,
-  getTreeImage,
-  selections
-} from './interpreter';
+import { getComposite, getLeavesImage, getRootsImage, getTreeImage, selections } from './interpreter';
 
 export const myCanvas: Writable<HTMLCanvasElement> = writable();
 export const customSvg: Writable<SVGElement> = writable();
@@ -20,7 +14,7 @@ class CanvasManager {
   processImg = (forceReload: boolean = false): void => {
     let composite = getComposite();
     let compositeString = JSON.stringify(composite);
-    if (!forceReload && this.previousCompositeString == compositeString) return;
+    if (!forceReload && (this.previousCompositeString == compositeString || compositeString == '{}')) return;
 
     this.previousCompositeString = compositeString;
     loading.set(true);
@@ -41,10 +35,13 @@ class CanvasManager {
 
     delete composite.use;
     let rootsExist = !!composite.roots && 'type' in composite.roots;
+    console.log(composite);
 
     let treeImg = getTreeImage(composite);
     let rootsImg = getRootsImage(composite.roots);
     let leavesImg = getLeavesImage(composite);
+
+    console.log(treeImg);
 
     let ctx = canvas.getContext('2d');
 

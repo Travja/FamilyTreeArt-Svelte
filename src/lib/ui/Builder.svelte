@@ -2,11 +2,12 @@
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
   import { composite, selections, totalCost } from '$lib/interpreter';
-  import { currentPage, PageHelper } from '$lib/pages';
+  import { currentPage, page, PageHelper, visitedLast } from '$lib/pages';
   import { svgStyle } from '$lib/conf/fonts';
   import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
-  import { customSvg, loading, myCanvas } from '$lib/canvas-manager';
+  import { canvasManager, customSvg, loading, myCanvas } from '$lib/canvas-manager';
+  import PayPalWidget from '$lib/ui/PayPalWidget.svelte';
 
   export let pageHelper: PageHelper;
 
@@ -16,20 +17,15 @@
 
   let unsub: Unsubscriber;
 
-  onMount(
-    () =>
-      (unsub = currentPage.subscribe(page => {
-        dispatch('change-page', page);
-        setTimeout(
-          () =>
-            window.scrollTo(
-              0,
-              document.getElementById('contentWrapper').offsetTop
-            ),
-          250
-        );
-      }))
-  );
+  onMount(() => {
+    unsub = currentPage.subscribe(page => {
+      dispatch('change-page', page);
+      setTimeout(() =>
+          window.scrollTo(0, document.getElementById('contentWrapper').offsetTop),
+        250);
+    });
+    canvasManager.processImg();
+  });
 
   onDestroy(() => {
     if (unsub) unsub();
@@ -127,18 +123,18 @@
         </text>
       </svg>
       {#if $loading}
-        <div class="loading" transition:fade={{ duration: 200 }}>
+        <div class="cover" transition:fade={{ duration: 200 }}>
           <span>Loading...</span>
         </div>
+      {/if}
+      {#if $selections['background']}
+        <div id="save" class="cover" on:click={saveTree}>Save Preview</div>
       {/if}
     </div>
     <div class="clear" />
     <div id="item-footer">
       This is only a representation to help you select design elements. Your
       tree, like your family, will be unique!
-      {#if $selections['background']}
-        <button on:click={saveTree}>Save Preview</button>
-      {/if}
     </div>
   </div>
   <div id="configuration">
@@ -168,6 +164,12 @@
     <div id="total" class="toggleable-cost" class:hidden={hideCost}>
       <h3>Total: ${$totalCost.toFixed(2)}</h3>
     </div>
+    <div class="clear" />
+    {#if $page?.finalPage}
+      <PayPalWidget />
+    {:else if $visitedLast}
+      <button id="skip" on:click={() => currentPage.set(pageHelper.pageCount - 1)}>Jump to Cart</button>
+    {/if}
   </div>
 </div>
 
@@ -343,14 +345,37 @@
     margin: 0;
   }
 
-  .loading {
+  svg {
+    display: none;
+  }
+
+  .cover {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
+    font-size: 1.5em;
 
     backdrop-filter: blur(5px);
     background: rgba(255, 255, 255, 0.4);
+  }
+
+  #save {
+    border: 3px dashed black;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+  }
+
+  #save:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
+
+  #skip {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
   }
 </style>

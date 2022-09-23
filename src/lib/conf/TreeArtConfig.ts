@@ -219,9 +219,9 @@ export interface TextOption extends BaseOption {
 
 export interface BaseData {
   prereq?: Prereqs;
+  key?: string;
   displayText?: string;
   cost?: number;
-  key?: string;
   summaryText?: string;
   default?: boolean;
   img?: ImageFormatData;
@@ -241,15 +241,19 @@ export interface BaseData {
 }
 
 export interface OptionImageData extends BaseData {
+  key: string;
   displayImage?: string;
   background?: string;
   footer?: string;
 }
 
-export interface ButtonData extends BaseData {}
+export interface ButtonData extends BaseData {
+  key: string;
+}
 
 export interface ItemData extends BaseData {
   formDisplay?: string;
+  key: string;
 }
 
 export interface ImageFormatData {

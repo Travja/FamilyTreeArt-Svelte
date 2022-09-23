@@ -7,7 +7,7 @@ body {
   font-family: Lato;
   padding: 2px 32px;
   margin: 0 auto;
-  width: 1041px;
+  max-width: 1041px;
   box-sizing: border-box;
 }
 

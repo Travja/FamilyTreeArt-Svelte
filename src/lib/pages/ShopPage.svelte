@@ -27,23 +27,35 @@
   } from '$lib/interpreter';
   import { onMount } from 'svelte';
   import { config } from '$lib/conf/config';
-
-  export let data: TreeArtPage = undefined;
+  import { currentPage, page } from '../pages';
 
   let loading = true;
   let options: (ImageOption | ButtonOption)[];
   let numOptions: any = {};
   let formattedEntries = {};
+  let previousPage = -1;
+  let cPage = -1;
 
   let localOpt: any;
   let currentData: MultiSelectData;
 
-  onMount(() => (loading = false));
+  onMount(() => {
+    currentPage.subscribe(p => {
+      previousPage = cPage;
+      cPage = p;
+    });
+    page.subscribe((pg) => {
+      if (!pg) return;
+      checkSelections(pg);
+      destroyMulti(pg);
+    });
+    loading = false;
+  });
 
-  export const destroyMulti = () => {
+  export const destroyMulti = (page: TreeArtPage) => {
     formattedEntries = {};
-    if (!data.multiselect || !data.multiselect.keys) return;
-    for (let key of data.multiselect.keys) {
+    if (!page.multiselect || !page.multiselect.keys) return;
+    for (let key of page.multiselect.keys) {
       unset(key);
     }
   };
@@ -68,13 +80,11 @@
   const purgeMulti = (multiId: string, index: number) => {
     let datum: any = getMultiSelect(multiId)[index];
     deleteMulti(multiId, datum);
-    updateMulti(data.multiselect);
+    updateMulti($page.multiselect);
   };
 
   const updateMulti = (multi: MultiSelectData) => {
     if (!multi) return;
-
-    console.log('multi', multi);
 
     let multiData = $multiSelectEntries[multi.id];
     if (!multiData) return;
@@ -141,31 +151,26 @@
     console.log(formattedEntries);
   };
 
-  $: if (data) {
-    options = <(ImageOption | ButtonOption)[]>data.options;
+  const checkSelections = (page) => {
+    if (previousPage == cPage) return;
+    previousPage = cPage;
+
+    options = <(ImageOption | ButtonOption)[]>page.options;
+    let toSelect: { string: any } = {};
 
     for (let opt: ImageOption | ButtonOption of options) {
-      let selected: BaseData | string = getValue(opt.id);
+      let selected: any = getValue(opt.id);
       let selectedValid = true;
       if (typeof selected === 'string' || typeof selected === 'number')
         continue;
       if (!meetsPrereqs(selected?.prereq)) selectedValid = false;
 
-      let key =
-        'images' in opt ? 'images' : 'buttons' in opt ? 'buttons' : 'items';
+      let key = 'images' in opt ? 'images'
+        : 'buttons' in opt ? 'buttons' : 'items';
       if (key in opt) {
         numOptions[opt.id] = 0;
-        for (let img: OptionImageData | ButtonData | GroupData of opt[key]) {
+        for (let img: BaseData | GroupData of opt[key]) {
           if (!meetsPrereqs(img?.prereq)) continue;
-
-          if (
-            (!selected && 'default' in img && img.default) ||
-            (!selectedValid && selected.key == img.key)
-          ) {
-            selectItem(opt.id, img);
-            selected = img;
-            selectedValid = true;
-          }
 
           if ('group' in img) {
             for (let data: OptionImageData of img.group.images) {
@@ -173,14 +178,26 @@
               numOptions[opt.id]++;
               if (
                 (!selected && 'default' in data && data.default) ||
-                (!selectedValid && selected.key == data.key)
+                (selected?.key == data.key)
               ) {
-                selectItem(opt.id, data);
+                toSelect[opt.id] = data;
                 selected = data;
                 selectedValid = true;
               }
             }
-          } else numOptions[opt.id]++;
+            continue;
+          }
+
+          numOptions[opt.id]++;
+          if (
+            (!selected && 'default' in img && img.default) ||
+            (selected?.key == img.key)
+          ) {
+            toSelect[opt.id] = img;
+            selected = img;
+            selectedValid = true;
+          }
+
         }
       } else if (opt.type === 'number' && !selected) selectItem(opt.id, 1);
 
@@ -189,21 +206,25 @@
       }
     }
 
-    updateMulti(data.multiselect);
-  }
+    Object.entries<any>(toSelect).forEach(([key, entry]) => {
+      selectItem(key, entry);
+    });
+
+    updateMulti(page.multiselect);
+  };
 </script>
 
 <container>
-  {#if loading || !data}
+  {#if loading || !$page}
     <h2 id="optionTitle">Hold tight!</h2>
     <div class="instructions">
       The webpage is loading! If it doesn't load in a few seconds, please
       refresh the page. If it still doesn't load, email us and let us know!
     </div>
   {:else}
-    <h2 class="optionTitle">{@html data.title}</h2>
-    {#if data.intro && data.intro.length > 0}
-      <div class="instructions">{@html data.intro}</div>
+    <h2 class="optionTitle">{@html $page.title}</h2>
+    {#if $page.intro && $page.intro.length > 0}
+      <div class="instructions">{@html $page.intro}</div>
     {/if}
     <div id="options">
       {#each options as opt}
@@ -232,7 +253,7 @@
                                 img.group.images.length
                               )}"
                               on:click={select(opt.id, gImg)}
-                              class:selected={getValue(opt.id) == gImg}
+                              class:selected={getValue(opt.id)?.key == gImg.key}
                             >
                               <div class="optText">
                                 {#if gImg.placeholder}
@@ -257,6 +278,11 @@
                                   alt={gImg.key}
                                 />
                               </div>
+                              {#if gImg.footer}
+                                <p class="optText footText">
+                                  {@html gImg.footer}
+                                </p>
+                              {/if}
                             </div>
                           {/if}
                         {/each}
@@ -268,7 +294,7 @@
                           numOptions[opt.id]
                         )}"
                         on:click={select(opt.id, img)}
-                        class:selected={getValue(opt.id) == img}
+                        class:selected={getValue(opt.id)?.key == img.key}
                       >
                         <div class="optText">
                           {#if img.placeholder}
@@ -297,6 +323,11 @@
                             alt={img.key}
                           />
                         </div>
+                        {#if img.footer}
+                          <p class="optText footText">
+                            {@html img.footer}
+                          </p>
+                        {/if}
                       </div>
                     {/if}
                   {/if}
@@ -317,7 +348,7 @@
                         numOptions[opt.id]
                       )} textButton"
                       on:click={select(opt.id, button)}
-                      class:selected={getValue(opt.id) == button}
+                      class:selected={getValue(opt.id)?.key == button.key}
                     >
                       <div class="optText">
                         {#if button.placeholder}
@@ -419,8 +450,8 @@
       {/each}
     </div>
   {/if}
-  {#if data.multiselect}
-    <button class="button add" on:click={addMultiSelect(data.multiselect)}
+  {#if $page.multiselect}
+    <button class="button add" on:click={addMultiSelect($page.multiselect)}
     ><p>Add Item</p></button
     >
   {/if}
@@ -440,7 +471,7 @@
     {/each}
   {/each}
 
-  {#if data.finalPage}
+  {#if $page.finalPage}
     <div id="summary">
       {#each Object.entries($selections) as [key, entry]}
         {#if entry && (entry.summaryText || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
@@ -471,14 +502,9 @@
           {#each entry as multi}
             <div class="summaryItem">
               {currentData.parseText(multi)}
-              <div
-                class="summaryPrice"
-                class:hidden={!currentData.total(multi)}
-              >
-                ${currentData
-                .total(multi)
-                ?.toFixed(2)
-                .replace(/[.,]00$/, '')}
+              <div class="summaryPrice"
+                   class:hidden={!currentData.total(multi)}>
+                ${currentData.total(multi)?.toFixed(2).replace(/[.,]00$/, '')}
               </div>
             </div>
           {/each}
@@ -539,6 +565,10 @@
     /*justify-content: center;*/
   }
 
+  .footText {
+    flex-grow: 0;
+  }
+
   .imgBox {
     position: relative;
   }
@@ -569,7 +599,6 @@
   .textButton {
     background-color: #bbb;
     box-sizing: border-box;
-    border-radius: 12px;
     margin: 5px;
   }
 
@@ -630,5 +659,9 @@
 
   .no-select {
     user-select: none;
+  }
+
+  #summary {
+    margin: 20px 20px 0;
   }
 </style>

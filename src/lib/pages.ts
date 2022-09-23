@@ -6,6 +6,7 @@ import { requirementsMet, selections } from './interpreter';
 
 export const page: Writable<TreeArtPage> = writable();
 export const currentPage: Writable<number> = writable(0);
+export const visitedLast: Writable<boolean> = writable(false);
 
 export class PageHelper {
   public nextPage: number = -1;
@@ -16,7 +17,8 @@ export class PageHelper {
   selSub: Unsubscriber;
 
   constructor() {
-    this.unsubIdx = currentPage.subscribe(idx => this.initPages());
+    this.pageCount = config.pages.length;
+    this.unsubIdx = currentPage.subscribe(this.initPages);
     this.selSub = selections.subscribe(this.initPages);
   }
 
@@ -26,9 +28,13 @@ export class PageHelper {
   };
 
   private initPages = (): void => {
-    let idx = get(currentPage);
-    page.set(config.pages[idx]);
-    for (let i = idx + 1; i < config.pages.length; i++) {
+    const idx = get(currentPage);
+    const pg = config.pages[idx];
+    if (pg.finalPage) visitedLast.set(true);
+    page.set(pg);
+
+    if (idx + 1 >= this.pageCount) this.nextPage = -1;
+    for (let i = idx + 1; i < this.pageCount; i++) {
       let next = config.pages[i];
       // console.log('n ' + i + ' ' + next?.meetsRequirements());
       if (next?.meetsRequirements()) {
@@ -48,10 +54,8 @@ export class PageHelper {
         this.previousPage = -1;
       }
     }
-    {
-      if (this.nextPage == idx) {
-        this.nextPage = -1;
-      }
+    if (this.nextPage == idx) {
+      this.nextPage = -1;
     }
 
     if (this.previousPage == idx) this.previousPage = -1;

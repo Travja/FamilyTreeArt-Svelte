@@ -69,7 +69,8 @@ config.addPage(
                   img: {
                     type: TreeType.ANCESTRY,
                     default: {
-                      couple: 'Couple'
+                      couple: 'Couple',
+                      gen: '3 Gen'
                     }
                   }
                 }
@@ -433,6 +434,7 @@ config.addPage(
           },
           {
             displayText: 'No',
+            key: 'no',
             default: true
           }
         ]
@@ -502,6 +504,7 @@ config.addPage(
         images: [
           {
             displayText: 'Style 1',
+            key: 'style1',
             img: {
               style1: 'Style 1'
             },
@@ -509,6 +512,7 @@ config.addPage(
           },
           {
             displayText: 'Style 2',
+            key: 'style2',
             img: {
               style1: 'Style 2'
             }
@@ -962,12 +966,14 @@ config.addPage(
           {
             displayText: 'Black',
             default: true,
+            key: 'black',
             img: {
               color: 'black'
             }
           },
           {
             displayText: 'Brown',
+            key: 'brown',
             prereq: {
               option: 'background',
               not_value: ['brown1', 'brown2', 'gray', 'red', 'green2']
@@ -978,6 +984,7 @@ config.addPage(
           },
           {
             displayText: 'White',
+            key: 'white',
             prereq: {
               option: 'background',
               not_value: ['s&g', 's&g2', 't1', 't2', 'sky_blue 1', 'sky_blue 2']
@@ -1007,13 +1014,15 @@ config.addPage(
           {
             displayText: 'Yes ($10)',
             summaryText: 'Add Leaves',
+            key: 'yes',
             cost: 10,
             img: {
               leaves: true
             }
           },
           {
-            displayText: 'No'
+            displayText: 'No',
+            key: 'no'
           }
         ],
         required: true
@@ -1054,19 +1063,23 @@ config.addPage(
           {
             default: true,
             displayText: 'Scriptina + Monotype Corsiva',
-            font: 'MType-Script'
+            font: 'MType-Script',
+            key: 'mtype-script'
           },
           {
             displayText: 'Monotype Corsiva',
-            font: 'MType'
+            font: 'MType',
+            key: 'monotype'
           },
           {
             displayText: 'Amazone',
-            font: 'Amaze'
+            font: 'Amaze',
+            key: 'amazone'
           },
           {
             displayText: 'Papyrus',
-            font: 'Papyrus8'
+            font: 'Papyrus8',
+            key: 'papyrus'
           }
         ]
       },
@@ -1078,12 +1091,14 @@ config.addPage(
           {
             displayText: 'Left',
             position: 'left',
+            key: 'left',
             disable: ['quoteLoc#left'], // <-------
             default: true
           },
           {
             displayText: 'Right',
             position: 'right',
+            key: 'right',
             // TODO: If this would overlap with the quote, switch the quote's position
             disable: {
               option: {
@@ -1094,11 +1109,12 @@ config.addPage(
           },
           {
             displayText: 'Center',
+            position: 'center',
+            key: 'center',
             prereq: {
               option: 'type',
               value: ['ancestry', 'descendant']
             },
-            position: 'center',
             reset: ['ground']
           }
         ]
@@ -1123,15 +1139,18 @@ config.addPage(
           {
             displayText: 'Monotype Corsiva',
             font: 'MType',
-            default: true
+            default: true,
+            key: 'monotype'
           },
           {
             displayText: 'Amazone',
-            font: 'Amaze'
+            font: 'Amaze',
+            key: 'amazone'
           },
           {
             displayText: 'Papyrus',
-            font: 'Papyrus'
+            font: 'Papyrus',
+            key: 'papyrus'
           }
         ]
       },
@@ -1142,7 +1161,8 @@ config.addPage(
         buttons: [
           {
             displayText: 'Left',
-            position: 'left'
+            position: 'left',
+            key: 'left'
             // disable: {
             // 	option: {
             // 		id: 'nameLoc',
@@ -1153,6 +1173,7 @@ config.addPage(
           {
             displayText: 'Right',
             position: 'right',
+            key: 'right',
             default: true
             // disable: {
             // 	option: {
@@ -1196,15 +1217,18 @@ config.addPage(
           {
             displayText: 'Monotype Corsiva',
             font: 'MType',
-            default: true
+            default: true,
+            key: 'monotype'
           },
           {
             displayText: 'Amazone',
-            font: 'Amaze'
+            font: 'Amaze',
+            key: 'amazone'
           },
           {
             displayText: 'Papyrus',
-            font: 'Papyrus9'
+            font: 'Papyrus9',
+            key: 'papyrus'
           }
         ]
       }
@@ -1226,7 +1250,7 @@ config.addPage(
     },
     intro: `
 			Double trunks usually work best with 2 people. Birthdates are added after each name to get the needed length.<br><br>
-			<img src='/imgs/Option Examples/Double Trunk Examples.jpg' class='full-width'/><br>
+			<img src="/imgs/Option Examples/Double Trunk Examples.jpg" class="full-width"/><br>
 			The image of the example tree you've been building won't change based on your selection, but we will create your tree with a double trunk if you select "Yes" here.
 			`,
     options: [
@@ -1237,10 +1261,12 @@ config.addPage(
         buttons: [
           {
             displayText: 'Yes',
-            summaryText: 'Double Trunk: Yes'
+            summaryText: 'Double Trunk: Yes',
+            key: 'yes'
           },
           {
             displayText: 'No',
+            key: 'no',
             default: true
           }
         ]
@@ -1308,12 +1334,14 @@ config.addPage(
           {
             displayText: 'Linen Texture',
             displayImage: '/imgs/Option Examples/Linen Texture.jpg',
-            summaryText: 'Texture: Linen'
+            summaryText: 'Texture: Linen',
+            key: 'linen'
           },
           {
             displayText: 'Canvas Texture',
             displayImage: '/imgs/Option Examples/Canvas Texture.jpg',
-            summaryText: 'Texture: Canvas'
+            summaryText: 'Texture: Canvas',
+            key: 'canvas'
           }
         ]
       },
@@ -1460,11 +1488,13 @@ config.addPage(
           {
             displayText: 'Yes ($39)',
             cost: 39,
-            summaryText: 'Extra Digital Copy'
+            summaryText: 'Extra Digital Copy',
+            key: 'yes'
           },
           {
             displayText: 'No',
-            summaryText: 'No Digital Copy'
+            summaryText: 'No Digital Copy',
+            key: 'no'
           }
         ]
       }
@@ -2100,7 +2130,7 @@ config.addPage(
           {
             displayText: 'Standard Shipping  3-10 Days (%value%)',
             default: true,
-            // hold: true,
+            key: 'standard',
             summaryText: 'Standard Shipping 3-10 Days',
             values: [
               {
@@ -2134,7 +2164,7 @@ config.addPage(
           },
           {
             displayText: '2 Day Shipping (%value%)',
-            // hold: true,
+            key: '2-day',
             summaryText: '2 Day Shipping',
             values: [
               {
@@ -2168,6 +2198,7 @@ config.addPage(
           },
           {
             displayText: '1 Day Shipping (%value%)',
+            key: '1-day',
             summaryText: '1 Day Shipping',
             values: [
               {
@@ -2211,7 +2242,7 @@ config.addPage(
     title: 'Your order is ready to submit! Please check out below.',
     intro: `After you place your order, you will receive an email from us that will have the name form(s) you need. If you don't see it soon, check your junk folder.
 					Enter your family names as directed by the form and email them to us.
-					<br>If you have any questions, please send us an email at <a href='mailto:Order@customfamilytreeart.com'>Order@CustomFamilyTreeArt.com</a>`,
+					<br>If you have any questions, please send us an email at <a href="mailto:Order@customfamilytreeart.com">Order@CustomFamilyTreeArt.com</a>`,
     options: [],
     finalPage: true
   })
