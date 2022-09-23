@@ -23,7 +23,8 @@ export const loadPrevious = (): void => {
   if (typeof window == 'undefined') return;
   currentPage.set(parseInt(localStorage.getItem('furthest-page')) || 0);
   selections.set(JSON.parse(atob(localStorage.getItem('tree-selections'))));
-  multiSelectEntries.set(JSON.parse(atob(localStorage.getItem('tree-multi'))));
+  if (localStorage.getItem('tree-multi'))
+    multiSelectEntries.set(JSON.parse(atob(localStorage.getItem('tree-multi'))));
 };
 
 export const deleteCache = (): void => {
