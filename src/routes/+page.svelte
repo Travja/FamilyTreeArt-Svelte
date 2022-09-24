@@ -3,7 +3,7 @@
   import { page, PageHelper } from '$lib/pages';
   import ShopPage from '$lib/pages/ShopPage.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { hasPreviousSelections, loadPrevious } from '$lib/data-store';
+  import { deleteCache, hasPreviousSelections, loadPrevious } from '$lib/data-store';
   import { slide } from 'svelte/transition';
   import { get } from 'svelte/store';
 
@@ -19,17 +19,16 @@
     pageHelper.destroy();
   });
 
-  const resetMultiSelect = () => shopComponent?.destroyMulti(get(page));
-
   const proceed = (load = false) => {
     if (load) loadPrevious();
+    else deleteCache();
     hasPrevious = false;
   };
 </script>
 
 {#if !hasPrevious}
   <div transition:slide>
-    <Builder on:change-page={resetMultiSelect} {pageHelper}>
+    <Builder {pageHelper}>
       {#if $page}
         <ShopPage bind:this={shopComponent} />
       {/if}

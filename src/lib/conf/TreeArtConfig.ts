@@ -299,8 +299,15 @@ export interface ValueInformation {
   cost: number;
 }
 
-export interface ShopPage {
-  destroyMulti(): void;
+export interface Coupon {
+  valid: boolean,
+  data?: CouponData
+}
 
-  data: TreeArtPage;
+export interface CouponData {
+  code: string,
+  expiry: string,
+  value: number,
+  isCoupon: boolean,
+  target: string
 }

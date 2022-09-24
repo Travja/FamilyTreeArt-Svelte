@@ -52,11 +52,12 @@
       cPage = p;
       checked = false;
       destroyed = false;
+      destroyMulti(config.pages[previousPage]);
+      updateMulti(config.pages[p]?.multiselect);
     });
     unTwo = page.subscribe((pg) => {
       if (!pg) return;
       checkSelections(pg);
-      destroyMulti(pg);
     });
     loading = false;
   });
@@ -67,15 +68,14 @@
   });
 
   export const destroyMulti = (page: TreeArtPage) => {
-    if(destroyed) return;
+    if (destroyed) return;
     destroyed = true;
+    if (!page) return;
     formattedEntries = {};
     if (!page.multiselect || !page.multiselect.keys) return;
     for (let key of page.multiselect.keys) {
       unset(key);
     }
-
-    updateMulti(page.multiselect);
   };
 
   const select = (optId, value) => {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
   import { composite, selections, totalCost } from '$lib/interpreter';
   import { currentPage, page, PageHelper, visitedLast } from '$lib/pages';
@@ -8,18 +8,16 @@
   import { fade } from 'svelte/transition';
   import { canvasManager, customSvg, loading, myCanvas } from '$lib/canvas-manager';
   import PayPalWidget from '$lib/ui/PayPalWidget.svelte';
+  import CouponBox from '$lib/ui/CouponBox.svelte';
 
   export let pageHelper: PageHelper;
-
-  const dispatch = createEventDispatcher();
 
   let hideCost = false;
 
   let unsub: Unsubscriber;
 
   onMount(() => {
-    unsub = currentPage.subscribe(page => {
-      dispatch('change-page', page);
+    unsub = currentPage.subscribe(() => {
       setTimeout(() =>
           window.scrollTo(0, document.getElementById('contentWrapper').offsetTop),
         250);
@@ -166,6 +164,7 @@
     </div>
     <div class="clear" />
     {#if $page?.finalPage}
+      <CouponBox />
       <PayPalWidget />
     {:else if $visitedLast}
       <button id="skip" on:click={() => currentPage.set(pageHelper.pageCount - 1)}>Jump to Cart</button>
