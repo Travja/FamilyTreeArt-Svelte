@@ -5,6 +5,7 @@ import type {
   OptionImageData,
   Prereqs,
   RootData,
+  TextOption,
   TreeArtPage
 } from '$lib/conf/TreeArtConfig';
 import { config } from '$lib/conf/config';
@@ -12,11 +13,15 @@ import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
 import { canvasManager } from './canvas-manager';
 import { saveMultiData, saveSelections } from './data-store';
+import { coupon, couponValue } from './coupon-manager';
+import { page } from './pages';
 
 export const requirementsNotMet = writable([]);
 export const selections: Writable<any> = writable({});
 export const multiSelectEntries: Writable<any> = writable({});
 export const composite: Writable<any> = writable();
+export const itemTotal: Writable<number> = writable(0);
+export const shipping: Writable<number> = writable(0);
 export const totalCost: Writable<number> = writable(0);
 
 export const calculateTotal = (option: BaseData): number => {
@@ -38,14 +43,45 @@ export const calculateTotal = (option: BaseData): number => {
 
 const updateTotal = () => {
   let total = 0;
-  Object.values(get(selections)).forEach((val: BaseData) => {
-    if (typeof val == 'object') total += calculateTotal(val);
+  let itmTotal = 0;
+  let sel = get(selections);
+  Object.entries<BaseData>(sel).forEach(([key, val]: [string, BaseData]) => {
+    if (typeof val == 'object') {
+      let value = calculateTotal(val);
+      if (key == 'shipping') shipping.set(value);
+      else itmTotal += value;
+      total += value;
+    }
   });
 
   Object.entries<any>(get(multiSelectEntries)).forEach(([key, entry]) => {
-    let currentData = config.getMultiSelectData(key);
-    entry.forEach(multi => (total += currentData.total(multi)));
+    const currentData = config.getMultiSelectData(key);
+    entry.forEach(multi => {
+      const sum = currentData.total(multi);
+      total += sum;
+      itmTotal += sum;
+    });
   });
+
+  itemTotal.set(itmTotal);
+
+  const coup = get(coupon);
+  if (coup) {
+    let amount;
+    if (coup.target == 'all') amount = itmTotal;
+    else amount = getQualifiedCost(sel[coup.target]);
+
+    let discount = 0;
+    if (coup.isCoupon) { // X% off
+      discount = amount * (coup.value / 100);
+      discount = Math.round(discount * 100) / 100;
+    } else { // Flat value
+      discount = Math.min(coup.value, amount);
+    }
+
+    couponValue.set(discount);
+    total -= discount;
+  }
 
   totalCost.set(total);
 };
@@ -58,10 +94,12 @@ multiSelectEntries.subscribe(entries => {
   updateTotal();
   saveMultiData(entries);
 });
+coupon.subscribe(updateTotal);
 
 export const selectItem = (
   optId: string,
-  value: BaseData | number | string
+  value: BaseData | number | string,
+  cascade: boolean = true
 ) => {
   let sel = get(selections);
   // console.log(`New value for ${optId}: `, value);
@@ -73,10 +111,20 @@ export const selectItem = (
         delete sel[res];
       }
     }
-
-    if (value.disable) {
-      // TODO Implement disabling
+    if (value.onselect && cascade) {
+      value.onselect();
     }
+  } else if (typeof value == 'string') {
+    const pg = get(page);
+    let txtOpt: TextOption;
+    for (const opt of pg.options) {
+      if (opt.type == 'text' && opt.id == optId) {
+        txtOpt = opt;
+        break;
+      }
+    }
+
+    if (txtOpt && txtOpt.onupdate) txtOpt.onupdate();
   }
 
   let reqs = get(requirementsNotMet).filter(item => item != optId);

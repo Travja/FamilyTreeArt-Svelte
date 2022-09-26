@@ -200,10 +200,8 @@
 
   #item-builder {
     position: relative;
-    /*width: 340px;*/
-    height: 435px;
     width: 100%;
-    /*height: 31.81vw;*/
+    aspect-ratio: .7816;
     min-height: 310px;
     background-color: white;
     box-shadow: inset -5px -5px 5px #ccc, inset 5px 5px 5px #ccc;
@@ -271,6 +269,7 @@
   @media screen and (max-width: 900px) {
     #contentWrapper {
       flex-direction: column;
+      max-width: 100%;
       min-width: 200px;
     }
 

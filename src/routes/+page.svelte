@@ -5,7 +5,6 @@
   import { onDestroy, onMount } from 'svelte';
   import { deleteCache, hasPreviousSelections, loadPrevious } from '$lib/data-store';
   import { slide } from 'svelte/transition';
-  import { get } from 'svelte/store';
 
   let shopComponent: ShopPage;
   let pageHelper: PageHelper = new PageHelper();
@@ -13,6 +12,8 @@
 
   onMount(() => {
     hasPrevious = hasPreviousSelections();
+    if (hasPrevious)
+      proceed(true);
   });
 
   onDestroy(() => {

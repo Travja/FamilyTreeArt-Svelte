@@ -28,6 +28,7 @@
   import { config } from '$lib/conf/config';
   import { currentPage, page } from '../pages';
   import type { Unsubscriber } from 'svelte/store';
+  import { coupon, couponValue } from '$lib/coupon-manager';
 
   let loading = true;
   let options: (ImageOption | ButtonOption)[];
@@ -528,6 +529,15 @@
           {/each}
         </span>
       {/each}
+
+      {#if $coupon}
+        <div class="summaryItem bold">
+          Coupon: {$coupon.code}
+          <div class="summaryPrice">
+            -${$couponValue?.toFixed(2).replace(/[.,]00$/, '')}
+          </div>
+        </div>
+      {/if}
     </div>
   {/if}
 </container>

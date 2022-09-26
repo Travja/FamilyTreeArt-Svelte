@@ -1,9 +1,8 @@
-import {
-  MultiSelectData,
-  TreeArtConfig,
-  TreeArtPage,
-  TreeType
-} from './TreeArtConfig';
+import type { ButtonOption } from './TreeArtConfig';
+import { TreeArtConfig, TreeArtPage, TreeType, MultiSelectData } from './TreeArtConfig';
+import { get } from 'svelte/store';
+import { page } from '$lib/pages';
+import { selections, selectItem } from '../interpreter';
 
 const config: TreeArtConfig = new TreeArtConfig();
 
@@ -393,9 +392,11 @@ config.addPage(
     // Page 4
     title: 'Do you have a small family?',
     intro:
-      'Small family trees can be filled out by adding additional branches with birthdates. Wedding dates can also be included.<br/><h4>You can double the number of branches on your tree by adding birthdate branches.</h4><br/>' +
+      'Small family trees can be filled out by adding additional branches with birthdates. Wedding dates can also be included.<br/><h4>You can double the number of branches on your tree by adding birthdate branches.</h4><br/>'
+      +
       '<table class="center"><tr>' +
-      '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>' +
+      '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>'
+      +
       '</tr><tr>' +
       '<td><img class="imgOption" src="/imgs/Option Examples/Small Family.jpg"/></td>' +
       '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates.jpg"/></td>' +
@@ -453,37 +454,43 @@ config.addPage(
             displayText: '0-20 (Free!)',
             cost: 0,
             summaryText: '0-20 Date Branches',
-            formDisplay: '0-20 Branches'
+            formDisplay: '0-20 Branches',
+            key: '0-20'
           },
           {
             displayText: '20-30 (+$5)',
             cost: 5,
             summaryText: '20-30 Date Branches',
-            formDisplay: '20-30 Branches'
+            formDisplay: '20-30 Branches',
+            key: '20-30'
           },
           {
             displayText: '30-40 (+$10)',
             cost: 10,
             summaryText: '30-40 Date Branches',
-            formDisplay: '30-40 Branches'
+            formDisplay: '30-40 Branches',
+            key: '30-40'
           },
           {
             displayText: '40-50 (+$20)',
             cost: 20,
             summaryText: '40-50 Date Branches',
-            formDisplay: '40-50 Branches'
+            formDisplay: '40-50 Branches',
+            key: '40-50'
           },
           {
             displayText: '50-70 (+$30)',
             cost: 30,
             summaryText: '50-70 Date Branches',
-            formDisplay: '50-70 Branches'
+            formDisplay: '50-70 Branches',
+            key: '50-70'
           },
           {
             displayText: '70+ (Contact Us for a Quote)',
             cost: 0,
             summaryText: '70+ Date Branches',
-            formDisplay: '70+ Branches'
+            formDisplay: '70+ Branches',
+            key: '70+'
           }
         ]
       }
@@ -1092,19 +1099,25 @@ config.addPage(
             displayText: 'Left',
             position: 'left',
             key: 'left',
-            disable: ['quoteLoc#left'], // <-------
-            default: true
+            default: true,
+            onselect: () => {
+              const pg = get(page);
+              const selectedQuote = get(selections)['quoteLoc'];
+              if (selectedQuote.key != 'left') return;
+              const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
+              selectItem('quoteLoc', quoteOpt.buttons[1], false);
+            }
           },
           {
             displayText: 'Right',
             position: 'right',
             key: 'right',
-            // TODO: If this would overlap with the quote, switch the quote's position
-            disable: {
-              option: {
-                id: 'quoteLoc',
-                value: 1
-              }
+            onselect: () => {
+              const pg = get(page);
+              const selectedQuote = get(selections)['quoteLoc'];
+              if (selectedQuote.key != 'right') return;
+              const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
+              selectItem('quoteLoc', quoteOpt.buttons[0], false);
             }
           },
           {
@@ -1162,25 +1175,27 @@ config.addPage(
           {
             displayText: 'Left',
             position: 'left',
-            key: 'left'
-            // disable: {
-            // 	option: {
-            // 		id: 'nameLoc',
-            // 		value: 0
-            // 	}
-            // }
+            key: 'left',
+            onselect: () => {
+              const pg = get(page);
+              const selectedName = get(selections)['nameLoc'];
+              if (selectedName.key != 'left') return;
+              const quoteOpt: ButtonOption = <ButtonOption>pg.options[3];
+              selectItem('nameLoc', quoteOpt.buttons[1], false);
+            }
           },
           {
             displayText: 'Right',
             position: 'right',
             key: 'right',
-            default: true
-            // disable: {
-            // 	option: {
-            // 		id: 'nameLoc',
-            // 		value: 1
-            // 	}
-            // }
+            default: true,
+            onselect: () => {
+              const pg = get(page);
+              const selectedName = get(selections)['nameLoc'];
+              if (selectedName.key != 'right') return;
+              const quoteOpt: ButtonOption = <ButtonOption>pg.options[3];
+              selectItem('nameLoc', quoteOpt.buttons[0], false);
+            }
           }
         ]
       },
@@ -1193,7 +1208,14 @@ config.addPage(
         name: '<br><strong>Ground Text: </strong> &nbsp;&nbsp;',
         type: 'text',
         id: 'ground',
-        placeholder: 'Add a quote or saying here'
+        placeholder: 'Add a quote or saying here',
+        onupdate: () => {
+          const pg = get(page);
+          const selectedName = get(selections)['nameLoc'];
+          if (selectedName.key != 'center') return;
+          const nameOpt: ButtonOption = <ButtonOption>pg.options[3];
+          selectItem('nameLoc', nameOpt.buttons[0]);
+        }
       },
       {
         prereq: {
@@ -1203,7 +1225,14 @@ config.addPage(
         name: '<br><strong>Ground Text: </strong> &nbsp;&nbsp;',
         type: 'text',
         id: 'ground',
-        placeholder: 'Add a quote or saying here'
+        placeholder: 'Add a quote or saying here',
+        onupdate: () => {
+          const pg = get(page);
+          const selectedName = get(selections)['nameLoc'];
+          if (selectedName.key != 'center') return;
+          const nameOpt: ButtonOption = <ButtonOption>pg.options[3];
+          selectItem('nameLoc', nameOpt.buttons[1]);
+        }
       },
       {
         name: 'Ground Font: &nbsp;&nbsp; ',
@@ -1280,7 +1309,8 @@ config.addPage(
     //Page 12
     title: 'What kind of print would you like?',
     intro:
-      '<b>If you are outside the CONTINENTAL U.S. please select the Digital Copy option. Shipping costs are too high to ship prints internationally.</b><br/>' +
+      '<b>If you are outside the CONTINENTAL U.S. please select the Digital Copy option. Shipping costs are too high to ship prints internationally.</b><br/>'
+      +
       'With the digital JPG file you will be able to have your tree printed locally as many times as you want.<br/>' +
       '<br/><b>Learn more about each print type <a target="_blank" href="https://customfamilytreeart.com/prints">here</a></b><br/>',
     options: [
@@ -1921,7 +1951,8 @@ config.addPage(
       id: 'additionalPrints',
       keys: ['addPrintType', 'addPrintSize', 'addQty'],
       quantifier: 'addQty',
-      format: '%addQty%x %addPrintType% - %addPrintSize%'
+      format: '%addQty%x %addPrintType% - %addPrintSize%',
+      paypal: '%addPrintType% - %addPrintSize%'
     }),
     options: [
       {
@@ -2114,8 +2145,10 @@ config.addPage(
     title: 'How do you want your products shipped?',
     intro:
       '<b>These shipping options are for the CONTINENTAL U.S. only.</b><br/>' +
-      'Shipping costs for all other locations are too high. Please select Digital Copy only so that you can have it printed locally.<br/>' +
-      '<b>Production and shipping times may be 2 to 3 times longer than normal because of labor shortages at the printing facility and shipping company. ' +
+      'Shipping costs for all other locations are too high. Please select Digital Copy only so that you can have it printed locally.<br/>'
+      +
+      '<b>Production and shipping times may be 2 to 3 times longer than normal because of labor shortages at the printing facility and shipping company. '
+      +
       'Please order early!</b><br/>',
     prereq: {
       option: 'printType',

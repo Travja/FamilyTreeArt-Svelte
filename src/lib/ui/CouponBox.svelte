@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Coupon } from '../conf/TreeArtConfig';
+  import type { Coupon, CouponData } from '../conf/TreeArtConfig';
+  import { applyCoupon } from '../coupon-manager';
 
   let code = '';
   let error = '';
@@ -9,18 +10,20 @@
 
   }
 
-  const checkCoupon = () => {
+  const checkCoupon = (e) => {
+    if (e.key && e.key != 'Enter') return;
     // TODO Check the coupon against the backend
     let url = '/checkcode/' + code.toLowerCase();
     fetch(url)
       .then(response => response.json())
-      .then((data: Coupon) => {
+      .then((data: CouponData) => {
         console.log(data);
         if (data.valid) {
-          coupon = data;
-          // TODO update the pricing information :D
+          coupon = data.data;
 
           error = '';
+          applyCoupon(coupon);
+          code = '';
         } else {
           error = 'Invalid code';
         }
@@ -35,8 +38,12 @@
   <div id="couponErr">{error}</div>
   <div id="inputGroup">
     <input id="couponBox" placeholder="Enter Coupon/Certificate Code"
+           on:keypress={checkCoupon}
            bind:value={code}>
-    <button id="applyCoupon" on:click={checkCoupon}>Apply</button>
+    <button id="applyCoupon"
+            on:click={checkCoupon}>
+      Apply
+    </button>
   </div>
 </div>
 

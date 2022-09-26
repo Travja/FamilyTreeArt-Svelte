@@ -115,6 +115,7 @@ export interface MultiSelectCreate {
   keys: string[];
   quantifier: string;
   format: string;
+  paypal: string;
 }
 
 export class MultiSelectData {
@@ -123,6 +124,7 @@ export class MultiSelectData {
   keys: string[];
   quantifier: string;
   format: string;
+  paypal: string;
 
   constructor(data: MultiSelectCreate) {
     this.display = data.display;
@@ -130,6 +132,7 @@ export class MultiSelectData {
     this.keys = data.keys;
     this.quantifier = data.quantifier;
     this.format = data.format;
+    this.paypal = data.paypal;
   }
 
   parseText = (data: any): string => {
@@ -150,19 +153,33 @@ export class MultiSelectData {
 
   total = (data: any) => {
     let quant = data[this.quantifier];
-    let cost = 0;
+    let cost = this.getUnitPrice(data) * quant;
+    return cost;
+  };
+
+  getUnitPrice = (data: any) => {
     for (let [key, val] of Object.entries<any>(data)) {
       if (typeof val == 'object' && 'values' in val) {
         for (const obj of val.values) {
           // Pick up here
           if (!obj.value.includes(data[obj.option].key)) continue;
           if ('cost' in obj && obj.cost) {
-            cost += obj.cost * quant;
+            return obj.cost;
           }
         }
       }
     }
-    return cost;
+    return 0;
+  };
+
+  formatPaypal = (data: any): string => {
+    let str = this.paypal;
+    for (let [key, val] of Object.entries<any>(data)) {
+      const replaceVal = val.placeholder || val.displayText;
+      str = str.replace(`%${key}%`, replaceVal);
+    }
+
+    return str;
   };
 }
 
@@ -214,6 +231,7 @@ export interface ItemOption extends BaseOption {
 
 export interface TextOption extends BaseOption {
   placeholder?: string;
+  onupdate?: () => void;
 }
 
 export interface BaseData {
@@ -227,7 +245,7 @@ export interface BaseData {
   placeholder?: string;
   values?: ValueInformation[];
   reset?: string[];
-  disable?: string[];
+  onselect?: () => void;
   font?:
     | 'MType'
     | 'MType-Script'
@@ -237,6 +255,7 @@ export interface BaseData {
     | 'Papyrus8'
     | 'Papyrus9';
   position?: 'left' | 'right' | 'center';
+  description?: string;
 }
 
 export interface OptionImageData extends BaseData {
@@ -299,15 +318,16 @@ export interface ValueInformation {
   cost: number;
 }
 
-export interface Coupon {
+export interface CouponData {
   valid: boolean,
-  data?: CouponData
+  data?: Coupon
 }
 
-export interface CouponData {
+export interface Coupon {
   code: string,
-  expiry: string,
+  expiry: Date,
   value: number,
   isCoupon: boolean,
-  target: string
+  target: string,
+  manual: boolean
 }

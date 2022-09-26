@@ -33,6 +33,8 @@
     "tabWidth": 2
   },
   "dependencies": {
-    "@paypal/paypal-js": "^5.1.1"
+    "@paypal/paypal-js": "^5.1.1",
+    "dotenv": "^16.0.2",
+    "mongoose": "^6.6.1"
   }
 }
