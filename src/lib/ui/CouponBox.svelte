@@ -1,20 +1,16 @@
 <script lang="ts">
   import type { Coupon, CouponData } from '../conf/TreeArtConfig';
   import { applyCoupon } from '../coupon-manager';
+  import { api } from '../api';
 
   let code = '';
   let error = '';
   let coupon: Coupon;
 
-  $: {
-
-  }
-
   const checkCoupon = (e) => {
     if (e.key && e.key != 'Enter') return;
     // TODO Check the coupon against the backend
-    let url = '/checkcode/' + code.toLowerCase();
-    fetch(url)
+    api.checkCoupon(code.toLowerCase())
       .then(response => response.json())
       .then((data: CouponData) => {
         console.log(data);

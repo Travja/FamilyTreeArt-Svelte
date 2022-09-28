@@ -331,3 +331,10 @@ export interface Coupon {
   target: string,
   manual: boolean
 }
+
+export interface CartInfo {
+  paypalCartId: string,
+  selections: any,
+  multiselect: any,
+  coupon: Coupon
+}

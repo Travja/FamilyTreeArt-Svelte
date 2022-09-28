@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type {
-    CreateOrderRequestBody, OrderResponseBody,
+    CreateOrderRequestBody,
+    OrderResponseBody,
     PayPalButtonsComponentOptions,
     PayPalNamespace,
     PurchaseItem,
@@ -13,6 +14,7 @@
   import { coupon, couponValue } from '../coupon-manager';
   import type { BaseData } from '../conf/TreeArtConfig';
   import { config } from '../conf/config';
+  import { api } from '../api';
 
   let paypal: PayPalNamespace;
   const style = { // https://developer.paypal.com/docs/checkout/standard/customize/buttons-style-guide/
@@ -81,18 +83,9 @@
     };
 
     if (coup) {
+      purchaseUnit.custom_id = `Coupon used: ${coup.code} ($${discObj.value})`;
       if (coup.target == 'shipping') purchaseUnit.amount.breakdown.shipping_discount = discObj;
       else purchaseUnit.amount.breakdown.discount = discObj;
-
-      // purchaseUnit.items.push({
-      //   name: `Code: ${coup.code} (-$${discount})`,
-      //   quantity: '1',
-      //   unit_amount: {
-      //     currency_code: 'USD',
-      //     value: '0'
-      //   },
-      //   category: 'DIGITAL_GOODS'
-      // });
     }
 
     Object.entries(get(selections)).forEach(([key, data]) => {
@@ -133,9 +126,19 @@
     // noinspection JSUnusedGlobalSymbols
     const paypalButtonsComponent = paypal.Buttons(<PayPalButtonsComponentOptions>{
       // set up the transaction
-      createOrder: (data, actions) => {
+      createOrder: async (data, actions) => {
         const createOrderPayload = getPayload();
-        return actions.order.create(createOrderPayload);
+        const cartId = await actions.order.create(createOrderPayload);
+
+        console.log(cartId);
+        let saved = await api.saveCart(cartId);
+        console.log(saved);
+
+        if (!saved) {
+          return Promise.resolve(undefined);
+        }
+
+        return Promise.resolve(cartId);
       },
 
       // finalize the transaction
