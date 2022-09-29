@@ -13,7 +13,6 @@
     api.checkCoupon(code.toLowerCase())
       .then(response => response.json())
       .then((data: CouponData) => {
-        console.log(data);
         if (data.valid) {
           coupon = data.data;
 

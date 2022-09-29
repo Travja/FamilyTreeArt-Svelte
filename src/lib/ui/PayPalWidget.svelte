@@ -130,10 +130,7 @@
         const createOrderPayload = getPayload();
         const cartId = await actions.order.create(createOrderPayload);
 
-        console.log(cartId);
         let saved = await api.saveCart(cartId);
-        console.log(saved);
-
         if (!saved) {
           return Promise.resolve(undefined);
         }
@@ -144,10 +141,13 @@
       // finalize the transaction
       onApprove: (data, actions) => {
         const captureOrderHandler = (details: OrderResponseBody) => {
-          console.log(details);
-
-          const payerName = details.payer.name.given_name;
+          const payerName = details.payer.name.given_name
+            + (!!details.payer.name.surname ? ' '
+              + details.payer.name.surname : '');
+          const email = details.payer.email_address;
           console.log('Transaction completed');
+
+          window.location.href = `/success?user=${payerName}&email=${email}`;
         };
 
         return actions.order.capture().then(captureOrderHandler);
@@ -156,6 +156,7 @@
       // handle unrecoverable errors
       onError: (err) => {
         console.error('An error prevented the buyer from checking out with PayPal');
+        window.location.href = '/error';
       },
       style
     });

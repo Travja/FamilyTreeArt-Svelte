@@ -1103,7 +1103,7 @@ config.addPage(
             onselect: () => {
               const pg = get(page);
               const selectedQuote = get(selections)['quoteLoc'];
-              if (selectedQuote.key != 'left') return;
+              if (selectedQuote?.key != 'left') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
               selectItem('quoteLoc', quoteOpt.buttons[1], false);
             }
@@ -1115,7 +1115,7 @@ config.addPage(
             onselect: () => {
               const pg = get(page);
               const selectedQuote = get(selections)['quoteLoc'];
-              if (selectedQuote.key != 'right') return;
+              if (selectedQuote?.key != 'right') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
               selectItem('quoteLoc', quoteOpt.buttons[0], false);
             }
@@ -1179,7 +1179,7 @@ config.addPage(
             onselect: () => {
               const pg = get(page);
               const selectedName = get(selections)['nameLoc'];
-              if (selectedName.key != 'left') return;
+              if (selectedName?.key != 'left') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[3];
               selectItem('nameLoc', quoteOpt.buttons[1], false);
             }
@@ -1192,7 +1192,7 @@ config.addPage(
             onselect: () => {
               const pg = get(page);
               const selectedName = get(selections)['nameLoc'];
-              if (selectedName.key != 'right') return;
+              if (selectedName?.key != 'right') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[3];
               selectItem('nameLoc', quoteOpt.buttons[0], false);
             }

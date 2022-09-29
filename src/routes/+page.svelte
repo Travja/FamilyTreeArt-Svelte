@@ -8,12 +8,12 @@
 
   let shopComponent: ShopPage;
   let pageHelper: PageHelper = new PageHelper();
-  let hasPrevious = true;
+  let hasPrevious = false;
 
   onMount(() => {
     hasPrevious = hasPreviousSelections();
-    if (hasPrevious)
-      proceed(true);
+    // if (hasPrevious)
+    //   proceed(true);
   });
 
   onDestroy(() => {

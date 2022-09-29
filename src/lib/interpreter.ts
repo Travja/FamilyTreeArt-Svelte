@@ -72,7 +72,7 @@ const updateTotal = () => {
     else amount = getQualifiedCost(sel[coup.target]);
 
     let discount = 0;
-    if (coup.isCoupon) { // X% off
+    if (coup.coupon) { // X% off
       discount = amount * (coup.value / 100);
       discount = Math.round(discount * 100) / 100;
     } else { // Flat value

@@ -89,7 +89,6 @@ export class PageHelper {
   };
 
   gotoPreviousPage = () => {
-    console.log('Going back.');
     currentPage.set(this.previousPage);
   };
 }
