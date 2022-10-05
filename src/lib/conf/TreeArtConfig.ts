@@ -337,5 +337,6 @@ export interface CartInfo {
   paypalCartId: string,
   selections: any,
   multiselect: any,
-  coupon: Coupon
+  coupon: Coupon,
+  cost: number,
 }

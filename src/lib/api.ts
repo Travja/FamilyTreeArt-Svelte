@@ -1,5 +1,5 @@
 import type { CartInfo } from './conf/TreeArtConfig';
-import { multiSelectEntries, selections } from './interpreter';
+import { itemTotal, multiSelectEntries, selections } from './interpreter';
 import { get } from 'svelte/store';
 import { coupon, couponValue } from './coupon-manager';
 
@@ -15,7 +15,8 @@ class Api {
       paypalCartId,
       selections: get(selections),
       multiselect: get(multiSelectEntries),
-      coupon: get(coupon)
+      coupon: get(coupon),
+      cost: get(itemTotal)
     };
     cartInfo.coupon.value = get(couponValue);
 
