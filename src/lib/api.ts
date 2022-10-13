@@ -18,7 +18,9 @@ class Api {
       coupon: get(coupon),
       cost: get(itemTotal)
     };
-    cartInfo.coupon.value = get(couponValue);
+    if (cartInfo.coupon) {
+      cartInfo.coupon.value = get(couponValue);
+    }
 
     return new Promise<boolean>(resolve => {
       fetch(`${this.apiUrl}/cart`, {

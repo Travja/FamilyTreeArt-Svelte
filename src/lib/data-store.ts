@@ -5,7 +5,7 @@ import { currentPage } from './pages';
 export const saveSelections = (selections): void => {
   if (typeof window == 'undefined' || Object.keys(selections).length == 0)
     return;
-  localStorage.setItem('tree-selections', btoa(JSON.stringify(selections)));
+  localStorage.setItem('tree-selections', window.btoa(encodeURIComponent(JSON.stringify(selections))));
   localStorage.setItem('furthest-page', get(currentPage).toString());
 };
 
@@ -24,7 +24,7 @@ export const loadPrevious = (): void => {
   currentPage.set(parseInt(localStorage.getItem('furthest-page')) || 0);
   selections.set(JSON.parse(atob(localStorage.getItem('tree-selections'))));
   if (localStorage.getItem('tree-multi'))
-    multiSelectEntries.set(JSON.parse(atob(localStorage.getItem('tree-multi'))));
+    multiSelectEntries.set(JSON.parse(window.atob(decodeURIComponent(localStorage.getItem('tree-multi')))));
 };
 
 export const deleteCache = (): void => {

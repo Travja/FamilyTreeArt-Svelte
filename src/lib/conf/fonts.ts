@@ -105,7 +105,7 @@ export const svgStyle = `
 		font-size: 1.1rem;
 		position: absolute;
 		word-wrap: normal;
-		height: 10%;
+		height: 14%;
 		width: 35%;
 		z-index: 10;
 		text-align: center;
@@ -117,7 +117,7 @@ export const svgStyle = `
 	}
 	
 	.left.shift, .right.shift {
-    top: 55%;
+    top: 50%;
 	}
 	
 	.left, .right {

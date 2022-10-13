@@ -80,6 +80,7 @@ class CanvasManager {
       images.push(leaves);
     }
 
+    this.resizeText();
     await this.drawImages(ctx, images);
     await this.drawSvg();
   };
@@ -100,6 +101,56 @@ class CanvasManager {
       }
       res();
     });
+  };
+
+  cacheText = {};
+  resizeText = () => {
+    let el, elements, _i, _len, _results;
+    elements = document.getElementsByClassName('resize');
+    if (elements.length < 0) {
+      return;
+    }
+    _results = [];
+    for (_i = 0, _len = elements.length; _i < _len; _i++) {
+      el = elements[_i];
+      if (!el.classList.contains('resizeGround')) {
+        _results.push((el => {
+          let _results1;
+          let resizeText = () => {
+            let font = window.getComputedStyle(el, null).getPropertyValue('font-size');
+            let elNewFontSize;
+            elNewFontSize = (parseFloat(font.slice(0, -2)) - 1) + 'px';
+            return el.style.fontSize = elNewFontSize;
+          };
+
+          _results1 = [];
+
+          el.style.fontSize = '';
+          while (el.scrollHeight > el.offsetHeight) {
+            _results1.push(resizeText());
+          }
+          return _results1;
+        })(el));
+      } else {
+        let text = el.innerHTML;
+        let resize = (e) => {
+          let shrink = (elm) => {
+            let font = window.getComputedStyle(elm, null).getPropertyValue('font-size');
+            let elNewFontSize = (parseFloat(font.slice(0, -2)) - 0.25) + 'px';
+            return elm.style.fontSize = elNewFontSize;
+          };
+
+          if (this.cacheText[e] && (this.cacheText[e].length > text.length || e.getBBox().width < 85))
+            e.style.fontSize = '';
+          while (e.getBBox().width > 95) {
+            shrink(e);
+          }
+        };
+        resize(el);
+        this.cacheText[el] = text;
+      }
+    }
+    return _results;
   };
 
   drawSvg = async (): Promise<void> => {

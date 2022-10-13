@@ -5,7 +5,8 @@
 </script>
 
 <div id="error">
-  <p>Something went wrong. If you hit the "Pay" button, we most likely received your payment. Please email us for further instruction.</p>
+  <p>Something went wrong. If you hit the "Pay" button, we most likely received your payment.
+    If not, something else went wrong. Please email us for further instruction.</p>
   <p><a href="mailto:order@customfamilytreeart.com">Order@CustomFamilyTreeArt.com</a></p>
 </div>
 

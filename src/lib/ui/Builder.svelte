@@ -122,7 +122,7 @@
       </svg>
       {#if $loading}
         <div class="cover" transition:fade={{ duration: 200 }}>
-          <span>Loading...</span>
+          <span>Creating...</span>
         </div>
       {/if}
       {#if $selections['background']}
@@ -249,21 +249,14 @@
     font-size: 0.21rem;
     position: absolute;
     word-wrap: normal;
-    height: 10%;
+    height: 14%;
     width: 35%;
     z-index: 10;
     text-align: center;
-    /*background-color: #dd9900;*/
   }
 
   #lineTwo {
     font-size: 0.87em;
-  }
-
-  #familyWrapper,
-  #quoteText,
-  #groundText {
-    display: none;
   }
 
   @media screen and (max-width: 900px) {
@@ -300,6 +293,8 @@
     position: absolute;
     left: 0;
     z-index: 100;
+    user-select: none;
+    opacity: 0;
   }
 
   text {
@@ -341,10 +336,6 @@
     width: 0;
     padding: 0;
     margin: 0;
-  }
-
-  svg {
-    display: none;
   }
 
   .cover {

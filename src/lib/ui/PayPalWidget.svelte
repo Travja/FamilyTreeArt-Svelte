@@ -15,6 +15,7 @@
   import type { BaseData } from '../conf/TreeArtConfig';
   import { config } from '../conf/config';
   import { api } from '../api';
+  import { goto } from '$app/navigation';
 
   let paypal: PayPalNamespace;
   const style = { // https://developer.paypal.com/docs/checkout/standard/customize/buttons-style-guide/
@@ -147,7 +148,7 @@
           const email = details.payer.email_address;
           console.log('Transaction completed');
 
-          window.location.href = `/success?user=${payerName}&email=${email}`;
+          goto(`/success?user=${payerName}&email=${email}`);
         };
 
         return actions.order.capture().then(captureOrderHandler);
@@ -156,7 +157,7 @@
       // handle unrecoverable errors
       onError: (err) => {
         console.error('An error prevented the buyer from checking out with PayPal');
-        window.location.href = '/error';
+        goto('/error');
       },
       style
     });

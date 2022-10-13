@@ -84,6 +84,16 @@
     options = [...options];
   };
 
+  const getOrSetValue = (optId, fallback) => {
+    let val = getValue(optId);
+    if (!val) {
+      selectItem(optId, fallback);
+      val = fallback;
+    }
+
+    return val;
+  };
+
   const addMultiSelect = (multi: MultiSelectData) => {
     let data = { id: {} };
     for (let key of multi.keys) {
@@ -441,7 +451,7 @@
                 on:keypress={e => select(opt.id, e.target.value)}
                 on:paste={e => select(opt.id, e.target.value)}
                 on:input={e => select(opt.id, e.target.value)}
-                value={$selections[opt.id] || `1`}
+                value={getOrSetValue(opt.id, 1)}
               />
             {:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
