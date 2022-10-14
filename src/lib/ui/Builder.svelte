@@ -291,8 +291,8 @@
     color: black;
     font-size: 0.2em;
     position: absolute;
+    z-index: 10;
     left: 0;
-    z-index: -10;
     user-select: none;
     opacity: 0;
   }
@@ -352,6 +352,8 @@
   }
 
   #save {
+    position: relative;
+    z-index: 20;
     border: 3px dashed black;
     opacity: 0;
     transition: opacity 0.25s ease-in-out;
