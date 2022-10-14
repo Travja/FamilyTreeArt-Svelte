@@ -11,7 +11,7 @@ export const saveSelections = (selections): void => {
 
 export const saveMultiData = (entries): void => {
   if (typeof window == 'undefined' || Object.keys(entries).length == 0) return;
-  localStorage.setItem('tree-multi', btoa(JSON.stringify(entries)));
+  localStorage.setItem('tree-multi', window.btoa(encodeURIComponent(JSON.stringify(entries))));
 };
 
 export const hasPreviousSelections = (): boolean => {
@@ -22,9 +22,9 @@ export const hasPreviousSelections = (): boolean => {
 export const loadPrevious = (): void => {
   if (typeof window == 'undefined') return;
   currentPage.set(parseInt(localStorage.getItem('furthest-page')) || 0);
-  selections.set(JSON.parse(atob(localStorage.getItem('tree-selections'))));
+  selections.set(JSON.parse(decodeURIComponent(window.atob(localStorage.getItem('tree-selections')))));
   if (localStorage.getItem('tree-multi'))
-    multiSelectEntries.set(JSON.parse(window.atob(decodeURIComponent(localStorage.getItem('tree-multi')))));
+    multiSelectEntries.set(JSON.parse(decodeURIComponent(window.atob(localStorage.getItem('tree-multi')))));
 };
 
 export const deleteCache = (): void => {

@@ -292,7 +292,7 @@
     font-size: 0.2em;
     position: absolute;
     left: 0;
-    z-index: 100;
+    z-index: -10;
     user-select: none;
     opacity: 0;
   }
