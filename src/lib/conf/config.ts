@@ -1,5 +1,5 @@
 import type { ButtonOption } from './TreeArtConfig';
-import { TreeArtConfig, TreeArtPage, TreeType, MultiSelectData } from './TreeArtConfig';
+import { MultiSelectData, TreeArtConfig, TreeArtPage, TreeType } from './TreeArtConfig';
 import { get } from 'svelte/store';
 import { page } from '$lib/pages';
 import { selections, selectItem } from '../interpreter';
@@ -56,7 +56,12 @@ config.addPage(
                   key: 'descendant_roots',
                   img: {
                     type: TreeType.DESCENDANT,
-                    couple: 'reset'
+                    couple: 'reset',
+                    use: 'roots',
+                    roots: {
+                      type: TreeType.ANCESTRY,
+                      gen: '2 Gen'
+                    },
                   },
                   reset: ['ancType']
                 },
@@ -67,6 +72,11 @@ config.addPage(
                   key: 'ancestry_roots',
                   img: {
                     type: TreeType.ANCESTRY,
+                    use: 'roots',
+                    roots: {
+                      type: TreeType.DESCENDANT,
+                      gen: '2 Gen'
+                    },
                     default: {
                       couple: 'Couple',
                       gen: '3 Gen'
@@ -151,8 +161,10 @@ config.addPage(
               value: ['ancestry', 'ancestry_roots']
             },
             displayText:
-              '<h3>3 Generations</h3><br/>Trunk: Main Couple or Individual' +
-              '<br/>1st Branches: Parents<br/>2nd Branches: Grandparents',
+              '<h3>3 Generations</h3>' +
+              'Trunk: Main Couple or Individual<br/>' +
+              '1st Branches: Parents<br/>' +
+              '2nd Branches: Grandparents',
             summaryText: 'Ancestry - 3 Generation',
             cost: 40,
             key: 'ancestry_3gen',
@@ -172,9 +184,11 @@ config.addPage(
               }
             },
             displayText:
-              '<h3>4 Generations</h3><br/>Trunk: Individual' +
-              '<br/>1st Branches: Parents<br/>2nd Branches: Grandparents' +
-              '<br/>3rd Branches: Great-Grandparents',
+              '<h3>4 Generations</h3>' +
+              'Trunk: Individual<br/>' +
+              '1st Branches: Parents<br/>' +
+              '2nd Branches: Grandparents<br/>' +
+              '3rd Branches: Great-Grandparents',
             summaryText: 'Ancestry - 4 Generation',
             cost: 40,
             key: 'ancestry_4gen',
@@ -194,9 +208,11 @@ config.addPage(
               }
             },
             displayText:
-              '<h3>4 Generations</h3><br/>Trunk: Main Couple' +
-              '<br/>1st Branches: Parents<br/>2nd Branches: Grandparents' +
-              '<br/>3rd Branches: Great-Grandparents',
+              '<h3>4 Generations</h3>' +
+              'Trunk: Main Couple<br/>' +
+              '1st Branches: Parents<br/>' +
+              '2nd Branches: Grandparents<br/>' +
+              '3rd Branches: Great-Grandparents',
             summaryText: 'Ancestry - 4 Generation',
             cost: 50,
             key: 'ancestry_4gen',
@@ -216,9 +232,12 @@ config.addPage(
               }
             },
             displayText:
-              '<h3>5 Generations</h3><br/>Trunk: Individual' +
-              '<br/>1st Branches: Parents<br/>2nd Branches: Grandparents' +
-              '<br/>3rd Branches: Great-Grandparents<br/>4th Branches: Great-Great-Grandparents',
+              '<h3>5 Generations</h3>' +
+              'Trunk: Individual<br/>' +
+              '1st Branches: Parents<br/>' +
+              '2nd Branches: Grandparents<br/>' +
+              '3rd Branches: Great-Grandparents<br/>' +
+              '4th Branches: Great-Great-Grandparents',
             summaryText: 'Ancestry - 5 Generation Individual',
             cost: 50,
             key: 'ancestry_5gen',
@@ -236,8 +255,10 @@ config.addPage(
               value: ['descendant', 'descendant_roots']
             },
             displayText:
-              '<h3>2 Generations</h3><br/>Trunk: Main Couple or Individual' +
-              '<br/>1st Branches: Children<br/>2nd Branches: Information like Birth Dates, Nicknames, Favorite Colors, Personality Traits - anything that represents the children or family.',
+              '<h3>2 Generations</h3>' +
+              'Trunk: Main Couple or Individual<br/>' +
+              '1st Branches: Children<br/>' +
+              '2nd Branches: Information like Birth Dates, Nicknames, Favorite Colors, Personality Traits - anything that represents the children or family.',
             summaryText: 'Descendant - 2 Generation',
             cost: 50,
             key: 'descendant_2gen',
@@ -253,8 +274,10 @@ config.addPage(
               value: ['descendant', 'descendant_roots']
             },
             displayText:
-              '<h3>3 Generations</h3><br/>Trunk: Main Couple or Individual' +
-              '<br/>1st Branches: Children<br/>2nd Branches: Grandchildren',
+              '<h3>3 Generations</h3>' +
+              'Trunk: Main Couple or Individual<br/>' +
+              '1st Branches: Children<br/>' +
+              '2nd Branches: Grandchildren',
             summaryText: 'Descendant - 3 Generation',
             cost: 50,
             key: 'descendant_3gen',
@@ -270,9 +293,11 @@ config.addPage(
               value: ['descendant', 'descendant_roots']
             },
             displayText:
-              '<h3>4 Generations</h3><br/>Trunk: Main Couple or Individual' +
-              '<br/>1st Branches: Children<br/>2nd Branches: Grandchildren' +
-              '<br/>3rd Branches: Great-Grandchildren',
+              '<h3>4 Generations</h3>' +
+              'Trunk: Main Couple or Individual<br/>' +
+              '1st Branches: Children<br/>' +
+              '2nd Branches: Grandchildren<br/>' +
+              '3rd Branches: Great-Grandchildren',
             summaryText: 'Descendant - 4 Generation',
             cost: 60,
             key: 'descendant_4gen',
@@ -899,18 +924,6 @@ config.addPage(
               option: 'style2',
               value: ['chalk']
             },
-            displayText: 'Black',
-            displayImage: '/imgs/Backgrounds/Black.jpg',
-            img: {
-              background: '/imgs/Backgrounds/Black.jpg'
-            },
-            key: 'black'
-          },
-          {
-            prereq: {
-              option: 'style2',
-              value: ['chalk']
-            },
             default: true,
             displayText: 'Chalkboard 1',
             displayImage: '/imgs/Backgrounds/Chalk 1.jpg',
@@ -942,6 +955,18 @@ config.addPage(
               background: '/imgs/Backgrounds/Chalk 3.jpg'
             },
             key: 'chalk3'
+          },
+          {
+            prereq: {
+              option: 'style2',
+              value: ['chalk']
+            },
+            displayText: 'Black',
+            displayImage: '/imgs/Backgrounds/Black.jpg',
+            img: {
+              background: '/imgs/Backgrounds/Black.jpg'
+            },
+            key: 'black'
           }
         ],
         required: true
@@ -1279,7 +1304,7 @@ config.addPage(
     },
     intro: `
 			Double trunks usually work best with 2 people. Birthdates are added after each name to get the needed length.<br><br>
-			<img src="/imgs/Option Examples/Double Trunk Examples.jpg" class="full-width"/><br>
+			<img src='/imgs/Option Examples/Double Trunk Examples.jpg' class='full-width'/><br>
 			The image of the example tree you've been building won't change based on your selection, but we will create your tree with a double trunk if you select "Yes" here.
 			`,
     options: [
@@ -2275,7 +2300,7 @@ config.addPage(
     title: 'Your order is ready to submit! Please check out below.',
     intro: `After you place your order, you will receive an email from us that will have the name form(s) you need. If you don't see it soon, check your junk folder.
 					Enter your family names as directed by the form and email them to us.
-					<br>If you have any questions, please send us an email at <a href="mailto:Order@customfamilytreeart.com">Order@CustomFamilyTreeArt.com</a>`,
+					<br>If you have any questions, please send us an email at <a href='mailto:Order@customfamilytreeart.com'>Order@CustomFamilyTreeArt.com</a>`,
     options: [],
     finalPage: true
   })

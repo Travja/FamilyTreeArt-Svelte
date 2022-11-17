@@ -89,17 +89,19 @@ class CanvasManager {
     ctx: CanvasRenderingContext2D,
     images: HTMLImageElement[]
   ): Promise<void> => {
-    new Promise<void>(async res => {
+    await new Promise<void>(async resolve => {
       let canvas = get(myCanvas);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let i = 0;
       for (const img of images) {
         let offset = 0;
         if (img.width < canvas.width) offset = (canvas.width - img.width) / 2;
-        await this.whenLoaded(img, () =>
-          ctx.drawImage(img, offset, 0, img.width, img.height)
-        );
+        await this.whenLoaded(img, () => {
+          ctx.drawImage(img, offset, 0, img.width, img.height);
+
+          if (++i == images.length) resolve();
+        });
       }
-      res();
     });
   };
 
@@ -170,8 +172,8 @@ class CanvasManager {
         let img = document.createElement('img');
         img.src = url;
         this.whenLoaded(img, () =>
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        ).then(() => resolve());
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height))
+          .then(() => resolve());
       };
     });
   };

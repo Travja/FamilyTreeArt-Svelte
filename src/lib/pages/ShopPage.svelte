@@ -1,5 +1,5 @@
 <!--suppress XmlDuplicatedId -->
-<script lang="ts">
+<script lang='ts'>
   import type {
     BaseData,
     ButtonOption,
@@ -241,50 +241,58 @@
       selectItem(key, entry);
     });
   };
+
+  const format = (str: string): string => {
+    if (str.match(/\d{4}-\d{2}-\d{2}/)) {
+      return new Date(str).toLocaleDateString(undefined, {timeZone: 'UTC'});
+    }
+
+    return str;
+  };
 </script>
 
 <container>
   {#if loading || !$page}
-    <h2 id="optionTitle">Hold tight!</h2>
-    <div class="instructions">
+    <h2 id='optionTitle'>Hold tight!</h2>
+    <div class='instructions'>
       The webpage is loading! If it doesn't load in a few seconds, please
       refresh the page. If it still doesn't load, email us and let us know!
     </div>
   {:else}
-    <h2 class="optionTitle">{@html $page.title}</h2>
+    <h2 class='optionTitle'>{@html $page.title}</h2>
     {#if $page.intro && $page.intro.length > 0}
-      <div class="instructions">{@html $page.intro}</div>
+      <div class='instructions'>{@html $page.intro}</div>
     {/if}
-    <div id="options">
+    <div id='options'>
       {#each options as opt}
         {#if !opt.prereq || meetsPrereqs(opt.prereq)}
-          <div class="option">
-            <div class="optionLabel">{@html opt.name}</div>
+          <div class='option'>
+            <div class='optionLabel'>{@html opt.name}</div>
 
             <!-- ImageOption -->
             {#if opt.images}
               <div
                 id={opt.id}
-                class="imgSelect"
+                class='imgSelect'
                 class:error={$requirementsNotMet.includes(opt.id)}
               >
                 {#each opt.images as img}
                   {#if !img.prereq || meetsPrereqs(img.prereq)}
                     <!-- Groups! -->
                     {#if img.group}
-                      <div id={img.group.id} class="grouping flex-2">
-                        <div class="flex-1">{@html img.group.header}</div>
+                      <div id={img.group.id} class='grouping flex-2'>
+                        <div class='flex-1'>{@html img.group.header}</div>
                         {#each img.group.images as gImg}
                           {#if !gImg.prereq || meetsPrereqs(gImg.prereq)}
                             <div
-                              class="imgContainer flex-{Math.min(
+                              class='imgContainer flex-{Math.min(
                                 4,
                                 img.group.images.length
-                              )}"
+                              )}'
                               on:click={select(opt.id, gImg)}
                               class:selected={getValue(opt.id)?.key == gImg.key}
                             >
-                              <div class="optText">
+                              <div class='optText'>
                                 {#if gImg.placeholder}
                                   {#if getQualifiedCost(gImg) == -1}
                                     {@html gImg.placeholder}
@@ -298,9 +306,9 @@
                                   {@html gImg.displayText}
                                 {/if}
                               </div>
-                              <div class="imgBox">
+                              <div class='imgBox'>
                                 <img
-                                  class="imgOption"
+                                  class='imgOption'
                                   src={gImg.displayImage
                                     ? gImg.displayImage
                                     : getImage(gImg)}
@@ -308,9 +316,9 @@
                                 />
                               </div>
                               {#if gImg.footer}
-                                <p class="optText footText">
+                                <div class='optText footText'>
                                   {@html gImg.footer}
-                                </p>
+                                </div>
                               {/if}
                             </div>
                           {/if}
@@ -318,14 +326,14 @@
                       </div>
                     {:else}
                       <div
-                        class="imgContainer flex-{Math.min(
+                        class='imgContainer flex-{Math.min(
                           opt.flexCount ? opt.flexCount : 4,
                           numOptions[opt.id]
-                        )}"
+                        )}'
                         on:click={select(opt.id, img)}
                         class:selected={getValue(opt.id)?.key == img.key}
                       >
-                        <div class="optText">
+                        <div class='optText'>
                           {#if img.placeholder}
                             {#if getQualifiedCost(img) == -1}
                               {@html img.placeholder}
@@ -342,20 +350,20 @@
                             )}
                           {/if}
                         </div>
-                        <div class="imgBox">
+                        <div class='imgBox'>
                           <img
-                            class="imgOption"
+                            class='imgOption'
                             src={img.displayImage
                               ? img.displayImage
                               : getImage(img)}
-                            style="background-image: {img.background}"
+                            style='background-image: {img.background}'
                             alt={img.key}
                           />
                         </div>
                         {#if img.footer}
-                          <p class="optText footText">
+                          <div class='optText footText'>
                             {@html img.footer}
-                          </p>
+                          </div>
                         {/if}
                       </div>
                     {/if}
@@ -366,20 +374,20 @@
             {:else if opt.buttons}
               <div
                 id={opt.id}
-                class="imgSelect"
+                class='imgSelect'
                 class:error={$requirementsNotMet.includes(opt.id)}
               >
                 {#each opt.buttons as button}
                   {#if !button.prereq || meetsPrereqs(button.prereq)}
                     <div
-                      class="imgContainer flex-{Math.min(
+                      class='imgContainer flex-{Math.min(
                         opt.flexCount ? opt.flexCount : 4,
                         numOptions[opt.id]
-                      )} textButton"
+                      )} textButton'
                       on:click={select(opt.id, button)}
                       class:selected={getValue(opt.id)?.key == button.key}
                     >
-                      <div class="optText">
+                      <div class='optText'>
                         {#if button.placeholder}
                           {#if getQualifiedCost(button) == -1}
                             {@html button.placeholder}
@@ -417,7 +425,7 @@
                 class:error={$requirementsNotMet.includes(opt.id)}
               >
                 {#if opt.items.filter(itm => itm.default).length == 0}
-                  <option value="-1" />
+                  <option value='-1' />
                 {/if}
                 {#each opt.items as item, i}
                   <option
@@ -430,7 +438,7 @@
               <!-- Text :D -->
             {:else if opt.type == 'text' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
-                type="text"
+                type='text'
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
@@ -442,8 +450,8 @@
               />
             {:else if opt.type == 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
-                type="number"
-                min="1"
+                type='number'
+                min='1'
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
@@ -455,7 +463,7 @@
               />
             {:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
-                type="date"
+                type='date'
                 id={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
                 on:change={e => select(opt.id, e.target.value)}
@@ -480,18 +488,18 @@
     </div>
   {/if}
   {#if $page.multiselect}
-    <button class="button add" on:click={addMultiSelect($page.multiselect)}
+    <button class='button add' on:click={addMultiSelect($page.multiselect)}
     ><p>Add Item</p></button
     >
   {/if}
   {#each Object.keys(formattedEntries) as key (formattedEntries[key].id)}
     {#each formattedEntries[key].data as entry, i}
-      <div class="multi">
+      <div class='multi'>
         {entry}
-        <div class="summaryPrice">${formattedEntries[key].costs[i]}</div>
+        <div class='summaryPrice'>${formattedEntries[key].costs[i]}</div>
         <div
-          class="delete material-icons no-select"
-          title="Delete"
+          class='delete material-icons no-select'
+          title='Delete'
           on:click={purgeMulti(key, i)}
         >
           delete
@@ -501,17 +509,17 @@
   {/each}
 
   {#if $page.finalPage}
-    <div id="summary">
+    <div id='summary'>
       {#each Object.entries($selections) as [key, entry]}
         {#if entry && (entry.summaryText || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
-          <div id="preview-{key}" class="summaryItem">
+          <div id='preview-{key}' class='summaryItem'>
             {#if entry.summaryText}
               {entry.summaryText ||
               entry.key ||
               entry.displayText ||
               JSON.stringify(entry)}
               <div
-                class="summaryPrice"
+                class='summaryPrice'
                 class:hidden={!entry.cost && !entry.values}
               >
                 ${calculateTotal(entry)
@@ -519,7 +527,7 @@
                 .replace(/[.,]00$/, '')}
               </div>
             {:else if typeof entry == 'string' && (localOpt = config.getOption(key))?.display}
-              {localOpt.display || ''}{entry}
+              {localOpt.display || ''}{format(entry)}
             {/if}
           </div>
         {/if}
@@ -529,9 +537,9 @@
         <span>
           {(currentData = config.getMultiSelectData(key)).display}
           {#each entry as multi}
-            <div class="summaryItem">
+            <div class='summaryItem'>
               {currentData.parseText(multi)}
-              <div class="summaryPrice"
+              <div class='summaryPrice'
                    class:hidden={!currentData.total(multi)}>
                 ${currentData.total(multi)?.toFixed(2).replace(/[.,]00$/, '')}
               </div>
@@ -541,9 +549,9 @@
       {/each}
 
       {#if $coupon}
-        <div class="summaryItem bold">
+        <div class='summaryItem bold'>
           Coupon: {$coupon.code}
-          <div class="summaryPrice">
+          <div class='summaryPrice'>
             -${$couponValue?.toFixed(2).replace(/[.,]00$/, '')}
           </div>
         </div>

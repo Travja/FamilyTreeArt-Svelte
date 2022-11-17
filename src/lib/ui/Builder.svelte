@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   import { onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
   import { composite, selections, totalCost } from '$lib/interpreter';
@@ -18,8 +18,11 @@
 
   onMount(() => {
     unsub = currentPage.subscribe(() => {
-      setTimeout(() =>
-          window.scrollTo(0, document.getElementById('contentWrapper').offsetTop),
+      setTimeout(() => {
+          if ($currentPage > 0) {
+            window.scrollTo(0, document.getElementById('contentWrapper').offsetTop);
+          }
+        },
         250);
     });
     canvasManager.processImg();
@@ -42,53 +45,53 @@
   };
 </script>
 
-<div id="contentWrapper">
-  <div id="item-wrapper">
-    <div id="item-builder">
+<div id='contentWrapper'>
+  <div id='item-wrapper'>
+    <div id='item-builder'>
       <canvas
-        id="builder-canvas"
-        width="640"
-        height="819"
+        id='builder-canvas'
+        width='640'
+        height='819'
         bind:this={$myCanvas}
       />
       <svg
-        id="svgBox"
-        height="100%"
-        width="100%"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
+        id='svgBox'
+        height='100%'
+        width='100%'
+        viewBox='0 0 100 100'
+        preserveAspectRatio='none'
+        xmlns='http://www.w3.org/2000/svg'
         bind:this={$customSvg}
       >
         <defs>{@html svgStyle}</defs>
 
-        <foreignObject width="100%" height="100%">
+        <foreignObject width='100%' height='100%'>
           <div
-            xmlns="http://www.w3.org/1999/xhtml"
-            class="resize
+            xmlns='http://www.w3.org/1999/xhtml'
+            class='resize
 							        {$selections[`nameLoc`]?.position || `left`}
                       {$composite?.color?.toLowerCase()}
                       {$composite?.color?.toLowerCase() != `chalk`
               ? $selections[`familyFont`]?.font?.toLowerCase() || `mtype`
-              : ``}"
+              : ``}'
             class:shift={!!$composite?.roots}
-            id="familyWrapper"
+            id='familyWrapper'
           >
-            <div class="resize" id="familyText">
+            <div class='resize' id='familyText'>
               {$selections['familyName'] || ''}
             </div>
-            <div id="lineTwo">{$selections['lineTwo'] || ''}</div>
+            <div id='lineTwo'>{$selections['lineTwo'] || ''}</div>
           </div>
           <div
-            xmlns="http://www.w3.org/1999/xhtml"
-            class="resize
+            xmlns='http://www.w3.org/1999/xhtml'
+            class='resize
 							        {$selections[`quoteLoc`]?.position || `right`}
                       {$composite?.color?.toLowerCase()}
 										  {$composite?.color?.toLowerCase() != `chalk`
               ? $selections[`quoteFont`]?.font?.toLowerCase() || `mtype`
-              : ``}"
+              : ``}'
             class:shift={!!$composite?.roots}
-            id="quoteText"
+            id='quoteText'
           >
             {$selections['quote'] || ''}
           </div>
@@ -96,22 +99,22 @@
 
         <!-- Path should be shifted if we are not showing roots -->
         <path
-          id="curve"
+          id='curve'
           class:shift={!$composite?.roots}
-          d="M0,71.5
+          d='M0,71.5
 								 C0,71.5 25,74 50,72 S
-								 85,71 100,72.5"
-          fill="transparent"
+								 85,71 100,72.5'
+          fill='transparent'
         />
-        <text x="50%">
+        <text x='50%'>
           <textPath
-            class="resize
+            class='resize
 													 resizeGround
 													 {$composite?.color?.toLowerCase()}
-													 {$selections[`groundFont`]?.font?.toLowerCase() || `mtype`}"
-            id="groundText"
-            href="#curve"
-            font-family=", sans-serif"
+													 {$selections[`groundFont`]?.font?.toLowerCase() || `mtype`}'
+            id='groundText'
+            href='#curve'
+            font-family=', sans-serif'
           >
             {$selections['ground'] ||
             ($composite?.roots
@@ -121,53 +124,53 @@
         </text>
       </svg>
       {#if $loading}
-        <div class="cover" transition:fade={{ duration: 200 }}>
+        <div class='cover' transition:fade={{ duration: 200 }}>
           <span>Creating...</span>
         </div>
       {/if}
       {#if $selections['background']}
-        <div id="save" class="cover" on:click={saveTree}>Save Preview</div>
+        <div id='save' class='cover' on:click={saveTree}>Save Preview</div>
       {/if}
     </div>
-    <div class="clear" />
-    <div id="item-footer">
+    <div class='clear' />
+    <div id='item-footer'>
       This is only a representation to help you select design elements. Your
       tree, like your family, will be unique!
     </div>
   </div>
-  <div id="configuration">
+  <div id='configuration'>
     <slot />
-    <div class="clear" />
-    <div id="pageFooter">
+    <div class='clear' />
+    <div id='pageFooter'>
       {#if pageHelper.error !== ''}
-        <div id="error">{pageHelper.error}</div>
+        <div id='error'>{pageHelper.error}</div>
       {/if}
       {#if config.pages[$currentPage].footer}
         <hr />
-        <div class="footer">
+        <div class='footer'>
           {@html config.pages[$currentPage].footer}
         </div>
       {/if}
       {#if pageHelper.previousPage != -1}
-        <button id="back" on:click={pageHelper.gotoPreviousPage}
+        <button id='back' on:click={pageHelper.gotoPreviousPage}
         ><p>&laquo; Back</p></button
         >
       {/if}
       {#if pageHelper.nextPage != -1}
-        <button id="next" on:click={pageHelper.gotoNextPage}
+        <button id='next' on:click={pageHelper.gotoNextPage}
         ><p>Next &raquo;</p></button
         >
       {/if}
     </div>
-    <div id="total" class="toggleable-cost" class:hidden={hideCost}>
+    <div id='total' class='toggleable-cost' class:hidden={hideCost}>
       <h3>Total: ${$totalCost.toFixed(2)}</h3>
     </div>
-    <div class="clear" />
+    <div class='clear' />
     {#if $page?.finalPage}
       <CouponBox />
       <PayPalWidget />
     {:else if $visitedLast}
-      <button id="skip" on:click={() => currentPage.set(pageHelper.pageCount - 1)}>Jump to Cart</button>
+      <button id='skip' on:click={() => currentPage.set(pageHelper.pageCount - 1)}>Jump to Cart</button>
     {/if}
   </div>
 </div>
