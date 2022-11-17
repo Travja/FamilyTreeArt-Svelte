@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   import { onMount } from 'svelte';
   import type {
     CreateOrderRequestBody,
@@ -16,6 +16,7 @@
   import { config } from '../conf/config';
   import { api } from '../api';
   import { goto } from '$app/navigation';
+  import FancyInput from '$lib/ui/FancyInput.svelte';
 
   let paypal: PayPalNamespace;
   const style = { // https://developer.paypal.com/docs/checkout/standard/customize/buttons-style-guide/
@@ -25,11 +26,13 @@
   };
 
   onMount(() => {
-    loadScript({ 'client-id': 'AS7YWa9oRXe4_aenz3gqNkmmL-rucRLE2CMO5YSSVpzRwdr7nHpp5UOe_KQ5zDTwAzhrH8Li8XfzJybH' })
-      .then(pp => {
-        paypal = pp;
-        setupPayPal();
-      });
+    if ($totalCost > 0) {
+      loadScript({ 'client-id': 'AS7YWa9oRXe4_aenz3gqNkmmL-rucRLE2CMO5YSSVpzRwdr7nHpp5UOe_KQ5zDTwAzhrH8Li8XfzJybH' })
+        .then(pp => {
+          paypal = pp;
+          setupPayPal();
+        });
+    }
   });
 
   const generateItem = (data: BaseData): PurchaseItem => {
@@ -170,13 +173,35 @@
   };
 </script>
 
-<div id="pay-later"></div>
-<div id="checkout"></div>
+{#if $totalCost > 0}
+  <div>
+    <div id='pay-later'></div>
+    <div id='checkout'></div>
+  </div>
+{:else}
+  <hr />
+  <h3 class='center'>Please enter your Shipping Information</h3>
+  <form id='customForm'>
+    <FancyInput id='payer-name'>Name</FancyInput>
+    <FancyInput id='payer-email'>Email</FancyInput>
+    <FancyInput id='payer-address'>Address</FancyInput>
+
+    <button id='complete-order'>Complete Order</button>
+  </form>
+{/if}
 
 <style>
   #checkout, #pay-later {
     width: 55%;
     text-align: center;
     margin: 0 auto;
+  }
+
+  #customForm {
+    margin: 0 auto;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 </style>

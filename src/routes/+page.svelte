@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   import Builder from '$lib/ui/Builder.svelte';
   import { page, PageHelper } from '$lib/pages';
   import ShopPage from '$lib/pages/ShopPage.svelte';
@@ -12,8 +12,11 @@
 
   onMount(() => {
     hasPrevious = hasPreviousSelections();
-    // if (hasPrevious)
-    //   proceed(true);
+    if (hasPrevious)
+      setTimeout(() => {
+        loadPrevious();
+        hasPrevious = false;
+      }, 500);
   });
 
   onDestroy(() => {
@@ -38,7 +41,7 @@
     </Builder>
   </div>
 {:else}
-  <div class="load-previous" transition:slide>
+  <div class='load-previous' transition:slide>
     <h3>Previous Tree in Progress</h3>
     <p>
       Looks like you have a previous tree in progress.

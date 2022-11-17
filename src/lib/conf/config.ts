@@ -1372,7 +1372,7 @@ config.addPage(
             cost: 60,
             key: 'digital',
             summaryText: 'Digital Copy',
-            reset: ['extraDigital', 'printSize', 'texture']
+            reset: ['extraDigital', 'printSize', 'texture', 'shipping']
           }
         ]
       },

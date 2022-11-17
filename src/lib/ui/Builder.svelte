@@ -153,12 +153,12 @@
       {/if}
       {#if pageHelper.previousPage != -1}
         <button id='back' on:click={pageHelper.gotoPreviousPage}
-        ><p>&laquo; Back</p></button
+        ><div>&laquo; Back</div></button
         >
       {/if}
       {#if pageHelper.nextPage != -1}
         <button id='next' on:click={pageHelper.gotoNextPage}
-        ><p>Next &raquo;</p></button
+        ><div>Next &raquo;</div></button
         >
       {/if}
     </div>
