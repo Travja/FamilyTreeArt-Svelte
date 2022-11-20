@@ -159,6 +159,10 @@ button > p {
   font-weight: bold;
 }
 
+.error {
+  color: red;
+}
+
 @media screen and (max-width: 900px) {
   body {
     padding: 0.5em;

@@ -10,14 +10,7 @@
   let pageHelper: PageHelper = new PageHelper();
   let hasPrevious = false;
 
-  onMount(() => {
-    hasPrevious = hasPreviousSelections();
-    if (hasPrevious)
-      setTimeout(() => {
-        loadPrevious();
-        hasPrevious = false;
-      }, 500);
-  });
+  onMount(() => hasPrevious = hasPreviousSelections());
 
   onDestroy(() => {
     pageHelper.destroy();

@@ -68,7 +68,7 @@ const updateTotal = () => {
   const coup = get(coupon);
   if (coup) {
     let amount;
-    if (coup.target == 'all') amount = itmTotal;
+    if (coup.target == 'all') amount = itmTotal + (coup.coupon ? 0 : get(shipping));
     else amount = getQualifiedCost(sel[coup.target]);
 
     let discount = 0;

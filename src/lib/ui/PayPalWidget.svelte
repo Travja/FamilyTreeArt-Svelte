@@ -126,7 +126,10 @@
     return payload;
   };
 
+  let setup = false;
   const setupPayPal = () => {
+    if (setup) return;
+    setup = true;
     // noinspection JSUnusedGlobalSymbols
     const paypalButtonsComponent = paypal.Buttons(<PayPalButtonsComponentOptions>{
       // set up the transaction
@@ -134,7 +137,9 @@
         const createOrderPayload = getPayload();
         const cartId = await actions.order.create(createOrderPayload);
 
-        let saved = await api.saveCart(cartId);
+        const ret = await api.saveCart(cartId);
+        const saved: boolean = ret[0];
+        const code: number = ret[1];
         if (!saved) {
           return Promise.resolve(undefined);
         }
@@ -159,7 +164,7 @@
 
       // handle unrecoverable errors
       onError: (err) => {
-        console.error('An error prevented the buyer from checking out with PayPal');
+        console.error('An error prevented the buyer from checking out with PayPal', err);
         goto('/error');
       },
       style
@@ -168,7 +173,56 @@
     paypalButtonsComponent
       .render('#checkout')
       .catch((err) => {
-        console.error('PayPal Buttons failed to render');
+        console.error('PayPal Buttons failed to render', err);
+      });
+  };
+
+  $: if ($totalCost > 0) {
+    if (paypal)
+      setTimeout(setupPayPal, 500);
+  } else {
+    setup = false;
+  }
+
+  let payerName: string;
+  let payerEmail: string;
+  let payerAddress: string;
+  let payerAddressTwo: string;
+  let payerCity: string;
+  let payerState: string;
+  let payerZip: string;
+  let payerCountryCode: string;
+
+  let processing = false;
+  let dots = '';
+  let error = '';
+  const submitCustom = (): void => {
+    let shippingInfo = {
+      payerName,
+      payerEmail,
+      payerAddress,
+      payerAddressTwo,
+      payerCity,
+      payerState,
+      payerZip,
+      payerCountryCode
+    };
+    processing = true;
+    const interval = setInterval(() => {
+      if (dots.length > 4)
+        dots = '';
+      dots += '.';
+    }, 500, 500);
+    api.saveCart(undefined, shippingInfo)
+      .then(ret => {
+        processing = false;
+        const isSuccessful: boolean = ret[0];
+        const code: number = ret[1];
+        clearInterval(interval);
+
+        if (isSuccessful) goto(`/success?user=${payerName}&email=${payerEmail}`);
+        else if (code == 404) error = 'Bad code used. Please try a different one.';
+        else goto(`/error`);
       });
   };
 </script>
@@ -181,12 +235,28 @@
 {:else}
   <hr />
   <h3 class='center'>Please enter your Shipping Information</h3>
-  <form id='customForm'>
-    <FancyInput id='payer-name'>Name</FancyInput>
-    <FancyInput id='payer-email'>Email</FancyInput>
-    <FancyInput id='payer-address'>Address</FancyInput>
+  <form id='customForm' on:submit|preventDefault={submitCustom}>
+    <FancyInput id='payer-name' required='true' bind:value={payerName}>Name</FancyInput>
+    <FancyInput id='payer-email'
+                pattern={'[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$'}
+                title='Please enter a valid email'
+                bind:value={payerEmail}
+                required='true'>
+      Email
+    </FancyInput>
+    <FancyInput id='payer-address' required='true' bind:value={payerAddress}>Street Address</FancyInput>
+    <FancyInput id='payer-address-two' bind:value={payerAddressTwo}>Apt No. (Optional)</FancyInput>
+    <FancyInput id='payer-city' required='true' bind:value={payerCity}>City</FancyInput>
+    <FancyInput id='payer-state' required='true' bind:value={payerState}>State</FancyInput>
+    <FancyInput id='payer-zip' required='true' bind:value={payerZip}>Zip</FancyInput>
+    <FancyInput id='payer-country-code' required='true' bind:value={payerCountryCode}>Country Code</FancyInput>
 
-    <button id='complete-order'>Complete Order</button>
+    {#if error}
+      <div class='error'>{error}</div>
+    {/if}
+    <button id='complete-order' disabled='{processing}'>
+      {processing ? 'Processing' + dots : 'Complete Order'}
+    </button>
   </form>
 {/if}
 

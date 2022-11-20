@@ -339,4 +339,5 @@ export interface CartInfo {
   multiselect: any,
   coupon: Coupon,
   cost: number,
+  custom?: any,
 }

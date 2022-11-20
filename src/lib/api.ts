@@ -10,20 +10,23 @@ class Api {
     return fetch(`${this.apiUrl}/coupon/${code.toLowerCase()}`);
   };
 
-  saveCart = async (paypalCartId: string): Promise<boolean> => {
+  saveCart = async (paypalCartId: string, custom?: any): Promise<[boolean, number]> => {
     let cartInfo: CartInfo = {
       paypalCartId,
       selections: get(selections),
       multiselect: get(multiSelectEntries),
       coupon: get(coupon),
-      cost: get(itemTotal)
+      cost: get(itemTotal),
+      custom
     };
     if (cartInfo.coupon) {
       cartInfo.coupon.value = get(couponValue);
     }
 
-    return new Promise<boolean>(resolve => {
-      fetch(`${this.apiUrl}/cart`, {
+    let url = `${this.apiUrl}/cart${cartInfo.custom ? '/internal' : ''}`;
+
+    return new Promise<[boolean, number]>(resolve => {
+      fetch(url, {
         method: 'post',
         body: JSON.stringify(cartInfo),
         headers: {
@@ -31,12 +34,12 @@ class Api {
         }
       }).then(res => {
         if (res.status != 201 && res.status != 200) {
-          resolve(false);
+          resolve([false, res.status]);
         }
-        resolve(true);
+        resolve([true, res.status]);
       }).catch(e => {
         console.error(e);
-        resolve(false);
+        resolve([false, -1]);
       });
     });
   };
