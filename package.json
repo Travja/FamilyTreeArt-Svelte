@@ -12,15 +12,15 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "next",
-    "@sveltejs/kit": "next",
-    "prettier": "^2.7.1",
-    "prettier-plugin-svelte": "^2.8.0",
-    "svelte": "^3.53.1",
-    "svelte-check": "^2.9.2",
-    "svelte-preprocess": "^4.10.7",
-    "tslib": "^2.4.1",
-    "typescript": "^4.9.3",
-    "vite": "^3.2.4"
+    "@sveltejs/kit": "^1.15.7",
+    "prettier": "^2.8.7",
+    "prettier-plugin-svelte": "^2.10.0",
+    "svelte": "^3.58.0",
+    "svelte-check": "^3.2.0",
+    "svelte-preprocess": "^5.0.3",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.1"
   },
   "type": "module",
   "prettier": {
@@ -33,7 +33,7 @@
     "tabWidth": 2
   },
   "dependencies": {
-    "@paypal/paypal-js": "^5.1.2",
+    "@paypal/paypal-js": "^5.1.6",
     "dotenv": "^16.0.3"
   }
 }
