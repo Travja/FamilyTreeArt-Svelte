@@ -61,7 +61,7 @@ config.addPage(
                     roots: {
                       type: TreeType.ANCESTRY,
                       gen: '2 Gen'
-                    },
+                    }
                   },
                   reset: ['ancType']
                 },
@@ -1974,9 +1974,9 @@ config.addPage(
     multiselect: new MultiSelectData({
       display: 'Additional Prints',
       id: 'additionalPrints',
-      keys: ['addPrintType', 'addPrintSize', 'addQty'],
+      keys: ['addPrintType', 'addPrintSize', 'addQty', 'addUseFrame', 'addFrame'],
       quantifier: 'addQty',
-      format: '%addQty%x %addPrintType% - %addPrintSize%',
+      format: '%addQty%x %addFrame% %addPrintType% - %addPrintSize%',
       paypal: '%addPrintType% - %addPrintSize%'
     }),
     options: [
@@ -2135,6 +2135,420 @@ config.addPage(
           value: ['8x10', '11x14', '16x20', '20x24', '24x30']
         },
         type: 'number'
+      },
+      {
+        name: '<h3>Do you want a frame?</h3>',
+        id: 'addUseFrame',
+        type: 'button',
+        prereq: {
+          option: 'addPrintType',
+          value: ['standard', 'm&t'],
+          and: {
+            option: 'addPrintSize',
+            value: ['8x10', '11x14', '16x20', '20x24', '24x30']
+          }
+        },
+        buttons: [
+          {
+            displayText: 'Yes',
+            key: 'yes'
+          },
+          {
+            displayText: 'No',
+            key: 'no',
+            default: true
+          }
+        ]
+      },
+      {
+        name: '<h3>What frame would you like?</h3><hr/>',
+        id: 'addFrame',
+        type: 'image',
+        prereq: {
+          option: 'addUseFrame',
+          value: ['yes'],
+          and: {
+            option: 'addPrintType',
+            value: ['standard', 'm&t']
+          }
+        },
+        flexCount: 3,
+        images: [
+          {
+            displayText: 'Natural Barnwood ~ 2.25" (%value%)',
+            key: 'natural_barnwood',
+            placeholder: 'Natural Barnwood ~ 2.25"',
+            displayImage: '/imgs/Products/Natural Barnwood Corner.jpg',
+            summaryText: 'Natural Barnwood Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          },
+          {
+            displayText: 'Whitewashed Barnwood ~ 2.25" (%value%)',
+            key: 'white_barnwood',
+            placeholder: 'Whitewashed Barnwood ~ 2.25"',
+            displayImage: '/imgs/Products/Whitewashed Barnwood Corner.jpg',
+            summaryText: 'Whitewashed Barnwood Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          },
+          {
+            displayText: 'Flat Black Wood ~ 1.125" (%value%)',
+            key: 'flat_black',
+            placeholder: 'Flat Black Wood ~ 1.125"',
+            displayImage: '/imgs/Products/Flat Black Corner.jpg',
+            summaryText: 'Flat Black Wood Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 80
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 99
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 115
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 150
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 185
+              }
+            ]
+          },
+          {
+            displayText: 'Flat White Wood ~ 1.125" (%value%)',
+            key: 'flat_white',
+            placeholder: 'Flat White Wood ~ 1.125"',
+            displayImage: '/imgs/Products/Flat White Corner.jpg',
+            summaryText: 'Flat White Wood Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 80
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 99
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 115
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 150
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 185
+              }
+            ]
+          },
+          {
+            displayText: 'Mocha Wood ~ 1.125" (%value%)',
+            key: 'mocha',
+            placeholder: 'Mocha Wood ~ 1.125"',
+            displayImage: '/imgs/Products/Mocha Corner.jpg',
+            summaryText: 'Mocha Wood Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 80
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 99
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 115
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 150
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 185
+              }
+            ]
+          },
+          {
+            displayText: 'Natural Basswood ~ 1.125" (%value%)',
+            key: 'basswood',
+            placeholder: 'Natural Basswood ~ 1.125"',
+            displayImage: '/imgs/Products/Natural Basswood Corner.jpg',
+            summaryText: 'Natural Basswood Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 80
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 99
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 115
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 150
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 185
+              }
+            ]
+          },
+          {
+            displayText: 'Classic Black ~ 1.625" (%value%)',
+            key: 'classic_black',
+            placeholder: 'Classic Black ~ 1.625"',
+            displayImage: '/imgs/Products/Black Americana Corner.jpg',
+            summaryText: 'Classic Black Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          },
+          {
+            displayText: 'Black & Silver Scoop ~ 1.75" (%value%)',
+            key: 'black_silver',
+            placeholder: 'Black & Silver Scoop ~ 1.75"',
+            displayImage: '/imgs/Products/Black & Silver Scoop Corner.jpg',
+            summaryText: 'Black & Silver Scoop Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          },
+          {
+            displayText: 'Black Scoop ~ 2" (%value%)',
+            key: 'black_scoop',
+            placeholder: 'Black Scoop ~ 2"',
+            displayImage: '/imgs/Products/Black Scoop Corner.jpg',
+            summaryText: 'Black Scoop Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          },
+          {
+            displayText: 'Gold Scoop ~ 2" (%value%)',
+            key: 'gold_scoop',
+            placeholder: 'Gold Scoop ~ 2"',
+            displayImage: '/imgs/Products/Gold Scoop Corner.jpg',
+            summaryText: 'Gold Scoop Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          },
+          {
+            displayText: 'Pewter Scoop ~ 2" (%value%)',
+            key: 'pewter_scoop',
+            placeholder: 'Pewter Scoop ~ 2"',
+            displayImage: '/imgs/Products/Pewter Scoop Corner.jpg',
+            summaryText: 'Pewter Scoop Frame',
+            values: [
+              {
+                option: 'addPrintSize',
+                value: ['8x10'],
+                cost: 90
+              },
+              {
+                option: 'addPrintSize',
+                value: ['11x14'],
+                cost: 110
+              },
+              {
+                option: 'addPrintSize',
+                value: ['16x20'],
+                cost: 130
+              },
+              {
+                option: 'addPrintSize',
+                value: ['20x24'],
+                cost: 170
+              },
+              {
+                option: 'addPrintSize',
+                value: ['24x30'],
+                cost: 220
+              }
+            ]
+          }
+        ]
       }
     ]
   })

@@ -127,6 +127,7 @@
       let matcher = matcherFormat;
       let quantifier = 0;
       for (let key of multi.keys) {
+        console.log(key, multiDatum);
         let dataValue = multiDatum[key];
         matcher = matcher.replace(
           `%${key}%`,
@@ -244,7 +245,7 @@
 
   const format = (str: string): string => {
     if (str.match(/\d{4}-\d{2}-\d{2}/)) {
-      return new Date(str).toLocaleDateString(undefined, {timeZone: 'UTC'});
+      return new Date(str).toLocaleDateString(undefined, { timeZone: 'UTC' });
     }
 
     return str;
@@ -561,153 +562,153 @@
 </container>
 
 <style>
-  #options {
-    user-select: none;
-  }
+    #options {
+        user-select: none;
+    }
 
-  .option {
-    position: relative;
-    /*display: flex;*/
-    /*align-items: center;*/
-    width: 100%;
-    margin: 5px 0 5px 0;
-  }
+    .option {
+        position: relative;
+        /*display: flex;*/
+        /*align-items: center;*/
+        width: 100%;
+        margin: 5px 0 5px 0;
+    }
 
-  .imgSelect {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: normal;
-    flex-wrap: wrap;
-    text-align: center;
-  }
+    .imgSelect {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: normal;
+        flex-wrap: wrap;
+        text-align: center;
+    }
 
-  .imgContainer {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    padding: 10px;
-    text-align: center;
-    box-sizing: border-box;
-    transition: background-color 0.5s;
-    border-radius: 8px;
-    min-width: 95px;
-  }
+    .imgContainer {
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        padding: 10px;
+        text-align: center;
+        box-sizing: border-box;
+        transition: background-color 0.5s;
+        border-radius: 8px;
+        min-width: 95px;
+    }
 
-  .imgContainer:hover {
-    cursor: pointer;
-    background-color: #aaa;
-  }
+    .imgContainer:hover {
+        cursor: pointer;
+        background-color: #aaa;
+    }
 
-  .imgContainer.selected {
-    background-color: #999;
-  }
+    .imgContainer.selected {
+        background-color: #999;
+    }
 
-  .optText {
-    display: flex;
-    flex-grow: 1;
-    flex-wrap: wrap;
-    flex-direction: column;
-    /*justify-content: center;*/
-  }
+    .optText {
+        display: flex;
+        flex-grow: 1;
+        flex-wrap: wrap;
+        flex-direction: column;
+        /*justify-content: center;*/
+    }
 
-  .footText {
-    flex-grow: 0;
-  }
+    .footText {
+        flex-grow: 0;
+    }
 
-  .imgBox {
-    position: relative;
-  }
+    .imgBox {
+        position: relative;
+    }
 
-  #roots .imgBox {
-    margin-top: -60%;
-  }
+    #roots .imgBox {
+        margin-top: -60%;
+    }
 
-  .grouping {
-    /*flex-grow: 2;*/
-    flex-basis: 50%;
-    display: flex;
-    flex-wrap: wrap;
-    position: relative;
-    padding-top: 10px;
-    text-align: center;
-    box-sizing: border-box;
-    transition: background-color 0.5s;
-    border-radius: 8px;
-    min-width: 100px;
-  }
+    .grouping {
+        /*flex-grow: 2;*/
+        flex-basis: 50%;
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        padding-top: 10px;
+        text-align: center;
+        box-sizing: border-box;
+        transition: background-color 0.5s;
+        border-radius: 8px;
+        min-width: 100px;
+    }
 
-  .optionLabel {
-    display: inline;
-    vertical-align: top;
-  }
+    .optionLabel {
+        display: inline;
+        vertical-align: top;
+    }
 
-  .textButton {
-    background-color: #bbb;
-    box-sizing: border-box;
-    margin: 5px;
-  }
+    .textButton {
+        background-color: #bbb;
+        box-sizing: border-box;
+        margin: 5px;
+    }
 
-  textarea {
-    width: 50%;
-    resize: none;
-  }
+    textarea {
+        width: 50%;
+        resize: none;
+    }
 
-  .error {
-    border: 2px solid red;
-  }
+    .error {
+        border: 2px solid red;
+    }
 
-  .add {
-    float: right;
-    margin-right: 20px;
-  }
+    .add {
+        float: right;
+        margin-right: 20px;
+    }
 
-  .multi {
-    display: inline-flex;
-    background-color: #999;
-    border-left: 4px solid #77a34f;
-    margin: 3px;
-    flex-direction: row;
-    align-items: center;
-    padding: 10px;
-  }
+    .multi {
+        display: inline-flex;
+        background-color: #999;
+        border-left: 4px solid #77a34f;
+        margin: 3px;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+    }
 
-  .multi:hover .delete {
-    opacity: 1;
-  }
+    .multi:hover .delete {
+        opacity: 1;
+    }
 
-  .delete {
-    display: inline-block;
-    opacity: 0;
-    transition: 0.3s opacity;
-  }
+    .delete {
+        display: inline-block;
+        opacity: 0;
+        transition: 0.3s opacity;
+    }
 
-  .delete:hover {
-    cursor: pointer;
-  }
+    .delete:hover {
+        cursor: pointer;
+    }
 
-  .summaryItem {
-    background-color: #bbb;
-    border-left: 4px solid #77a34f;
-    margin: 3px;
-    padding: 10px;
-  }
+    .summaryItem {
+        background-color: #bbb;
+        border-left: 4px solid #77a34f;
+        margin: 3px;
+        padding: 10px;
+    }
 
-  span > .summaryItem {
-    margin-left: 1.5em;
-  }
+    span > .summaryItem {
+        margin-left: 1.5em;
+    }
 
-  .summaryPrice {
-    float: right;
-    margin: 0 0.4em 0 1.25em;
-    color: #555;
-  }
+    .summaryPrice {
+        float: right;
+        margin: 0 0.4em 0 1.25em;
+        color: #555;
+    }
 
-  .no-select {
-    user-select: none;
-  }
+    .no-select {
+        user-select: none;
+    }
 
-  #summary {
-    margin: 20px 20px 0;
-  }
+    #summary {
+        margin: 20px 20px 0;
+    }
 </style>
