@@ -136,6 +136,7 @@
       createOrder: async (data, actions) => {
         const createOrderPayload = getPayload();
         const cartId = await actions.order.create(createOrderPayload);
+        console.log(cartId);
 
         const ret = await api.saveCart(cartId);
         const saved: boolean = ret[0];
