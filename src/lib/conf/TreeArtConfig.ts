@@ -154,12 +154,11 @@ export class MultiSelectData {
 
   total = (data: any) => {
     let quant = data[this.quantifier];
-    let cost = this.getUnitPrice(data) * quant;
-    return cost;
+    return this.getUnitPrice(data) * quant;
   };
 
   getUnitPrice = (data: any) => {
-    for (let [key, val] of Object.entries<any>(data)) {
+    for (let val of Object.values<any>(data)) {
       if (typeof val == 'object' && 'values' in val) {
         for (const obj of val.values) {
           // Pick up here
@@ -320,24 +319,24 @@ export interface ValueInformation {
 }
 
 export interface CouponData {
-  valid: boolean,
-  data?: Coupon
+  valid: boolean;
+  data?: Coupon;
 }
 
 export interface Coupon {
-  code: string,
-  expiry: Date,
-  value: number,
-  coupon: boolean,
-  target: string,
-  manual: boolean
+  code: string;
+  expiry: Date;
+  value: number;
+  coupon: boolean;
+  target: string;
+  manuallyCreated: boolean;
 }
 
 export interface CartInfo {
-  paypalCartId: string,
-  selections: any,
-  multiselect: any,
-  coupon: Coupon,
-  cost: number,
-  custom?: any,
+  paypalCartId: string;
+  selections: any;
+  multiselect: any;
+  coupon: Coupon;
+  cost: number;
+  custom?: any;
 }
