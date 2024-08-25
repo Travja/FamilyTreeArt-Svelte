@@ -156,7 +156,7 @@
           const email = details.payer.email_address;
           console.log('Transaction completed');
 
-          goto(`/success?user=${payerName}&email=${email}`);
+          goto(`/success?user=${encodeURIComponent(payerName)}&email=${encodeURIComponent(email)}`);
         };
 
         return actions.order.capture().then(captureOrderHandler);
