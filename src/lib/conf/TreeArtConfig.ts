@@ -158,18 +158,20 @@ export class MultiSelectData {
   };
 
   getUnitPrice = (data: any) => {
+    let cost = 0;
     for (let val of Object.values<any>(data)) {
       if (typeof val == 'object' && 'values' in val) {
         for (const obj of val.values) {
           // Pick up here
           if (!obj.value.includes(data[obj.option].key)) continue;
           if ('cost' in obj && obj.cost) {
-            return obj.cost;
+            cost += obj.cost;
+            continue;
           }
         }
       }
     }
-    return 0;
+    return cost;
   };
 
   formatPaypal = (data: any): string => {

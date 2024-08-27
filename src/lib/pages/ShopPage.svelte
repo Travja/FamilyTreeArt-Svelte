@@ -127,7 +127,6 @@
       let matcher = matcherFormat;
       let quantifier = 0;
       for (let key of multi.keys) {
-        console.log(key, multiDatum);
         let dataValue = multiDatum[key];
         matcher = matcher.replace(
           `%${key}%`,
@@ -488,7 +487,7 @@
       {/each}
     </div>
   {/if}
-  {#if $page.multiselect}
+  {#if $page?.multiselect}
     <button class='button add' on:click={addMultiSelect($page.multiselect)}
     ><p>Add Item</p></button
     >
@@ -509,7 +508,7 @@
     {/each}
   {/each}
 
-  {#if $page.finalPage}
+  {#if $page?.finalPage}
     <div id='summary'>
       {#each Object.entries($selections) as [key, entry]}
         {#if entry && (entry.summaryText || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}

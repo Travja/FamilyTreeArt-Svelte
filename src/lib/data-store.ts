@@ -5,7 +5,6 @@ import { currentPage, visitedLast } from './pages';
 currentPage.subscribe(page => {
   if (typeof window == 'undefined' || !localStorage) return;
   const previous = parseInt(localStorage.getItem('furthest-page'));
-  console.log(previous);
   if (!previous || page != 0)
     localStorage.setItem('furthest-page', page.toString());
 });

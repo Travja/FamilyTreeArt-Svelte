@@ -1976,8 +1976,8 @@ config.addPage(
       id: 'additionalPrints',
       keys: ['addPrintType', 'addPrintSize', 'addQty', 'addUseFrame', 'addFrame'],
       quantifier: 'addQty',
-      format: '%addQty%x %addFrame% %addPrintType% - %addPrintSize%',
-      paypal: '%addPrintType% - %addPrintSize%'
+      format: '%addQty%x %addPrintType% - %addPrintSize%, %addFrame%',
+      paypal: '%addPrintType% - %addPrintSize%, %addFrame%'
     }),
     options: [
       {
