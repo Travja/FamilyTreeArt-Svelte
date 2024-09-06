@@ -37,7 +37,7 @@
   <div class='load-previous' transition:slide>
     <h3>Previous Tree in Progress</h3>
     <p>
-      Looks like you have a previous tree in progress.
+      It looks like you have a previous tree in progress.
       You can load your previous tree or start a new one.
     </p>
     <button on:click={() => proceed(true)}>Load</button>
