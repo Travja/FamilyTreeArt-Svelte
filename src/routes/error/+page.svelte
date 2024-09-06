@@ -5,9 +5,9 @@
 </script>
 
 <div id="error">
-  <p>Something went wrong. We most likely received your order and were simply unable to
-    send you a confirmation email.
-    Please email us for further instruction.</p>
+  <p>Something went wrong. If you checked out, we most likely received your order and were simply unable to
+    send you a confirmation email. If the PayPal window crashed, please wait a couple minutes and try again. If
+    you are still having trouble, please email us for further instruction.</p>
   <p><a href="mailto:order@customfamilytreeart.com">Order@CustomFamilyTreeArt.com</a></p>
 </div>
 
