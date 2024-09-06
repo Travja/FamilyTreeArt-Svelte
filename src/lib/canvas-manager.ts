@@ -9,7 +9,7 @@ export const loading: Writable<boolean> = writable(false);
 class CanvasManager {
   lastUpdate: number = 0;
   previousCompositeString: string = '';
-  time: NodeJS.Timeout;
+  time: number;
 
   processImg = (forceReload: boolean = false): void => {
     let composite = getComposite();
@@ -29,7 +29,7 @@ class CanvasManager {
     }, 500);
   };
 
-  renderCanvas = async composite => {
+  renderCanvas = async (composite: any) => {
     let canvas = get(myCanvas);
     let select = get(selections);
 
