@@ -1414,7 +1414,6 @@ config.addPage(
         buttons: [
           //Standard print
           {
-            // TODO Work out these placeholder things
             displayText: '8x10 &nbsp;(%value%)',
             placeholder: '8x10',
             key: '8x10',
@@ -2578,6 +2577,7 @@ config.addPage(
   })
 );
 /** Page 16 - Shipping **/
+// TODO Make it so you can't skip this page if you click 'Jump to Cart' button
 config.addPage(
   new TreeArtPage({
     //Page 16 - Shipping!
