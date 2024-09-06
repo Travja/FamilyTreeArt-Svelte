@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'MType';
+  font-style: normal;
+  font-weight: normal;
+  src: url('MCo.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Chalk';
+  font-style: normal;
+  font-weight: normal;
+  src: url('Chalk2.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Papyrus';
+  font-style: normal;
+  font-weight: normal;
+  src: url('Pap.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Script';
+  font-style: normal;
+  font-weight: normal;
+  src: url('Script.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Amaze';
+  font-style: normal;
+  font-weight: normal;
+  src: url('Am.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('Ubuntu-R.ttf') format('truetype');
+}
