@@ -12,7 +12,7 @@ const config = {
       // default options are shown
       pages: 'dist/www',
       assets: 'dist/www',
-      fallback: 'index.html',
+      fallback: '404.html',
       precompress: false
     }),
     prerender: {

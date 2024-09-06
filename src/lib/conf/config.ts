@@ -2577,7 +2577,7 @@ config.addPage(
   })
 );
 /** Page 16 - Shipping **/
-// TODO Make it so you can't skip this page if you click 'Jump to Cart' button
+// TODO Make it so you can't skip this page if you click 'Jump to Cart' button -- current defect
 config.addPage(
   new TreeArtPage({
     //Page 16 - Shipping!
