@@ -1,5 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 
+export let prerender = false;
+
 /** @type {import('./$types').PageLoad} */
 export function load({ url }) {
   let searchParams = url.searchParams;
