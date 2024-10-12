@@ -1,12 +1,6 @@
 <!--suppress XmlDuplicatedId -->
 <script lang='ts'>
   import type {
-    BaseData,
-    ButtonOption,
-    ImageOption,
-    ItemOption,
-    MultiSelectData,
-    TextOption,
     TreeArtPage
   } from '$lib/conf/TreeArtConfig';
   import {
@@ -40,6 +34,9 @@
     isTextLongOption,
     isTextOption
   } from '$lib/conf/util';
+  import type { ButtonOption, ImageOption, ItemOption, TextOption } from '../../types/options';
+  import type { MultiSelectData } from '$lib/multi-select';
+  import type { BaseData } from '../../types/data';
 
   let loading = true;
   let options: (ImageOption | ButtonOption | ItemOption | TextOption)[];

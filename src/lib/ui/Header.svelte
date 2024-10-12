@@ -229,7 +229,8 @@
   }
 
   .items > a {
-    padding: 9.5px 20px;
+      /*noinspection CssNonIntegerLengthInPixels*/
+      padding: 9.5px 20px;
   }
 
   .active {

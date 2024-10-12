@@ -27,7 +27,7 @@ export class PageHelper {
     this.selSub();
   };
 
-  private initPages = (idx): void => {
+  private initPages = (idx: number): void => {
     if (idx == -1) return;
     const pg = config.pages[idx];
     if (pg.finalPage) visitedLast.set(true);

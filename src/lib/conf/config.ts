@@ -1,8 +1,10 @@
-import type { BaseData, ButtonOption } from './TreeArtConfig';
-import { MultiSelectData, TreeArtConfig, TreeArtPage, TreeType } from './TreeArtConfig';
+import { TreeArtConfig, TreeArtPage, TreeType } from './TreeArtConfig';
 import { get } from 'svelte/store';
 import { page } from '$lib/pages';
 import { selections, selectItem } from '../interpreter';
+import type { BaseData } from '../../types/data';
+import type { ButtonOption } from '../../types/options';
+import { MultiSelectData } from '$lib/multi-select';
 
 const config: TreeArtConfig = new TreeArtConfig();
 
@@ -417,11 +419,9 @@ config.addPage(
     // Page 4
     title: 'Do you have a small family?',
     intro:
-      'Small family trees can be filled out by adding additional branches with birthdates. Wedding dates can also be included.<br/><h4>You can double the number of branches on your tree by adding birthdate branches.</h4><br/>'
-      +
+      'Small family trees can be filled out by adding additional branches with birthdates. Wedding dates can also be included.<br/><h4>You can double the number of branches on your tree by adding birthdate branches.</h4><br/>' +
       '<table class="center"><tr>' +
-      '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>'
-      +
+      '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>' +
       '</tr><tr>' +
       '<td><img class="imgOption" src="/imgs/Option Examples/Small Family.jpg" alt="Small Family"/></td>' +
       '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates.jpg" alt="Small Family w/ Dates"/></td>' +
@@ -1334,8 +1334,7 @@ config.addPage(
     //Page 12
     title: 'What kind of print would you like?',
     intro:
-      '<b>If you are outside the CONTINENTAL U.S. please select the Digital Copy option. Shipping costs are too high to ship prints internationally.</b><br/>'
-      +
+      '<b>If you are outside the CONTINENTAL U.S. please select the Digital Copy option. Shipping costs are too high to ship prints internationally.</b><br/>' +
       'With the digital JPG file you will be able to have your tree printed locally as many times as you want.<br/>' +
       '<br/><b>Learn more about each print type <a target="_blank" href="https://customfamilytreeart.com/prints">here</a></b><br/>',
     options: [
@@ -1973,7 +1972,13 @@ config.addPage(
     multiselect: new MultiSelectData({
       display: 'Additional Prints',
       id: 'additionalPrints',
-      keys: ['addPrintType', 'addPrintSize', 'addQty', 'addUseFrame', 'addFrame'],
+      keys: [
+        'addPrintType',
+        'addPrintSize',
+        'addQty',
+        'addUseFrame',
+        'addFrame'
+      ],
       quantifier: 'addQty',
       format: '%addQty%x %addPrintType% - %addPrintSize%%addFrame%',
       paypal: '%addPrintType% - %addPrintSize%%addFrame%'
@@ -2584,10 +2589,8 @@ config.addPage(
     title: 'How do you want your products shipped?',
     intro:
       '<b>These shipping options are for the CONTINENTAL U.S. only.</b><br/>' +
-      'Shipping costs for all other locations are too high. Please select Digital Copy only so that you can have it printed locally.<br/>'
-      +
-      '<b>Production and shipping times may be 2 to 3 times longer than normal because of labor shortages at the printing facility and shipping company. '
-      +
+      'Shipping costs for all other locations are too high. Please select Digital Copy only so that you can have it printed locally.<br/>' +
+      '<b>Production and shipping times may be 2 to 3 times longer than normal because of labor shortages at the printing facility and shipping company. ' +
       'Please order early!</b><br/>',
     prereq: {
       option: 'printType',

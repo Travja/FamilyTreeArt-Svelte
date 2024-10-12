@@ -4,7 +4,7 @@ html {
 
 body {
   background-color: #fff;
-  font-family: Lato;
+  font-family: Lato, serif;
   padding: 2px 32px;
   margin: 0 auto;
   max-width: 1041px;
@@ -110,7 +110,7 @@ button {
   border: 2px solid #77a34f;
   border-radius: 8px;
   padding: 10px;
-  font-family: Lato;
+  font-family: Lato, serif;
   font-size: 20px;
   margin: 5px 0;
   user-select: none;

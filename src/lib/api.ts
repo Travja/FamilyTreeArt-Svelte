@@ -1,7 +1,16 @@
-import type { CartInfo } from './conf/TreeArtConfig';
 import { itemTotal, multiSelectEntries, selections } from './interpreter';
 import { get } from 'svelte/store';
 import { coupon, couponValue } from './coupon-manager';
+import type { Coupon } from '../types/coupon';
+
+export interface CartInfo {
+  paypalCartId: string;
+  selections: any;
+  multiselect: any;
+  coupon: Coupon;
+  cost: number;
+  custom?: any;
+}
 
 class Api {
   private apiUrl = import.meta.env.VITE_API_URL || '';
@@ -10,7 +19,10 @@ class Api {
     return fetch(`${this.apiUrl}/coupon/${code.toLowerCase()}`);
   };
 
-  saveCart = async (paypalCartId: string, custom?: any): Promise<[boolean, number]> => {
+  saveCart = async (
+    paypalCartId: string,
+    custom?: any
+  ): Promise<[boolean, number]> => {
     let cartInfo: CartInfo = {
       paypalCartId,
       selections: get(selections),
@@ -32,15 +44,17 @@ class Api {
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(res => {
-        if (res.status != 201 && res.status != 200) {
-          resolve([false, res.status]);
-        }
-        resolve([true, res.status]);
-      }).catch(e => {
-        console.error(e);
-        resolve([false, -1]);
-      });
+      })
+        .then(res => {
+          if (res.status != 201 && res.status != 200) {
+            resolve([false, res.status]);
+          }
+          resolve([true, res.status]);
+        })
+        .catch(e => {
+          console.error(e);
+          resolve([false, -1]);
+        });
     });
   };
 }

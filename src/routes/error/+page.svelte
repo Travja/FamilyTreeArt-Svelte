@@ -1,9 +1,3 @@
-<script lang='ts'>
-
-  export let data;
-
-</script>
-
 <div id='error'>
   <p>Something went wrong. If you checked out, we most likely received your order and were simply unable to
     send you a confirmation email. If the PayPal window crashed unexpectedly, please wait a couple minutes and try

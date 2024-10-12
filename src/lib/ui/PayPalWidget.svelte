@@ -11,12 +11,12 @@
   import { get } from 'svelte/store';
   import { calculateTotal, itemTotal, multiSelectEntries, selections, shipping, totalCost } from '../interpreter';
   import { coupon, couponValue } from '../coupon-manager';
-  import type { BaseData } from '../conf/TreeArtConfig';
   import { config } from '../conf/config';
   import { api } from '../api';
   import { goto } from '$app/navigation';
   import FancyInput from '$lib/ui/FancyInput.svelte';
   import type { components } from '@paypal/paypal-js/types/apis/openapi/checkout_orders_v2';
+  import type { BaseData } from '../../types/data';
 
   let paypal: PayPalNamespace;
   const style = { // https://developer.paypal.com/docs/checkout/standard/customize/buttons-style-guide/
@@ -152,6 +152,7 @@
       // finalize the transaction
       onApprove: async (data, actions) => {
         const captureOrderHandler = (details: OrderResponseBody) => {
+          // noinspection JSDeprecatedSymbols
           const payer = details.payment_source?.paypal || details.payer;
           const payerName = payer.name.given_name
             + (!!payer.name.surname ? ' '

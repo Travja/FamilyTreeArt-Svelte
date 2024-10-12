@@ -17,12 +17,18 @@ visitedLast.subscribe(visited => {
 export const saveSelections = (selections): void => {
   if (typeof window == 'undefined' || Object.keys(selections).length == 0)
     return;
-  localStorage.setItem('tree-selections', window.btoa(encodeURIComponent(JSON.stringify(selections))));
+  localStorage.setItem(
+    'tree-selections',
+    window.btoa(encodeURIComponent(JSON.stringify(selections)))
+  );
 };
 
 export const saveMultiData = (entries): void => {
   if (typeof window == 'undefined' || Object.keys(entries).length == 0) return;
-  localStorage.setItem('tree-multi', window.btoa(encodeURIComponent(JSON.stringify(entries))));
+  localStorage.setItem(
+    'tree-multi',
+    window.btoa(encodeURIComponent(JSON.stringify(entries)))
+  );
 };
 
 export const hasPreviousSelections = (): boolean => {
@@ -36,9 +42,17 @@ export const loadPrevious = (): void => {
   if (localStorage.getItem('visited-last'))
     visitedLast.set(localStorage.getItem('visited-last') == 'true');
 
-  selections.set(JSON.parse(decodeURIComponent(window.atob(localStorage.getItem('tree-selections')))));
+  selections.set(
+    JSON.parse(
+      decodeURIComponent(window.atob(localStorage.getItem('tree-selections')))
+    )
+  );
   if (localStorage.getItem('tree-multi'))
-    multiSelectEntries.set(JSON.parse(decodeURIComponent(window.atob(localStorage.getItem('tree-multi')))));
+    multiSelectEntries.set(
+      JSON.parse(
+        decodeURIComponent(window.atob(localStorage.getItem('tree-multi')))
+      )
+    );
 };
 
 export const deleteCache = (): void => {

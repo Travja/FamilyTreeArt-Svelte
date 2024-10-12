@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Coupon, CouponData } from '../conf/TreeArtConfig';
   import { applyCoupon } from '../coupon-manager';
   import { api } from '../api';
+  import type { Coupon, CouponData } from '../../types/coupon';
 
   let code = '';
   let error = '';

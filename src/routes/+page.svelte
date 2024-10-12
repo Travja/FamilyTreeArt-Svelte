@@ -29,8 +29,6 @@
       {#if $page}
         <ShopPage bind:this={shopComponent} />
       {/if}
-      <!--<svelte:component this='{pageElement}'></svelte:component>-->
-      <!--<button on:click={() => pageElement = pageElement == Page1 ? Page2 : Page1}>Click Me</button>-->
     </Builder>
   </div>
 {:else}

@@ -1,12 +1,4 @@
-import type {
-  BaseData,
-  ImageFormatData,
-  OptionImageData,
-  Prereqs,
-  RootData,
-  TextOption,
-  TreeArtPage
-} from '$lib/conf/TreeArtConfig';
+import type { TreeArtPage } from '$lib/conf/TreeArtConfig';
 import { config } from '$lib/conf/config';
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
@@ -15,10 +7,21 @@ import { saveMultiData, saveSelections } from './data-store';
 import { coupon, couponValue } from './coupon-manager';
 import { page } from './pages';
 import { isBaseData } from '$lib/conf/util';
+import type {
+  BaseData,
+  ImageFormatData,
+  OptionImageData,
+  Prereqs,
+  RootData
+} from '../types/data';
+import type { TextOption } from '../types/options';
 
 export const requirementsNotMet = writable([]);
-export const selections: Writable<{ [key: string]: string | & BaseData }> = writable({});
-export const multiSelectEntries: Writable<{ [key: string]: any[] }> = writable({});
+export const selections: Writable<{ [key: string]: string | BaseData }> =
+  writable({});
+export const multiSelectEntries: Writable<{ [key: string]: any[] }> = writable(
+  {}
+);
 export const composite: Writable<any> = writable();
 export const itemTotal: Writable<number> = writable(0);
 export const shipping: Writable<number> = writable(0);
@@ -70,14 +73,17 @@ const updateTotal = () => {
   const coup = get(coupon);
   if (coup) {
     let amount: number;
-    if (coup.target == 'all') amount = itmTotal + (coup.coupon ? 0 : get(shipping));
+    if (coup.target == 'all')
+      amount = itmTotal + (coup.coupon ? 0 : get(shipping));
     else amount = getQualifiedCost(<BaseData>sel[coup.target]);
 
     let discount: number;
-    if (coup.coupon) { // X% off
+    if (coup.coupon) {
+      // X% off
       discount = amount * (coup.value / 100);
       discount = Math.round(discount * 100) / 100;
-    } else { // Flat value
+    } else {
+      // Flat value
       discount = Math.min(coup.value, amount);
     }
 
@@ -108,7 +114,13 @@ export const selectItem = (
   const prev = sel[optId];
   sel[optId] = value;
   if (typeof value === 'object') {
-    if (prev && typeof prev === 'object' && 'key' in value && prev.key != value.key && 'reset' in value) {
+    if (
+      prev &&
+      typeof prev === 'object' &&
+      'key' in value &&
+      prev.key != value.key &&
+      'reset' in value
+    ) {
       for (let res of value.reset) {
         delete sel[res];
       }
@@ -164,11 +176,11 @@ export const getValue = (
     : get(selections)[optId];
 };
 
-export const getDataValue = (optId: string,
-                             sourceData?: any): BaseData => {
-  const data = sourceData && sourceData[optId]
-    ? sourceData[optId]
-    : get(selections)[optId];
+export const getDataValue = (optId: string, sourceData?: any): BaseData => {
+  const data =
+    sourceData && sourceData[optId]
+      ? sourceData[optId]
+      : get(selections)[optId];
 
   return data instanceof Object ? data : undefined;
 };
@@ -197,10 +209,7 @@ export const getQualifiedCost = (
   if (!option.values) return value;
 
   for (let check of option.values) {
-    let targetValue: BaseData | string = getValue(
-      check.option,
-      sourceData
-    );
+    let targetValue: BaseData | string = getValue(check.option, sourceData);
     // console.log('Target value: ' + targetValue);
     if (!targetValue) continue;
 
@@ -227,9 +236,9 @@ export const meetsPrereqs = (prereq: Prereqs): boolean => {
   value = value + '';
   let result = prereq.value
     ? // Check if we have an included value
-    prereq.value.includes(value)
+      prereq.value.includes(value)
     : // Or that we are properly using an excluded value
-    prereq.not_value && !prereq.not_value.includes(value);
+      prereq.not_value && !prereq.not_value.includes(value);
 
   // Check the 'and' recursively
   if (prereq.and) result = result && meetsPrereqs(prereq.and);

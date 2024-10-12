@@ -1,4 +1,13 @@
 import { meetsPrereqs } from '../interpreter';
+import type {
+  BaseOption,
+  ButtonOption,
+  ImageOption,
+  ItemOption,
+  TextOption
+} from '../../types/options';
+import type { MultiSelectData } from '$lib/multi-select';
+import type { Prereqs } from '../../types/data';
 
 export class TreeArtConfig {
   imageFormats = <ImageFormats>{
@@ -91,6 +100,11 @@ export class TreeArtPage {
 }
 
 /** @type **/
+export enum TreeType {
+  ANCESTRY = 'ANCESTRY',
+  DESCENDANT = 'DESCENDANT'
+}
+
 export interface TreeArtPageData {
   title: string;
   intro: string;
@@ -99,90 +113,6 @@ export interface TreeArtPageData {
   options: (ImageOption | ButtonOption | ItemOption | TextOption)[];
   finalPage?: boolean;
   multiselect?: MultiSelectData;
-}
-
-export interface Prereqs {
-  option: string;
-  value?: string[];
-  not_value?: string[];
-  and?: Prereqs;
-  or?: Prereqs;
-}
-
-export interface MultiSelectCreate {
-  display: string;
-  id: string;
-  keys: string[];
-  quantifier: string;
-  format: string;
-  paypal: string;
-}
-
-export class MultiSelectData {
-  display: string;
-  id: string;
-  keys: string[];
-  quantifier: string;
-  format: string;
-  paypal: string;
-
-  constructor(data: MultiSelectCreate) {
-    this.display = data.display;
-    this.id = data.id;
-    this.keys = data.keys;
-    this.quantifier = data.quantifier;
-    this.format = data.format;
-    this.paypal = data.paypal;
-  }
-
-  parseText = (data: any): string => {
-    let final = this.format;
-    for (const text of this.keys) {
-      let obj = data[text];
-      if (!obj) obj = '';
-      if (typeof obj == 'number' || typeof obj == 'string')
-        final = final.replace(`%${text}%`, obj + '');
-      else {
-        final = final.replace(
-          `%${text}%`,
-          obj.placeholder || obj.summaryText || obj.displayText || obj.key
-        );
-      }
-    }
-
-    return final;
-  };
-
-  total = (data: any) => {
-    let quant = data[this.quantifier];
-    return this.getUnitPrice(data) * quant;
-  };
-
-  getUnitPrice = (data: any) => {
-    let cost = 0;
-    for (let val of Object.values<any>(data)) {
-      if (typeof val == 'object' && 'values' in val) {
-        for (const obj of val.values) {
-          // Pick up here
-          if (!obj.value.includes(data[obj.option].key)) continue;
-          if ('cost' in obj && obj.cost) {
-            cost += obj.cost;
-          }
-        }
-      }
-    }
-    return cost;
-  };
-
-  formatPaypal = (data: any): string => {
-    let str = this.paypal;
-    for (let [key, val] of Object.entries<any>(data)) {
-      const replaceVal = val.placeholder || val.displayText;
-      str = str.replace(`%${key}%`, replaceVal);
-    }
-
-    return str;
-  };
 }
 
 export interface TreeArtConfigData {
@@ -206,139 +136,4 @@ export interface ImageFormats {
     color?: string;
     chalk?: string;
   };
-}
-
-export interface BaseOption {
-  prereq?: Prereqs;
-  name: string;
-  id: string;
-  type: string;
-  required?: boolean;
-  layer?: number;
-  display?: string;
-  flexCount?: number;
-}
-
-export interface ImageOption extends BaseOption {
-  images: (OptionImageData | GroupData)[];
-}
-
-export interface ButtonOption extends BaseOption {
-  buttons: ButtonData[];
-}
-
-export interface ItemOption extends BaseOption {
-  items: ItemData[];
-}
-
-export interface TextOption extends BaseOption {
-  placeholder?: string;
-  onupdate?: () => void;
-}
-
-export interface BaseData {
-  prereq?: Prereqs;
-  key?: string;
-  displayText?: string;
-  cost?: number;
-  summaryText?: string;
-  default?: boolean;
-  img?: ImageFormatData;
-  placeholder?: string;
-  values?: ValueInformation[];
-  reset?: string[];
-  onselect?: () => void;
-  font?:
-    | 'MType'
-    | 'MType-Script'
-    | 'Amaze'
-    | 'Script'
-    | 'Papyrus'
-    | 'Papyrus8'
-    | 'Papyrus9';
-  position?: 'left' | 'right' | 'center';
-  description?: string;
-}
-
-export interface OptionImageData extends BaseData {
-  key: string;
-  displayImage?: string;
-  background?: string;
-  footer?: string;
-}
-
-export interface ButtonData extends BaseData {
-  key: string;
-}
-
-export interface ItemData extends BaseData {
-  formDisplay?: string;
-  key: string;
-}
-
-export interface ImageFormatData {
-  use?: string;
-  type?: TreeType;
-  couple?: string;
-  color?: string;
-  chalk?: string;
-  gen?: string;
-  style1?: string;
-  background?: string;
-  roots?: RootData;
-  leaves?: boolean;
-  default?: {
-    type?: TreeType;
-    couple?: string;
-    color?: string;
-    gen?: string;
-    style1?: string;
-  };
-}
-
-export interface RootData {
-  type?: string;
-  gen?: string;
-}
-
-export interface GroupData extends BaseData {
-  group: {
-    id: string;
-    header?: string;
-    images: OptionImageData[];
-  };
-}
-
-export enum TreeType {
-  ANCESTRY = 'ANCESTRY',
-  DESCENDANT = 'DESCENDANT'
-}
-
-export interface ValueInformation {
-  option: string;
-  value: any[];
-  cost: number;
-}
-
-export interface CouponData {
-  valid: boolean;
-  data?: Coupon;
-}
-
-export interface Coupon {
-  code: string;
-  expiry: Date;
-  value: number;
-  coupon: boolean;
-  target: string;
-  manuallyCreated: boolean;
-}
-
-export interface CartInfo {
-  paypalCartId: string;
-  selections: any;
-  multiselect: any;
-  coupon: Coupon;
-  cost: number;
-  custom?: any;
 }
