@@ -3,8 +3,8 @@
   export let id: string;
   export let value: string;
   export let required = false;
-  export let pattern: string;
-  export let title: string;
+  export let pattern: string | undefined = undefined;
+  export let title: string | undefined = undefined;
   let focused = false;
   let regex;
 

@@ -1,4 +1,4 @@
-import type { ButtonOption } from './TreeArtConfig';
+import type { BaseData, ButtonOption } from './TreeArtConfig';
 import { MultiSelectData, TreeArtConfig, TreeArtPage, TreeType } from './TreeArtConfig';
 import { get } from 'svelte/store';
 import { page } from '$lib/pages';
@@ -423,10 +423,10 @@ config.addPage(
       '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>'
       +
       '</tr><tr>' +
-      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family.jpg"/></td>' +
-      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates.jpg"/></td>' +
-      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Leaves.jpg"/></td>' +
-      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates and Leaves.jpg"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family.jpg" alt="Small Family"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates.jpg" alt="Small Family w/ Dates"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Leaves.jpg" alt="Small Family w/ Leaves"/></td>' +
+      '<td><img class="imgOption" src="/imgs/Option Examples/Small Family With Dates and Leaves.jpg" alt="Small Family w/ Dates + Leaves"/></td>' +
       '</tr><tr><td colspan="2"></td><td colspan="2">*Leaves can be added in a later step.</p></td></table><br/>',
     prereq: {
       option: 'generations',
@@ -1127,7 +1127,7 @@ config.addPage(
             default: true,
             onselect: () => {
               const pg = get(page);
-              const selectedQuote = get(selections)['quoteLoc'];
+              const selectedQuote = <BaseData>get(selections)['quoteLoc'];
               if (selectedQuote?.key != 'left') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
               selectItem('quoteLoc', quoteOpt.buttons[1], false);
@@ -1139,7 +1139,7 @@ config.addPage(
             key: 'right',
             onselect: () => {
               const pg = get(page);
-              const selectedQuote = get(selections)['quoteLoc'];
+              const selectedQuote = <BaseData>get(selections)['quoteLoc'];
               if (selectedQuote?.key != 'right') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
               selectItem('quoteLoc', quoteOpt.buttons[0], false);
@@ -1203,7 +1203,7 @@ config.addPage(
             key: 'left',
             onselect: () => {
               const pg = get(page);
-              const selectedName = get(selections)['nameLoc'];
+              const selectedName = <BaseData>get(selections)['nameLoc'];
               if (selectedName?.key != 'left') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[3];
               selectItem('nameLoc', quoteOpt.buttons[1], false);
@@ -1216,7 +1216,7 @@ config.addPage(
             default: true,
             onselect: () => {
               const pg = get(page);
-              const selectedName = get(selections)['nameLoc'];
+              const selectedName = <BaseData>get(selections)['nameLoc'];
               if (selectedName?.key != 'right') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[3];
               selectItem('nameLoc', quoteOpt.buttons[0], false);
@@ -1236,7 +1236,7 @@ config.addPage(
         placeholder: 'Add a quote or saying here',
         onupdate: () => {
           const pg = get(page);
-          const selectedName = get(selections)['nameLoc'];
+          const selectedName = <BaseData>get(selections)['nameLoc'];
           if (selectedName.key != 'center') return;
           const nameOpt: ButtonOption = <ButtonOption>pg.options[3];
           selectItem('nameLoc', nameOpt.buttons[0]);
@@ -1253,7 +1253,7 @@ config.addPage(
         placeholder: 'Add a quote or saying here',
         onupdate: () => {
           const pg = get(page);
-          const selectedName = get(selections)['nameLoc'];
+          const selectedName = <BaseData>get(selections)['nameLoc'];
           if (selectedName.key != 'center') return;
           const nameOpt: ButtonOption = <ButtonOption>pg.options[3];
           selectItem('nameLoc', nameOpt.buttons[1]);
@@ -1304,7 +1304,7 @@ config.addPage(
     },
     intro: `
 			Double trunks usually work best with 2 people. Birthdates are added after each name to get the needed length.<br><br>
-			<img src='/imgs/Option Examples/Double Trunk Examples.jpg' class='full-width'/><br>
+			<img src='/imgs/Option Examples/Double Trunk Examples.jpg' class='full-width' alt='Example'/><br>
 			The image of the example tree you've been building won't change based on your selection, but we will create your tree with a double trunk if you select "Yes" here.
 			`,
     options: [
@@ -1975,8 +1975,8 @@ config.addPage(
       id: 'additionalPrints',
       keys: ['addPrintType', 'addPrintSize', 'addQty', 'addUseFrame', 'addFrame'],
       quantifier: 'addQty',
-      format: '%addQty%x %addPrintType% - %addPrintSize%, %addFrame%',
-      paypal: '%addPrintType% - %addPrintSize%, %addFrame%'
+      format: '%addQty%x %addPrintType% - %addPrintSize%%addFrame%',
+      paypal: '%addPrintType% - %addPrintSize%%addFrame%'
     }),
     options: [
       {
@@ -2176,7 +2176,7 @@ config.addPage(
           {
             displayText: 'Natural Barnwood ~ 2.25" (%value%)',
             key: 'natural_barnwood',
-            placeholder: 'Natural Barnwood ~ 2.25"',
+            placeholder: ', Natural Barnwood ~ 2.25"',
             displayImage: '/imgs/Products/Natural Barnwood Corner.jpg',
             summaryText: 'Natural Barnwood Frame',
             values: [
@@ -2210,7 +2210,7 @@ config.addPage(
           {
             displayText: 'Whitewashed Barnwood ~ 2.25" (%value%)',
             key: 'white_barnwood',
-            placeholder: 'Whitewashed Barnwood ~ 2.25"',
+            placeholder: ', Whitewashed Barnwood ~ 2.25"',
             displayImage: '/imgs/Products/Whitewashed Barnwood Corner.jpg',
             summaryText: 'Whitewashed Barnwood Frame',
             values: [
@@ -2244,7 +2244,7 @@ config.addPage(
           {
             displayText: 'Flat Black Wood ~ 1.125" (%value%)',
             key: 'flat_black',
-            placeholder: 'Flat Black Wood ~ 1.125"',
+            placeholder: ', Flat Black Wood ~ 1.125"',
             displayImage: '/imgs/Products/Flat Black Corner.jpg',
             summaryText: 'Flat Black Wood Frame',
             values: [
@@ -2278,7 +2278,7 @@ config.addPage(
           {
             displayText: 'Flat White Wood ~ 1.125" (%value%)',
             key: 'flat_white',
-            placeholder: 'Flat White Wood ~ 1.125"',
+            placeholder: ', Flat White Wood ~ 1.125"',
             displayImage: '/imgs/Products/Flat White Corner.jpg',
             summaryText: 'Flat White Wood Frame',
             values: [
@@ -2312,7 +2312,7 @@ config.addPage(
           {
             displayText: 'Mocha Wood ~ 1.125" (%value%)',
             key: 'mocha',
-            placeholder: 'Mocha Wood ~ 1.125"',
+            placeholder: ', Mocha Wood ~ 1.125"',
             displayImage: '/imgs/Products/Mocha Corner.jpg',
             summaryText: 'Mocha Wood Frame',
             values: [
@@ -2346,7 +2346,7 @@ config.addPage(
           {
             displayText: 'Natural Basswood ~ 1.125" (%value%)',
             key: 'basswood',
-            placeholder: 'Natural Basswood ~ 1.125"',
+            placeholder: ', Natural Basswood ~ 1.125"',
             displayImage: '/imgs/Products/Natural Basswood Corner.jpg',
             summaryText: 'Natural Basswood Frame',
             values: [
@@ -2380,7 +2380,7 @@ config.addPage(
           {
             displayText: 'Classic Black ~ 1.625" (%value%)',
             key: 'classic_black',
-            placeholder: 'Classic Black ~ 1.625"',
+            placeholder: ', Classic Black ~ 1.625"',
             displayImage: '/imgs/Products/Black Americana Corner.jpg',
             summaryText: 'Classic Black Frame',
             values: [
@@ -2414,7 +2414,7 @@ config.addPage(
           {
             displayText: 'Black & Silver Scoop ~ 1.75" (%value%)',
             key: 'black_silver',
-            placeholder: 'Black & Silver Scoop ~ 1.75"',
+            placeholder: ', Black & Silver Scoop ~ 1.75"',
             displayImage: '/imgs/Products/Black & Silver Scoop Corner.jpg',
             summaryText: 'Black & Silver Scoop Frame',
             values: [
@@ -2448,7 +2448,7 @@ config.addPage(
           {
             displayText: 'Black Scoop ~ 2" (%value%)',
             key: 'black_scoop',
-            placeholder: 'Black Scoop ~ 2"',
+            placeholder: ', Black Scoop ~ 2"',
             displayImage: '/imgs/Products/Black Scoop Corner.jpg',
             summaryText: 'Black Scoop Frame',
             values: [
@@ -2482,7 +2482,7 @@ config.addPage(
           {
             displayText: 'Gold Scoop ~ 2" (%value%)',
             key: 'gold_scoop',
-            placeholder: 'Gold Scoop ~ 2"',
+            placeholder: ', Gold Scoop ~ 2"',
             displayImage: '/imgs/Products/Gold Scoop Corner.jpg',
             summaryText: 'Gold Scoop Frame',
             values: [
@@ -2516,7 +2516,7 @@ config.addPage(
           {
             displayText: 'Pewter Scoop ~ 2" (%value%)',
             key: 'pewter_scoop',
-            placeholder: 'Pewter Scoop ~ 2"',
+            placeholder: ', Pewter Scoop ~ 2"',
             displayImage: '/imgs/Products/Pewter Scoop Corner.jpg',
             summaryText: 'Pewter Scoop Frame',
             values: [

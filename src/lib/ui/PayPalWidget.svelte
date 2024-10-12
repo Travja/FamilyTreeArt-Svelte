@@ -5,7 +5,6 @@
     OrderResponseBody,
     PayPalButtonsComponentOptions,
     PayPalNamespace,
-    PurchaseItem,
     PurchaseUnit
   } from '@paypal/paypal-js';
   import { loadScript } from '@paypal/paypal-js';
@@ -17,6 +16,7 @@
   import { api } from '../api';
   import { goto } from '$app/navigation';
   import FancyInput from '$lib/ui/FancyInput.svelte';
+  import type { components } from '@paypal/paypal-js/types/apis/openapi/checkout_orders_v2';
 
   let paypal: PayPalNamespace;
   const style = { // https://developer.paypal.com/docs/checkout/standard/customize/buttons-style-guide/
@@ -27,7 +27,7 @@
 
   onMount(() => {
     if ($totalCost > 0) {
-      loadScript({ 'client-id': 'AS7YWa9oRXe4_aenz3gqNkmmL-rucRLE2CMO5YSSVpzRwdr7nHpp5UOe_KQ5zDTwAzhrH8Li8XfzJybH' })
+      loadScript({ 'clientId': 'AS7YWa9oRXe4_aenz3gqNkmmL-rucRLE2CMO5YSSVpzRwdr7nHpp5UOe_KQ5zDTwAzhrH8Li8XfzJybH' })
         .then(pp => {
           paypal = pp;
           setupPayPal();
@@ -35,8 +35,8 @@
     }
   });
 
-  const generateItem = (data: BaseData): PurchaseItem => {
-    let item: PurchaseItem = {
+  const generateItem = (data: BaseData): components["schemas"]["item"] => {
+    let item: components["schemas"]["item"] = {
       name: '',
       quantity: '0',
       unit_amount: {
@@ -65,6 +65,7 @@
     let purchaseUnit: PurchaseUnit = {
       description: 'Family Tree',
       amount: {
+        currency_code: 'USD',
         value: get(totalCost).toFixed(2),
         breakdown: {
           item_total: {
@@ -119,7 +120,8 @@
 
     // pass in any options from the v2 orders create call:
     // https://developer.paypal.com/api/orders/v2/#orders-create-request-body
-    let payload: CreateOrderRequestBody = {
+    const payload: CreateOrderRequestBody = {
+      intent: 'CAPTURE',
       purchase_units: [purchaseUnit]
     };
 
@@ -148,18 +150,20 @@
       },
 
       // finalize the transaction
-      onApprove: (data, actions) => {
+      onApprove: async (data, actions) => {
         const captureOrderHandler = (details: OrderResponseBody) => {
-          const payerName = details.payer.name.given_name
-            + (!!details.payer.name.surname ? ' '
-              + details.payer.name.surname : '');
-          const email = details.payer.email_address;
+          const payer = details.payment_source?.paypal || details.payer;
+          const payerName = payer.name.given_name
+            + (!!payer.name.surname ? ' '
+              + payer.name.surname : '');
+          const email = payer.email_address;
           console.log('Transaction completed');
 
           goto(`/success?user=${encodeURIComponent(payerName)}&email=${encodeURIComponent(email)}`);
         };
 
-        return actions.order.capture().then(captureOrderHandler);
+        let details = await actions.order.capture();
+        return captureOrderHandler(details);
       },
 
       // handle unrecoverable errors
@@ -236,20 +240,20 @@
   <hr />
   <h3 class='center'>Please enter your Shipping Information</h3>
   <form id='customForm' on:submit|preventDefault={submitCustom}>
-    <FancyInput id='payer-name' required='true' bind:value={payerName}>Name</FancyInput>
+    <FancyInput id='payer-name' required={true} bind:value={payerName}>Name</FancyInput>
     <FancyInput id='payer-email'
                 pattern={'[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$'}
                 title='Please enter a valid email'
                 bind:value={payerEmail}
-                required='true'>
+                required={true}>
       Email
     </FancyInput>
-    <FancyInput id='payer-address' required='true' bind:value={payerAddress}>Street Address</FancyInput>
+    <FancyInput id='payer-address' required={true} bind:value={payerAddress}>Street Address</FancyInput>
     <FancyInput id='payer-address-two' bind:value={payerAddressTwo}>Apt No. (Optional)</FancyInput>
-    <FancyInput id='payer-city' required='true' bind:value={payerCity}>City</FancyInput>
-    <FancyInput id='payer-state' required='true' bind:value={payerState}>State</FancyInput>
-    <FancyInput id='payer-zip' required='true' bind:value={payerZip}>Zip</FancyInput>
-    <FancyInput id='payer-country-code' required='true' bind:value={payerCountryCode}>Country Code</FancyInput>
+    <FancyInput id='payer-city' required={true} bind:value={payerCity}>City</FancyInput>
+    <FancyInput id='payer-state' required={true} bind:value={payerState}>State</FancyInput>
+    <FancyInput id='payer-zip' required={true} bind:value={payerZip}>Zip</FancyInput>
+    <FancyInput id='payer-country-code' required={true} bind:value={payerCountryCode}>Country Code</FancyInput>
 
     {#if error}
       <div class='error'>{error}</div>

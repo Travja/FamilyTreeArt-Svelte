@@ -3,15 +3,16 @@
   import type {
     BaseData,
     ButtonOption,
-    GroupData,
     ImageOption,
+    ItemOption,
     MultiSelectData,
-    OptionImageData,
+    TextOption,
     TreeArtPage
   } from '$lib/conf/TreeArtConfig';
   import {
     calculateTotal,
     deleteMulti,
+    getDataValue,
     getImage,
     getMultiSelect,
     getQualifiedCost,
@@ -29,9 +30,19 @@
   import { currentPage, page } from '../pages';
   import type { Unsubscriber } from 'svelte/store';
   import { coupon, couponValue } from '$lib/coupon-manager';
+  import {
+    isBaseData,
+    isButtonOption,
+    isGroupData,
+    isImageOption,
+    isItemOption,
+    isNumOption,
+    isTextLongOption,
+    isTextOption
+  } from '$lib/conf/util';
 
   let loading = true;
-  let options: (ImageOption | ButtonOption)[];
+  let options: (ImageOption | ButtonOption | ItemOption | TextOption)[];
   let numOptions: any = {};
   let formattedEntries = {};
   let failsafe = 0;
@@ -79,12 +90,12 @@
     }
   };
 
-  const select = (optId, value) => {
+  const select = (optId: string, value: string | BaseData) => {
     selectItem(optId, value);
     options = [...options];
   };
 
-  const getOrSetValue = (optId, fallback) => {
+  const getOrSetValue = (optId: string, fallback: string | BaseData) => {
     let val = getValue(optId);
     if (!val) {
       selectItem(optId, fallback);
@@ -128,6 +139,8 @@
       let quantifier = 0;
       for (let key of multi.keys) {
         let dataValue = multiDatum[key];
+        if (!dataValue) dataValue = '';
+
         matcher = matcher.replace(
           `%${key}%`,
           dataValue.placeholder ||
@@ -156,6 +169,8 @@
       let total = 0;
       for (let key of multi.keys) {
         let dataValue = multData[key];
+        if (!dataValue) dataValue = '';
+
         formatted = formatted.replace(
           `%${key}%`,
           dataValue.placeholder ||
@@ -176,7 +191,7 @@
     formattedEntries = { ...formattedEntries };
   };
 
-  const checkSelections = (page) => {
+  const checkSelections = (page: TreeArtPage): void => {
     if (checked) return;
     checked = true;
     failsafe++;
@@ -187,9 +202,9 @@
     }
 
     options = <(ImageOption | ButtonOption)[]>page.options;
-    let toSelect: { string: any } = {};
+    let toSelect: { [key: string]: any } = {};
 
-    for (let opt: ImageOption | ButtonOption of options) {
+    for (const opt of options) {
       let selected: any = getValue(opt.id);
       let selectedValid = true;
       if (typeof selected === 'string' || typeof selected === 'number')
@@ -200,11 +215,11 @@
         : 'buttons' in opt ? 'buttons' : 'items';
       if (key in opt) {
         numOptions[opt.id] = 0;
-        for (let img: BaseData | GroupData of opt[key]) {
+        for (const img of opt[key]) {
           if (!meetsPrereqs(img?.prereq)) continue;
 
           if ('group' in img) {
-            for (let data: OptionImageData of img.group.images) {
+            for (const data of img.group.images) {
               if (!meetsPrereqs(data?.prereq)) continue;
               numOptions[opt.id]++;
               if (
@@ -230,7 +245,7 @@
           }
 
         }
-      } else if (opt.type === 'number' && !selected) selectItem(opt.id, 1);
+      } else if (opt.type === 'number' && !selected) selectItem(opt.id, '1');
 
       if (!selectedValid) {
         unset(opt.id);
@@ -251,7 +266,7 @@
   };
 </script>
 
-<container>
+<section>
   {#if loading || !$page}
     <h2 id='optionTitle'>Hold tight!</h2>
     <div class='instructions'>
@@ -270,7 +285,7 @@
             <div class='optionLabel'>{@html opt.name}</div>
 
             <!-- ImageOption -->
-            {#if opt.images}
+            {#if isImageOption(opt)}
               <div
                 id={opt.id}
                 class='imgSelect'
@@ -279,7 +294,7 @@
                 {#each opt.images as img}
                   {#if !img.prereq || meetsPrereqs(img.prereq)}
                     <!-- Groups! -->
-                    {#if img.group}
+                    {#if isGroupData(img)}
                       <div id={img.group.id} class='grouping flex-2'>
                         <div class='flex-1'>{@html img.group.header}</div>
                         {#each img.group.images as gImg}
@@ -289,8 +304,11 @@
                                 4,
                                 img.group.images.length
                               )}'
-                              on:click={select(opt.id, gImg)}
-                              class:selected={getValue(opt.id)?.key == gImg.key}
+                              role='button'
+                              tabindex='0'
+                              on:click={() => select(opt.id, gImg)}
+                              on:keypress={(e) => e.key === 'Enter' && select(opt.id, gImg)}
+                              class:selected={getDataValue(opt.id)?.key === gImg.key}
                             >
                               <div class='optText'>
                                 {#if gImg.placeholder}
@@ -330,8 +348,11 @@
                           opt.flexCount ? opt.flexCount : 4,
                           numOptions[opt.id]
                         )}'
-                        on:click={select(opt.id, img)}
-                        class:selected={getValue(opt.id)?.key == img.key}
+                        role='button'
+                        tabindex='0'
+                        on:click={() => select(opt.id, img)}
+                        on:keypress={(e) => e.key === 'Enter' && select(opt.id, img)}
+                        class:selected={getDataValue(opt.id)?.key === img.key}
                       >
                         <div class='optText'>
                           {#if img.placeholder}
@@ -371,7 +392,7 @@
                 {/each}
               </div>
               <!-- ButtonOption -->
-            {:else if opt.buttons}
+            {:else if isButtonOption(opt)}
               <div
                 id={opt.id}
                 class='imgSelect'
@@ -384,8 +405,11 @@
                         opt.flexCount ? opt.flexCount : 4,
                         numOptions[opt.id]
                       )} textButton'
-                      on:click={select(opt.id, button)}
-                      class:selected={getValue(opt.id)?.key == button.key}
+                      role='button'
+                      tabindex='0'
+                      on:click={() => select(opt.id, button)}
+                      on:keypress={(e) => e.key === 'Enter' && select(opt.id, button)}
+                      class:selected={getDataValue(opt.id)?.key === button.key}
                     >
                       <div class='optText'>
                         {#if button.placeholder}
@@ -409,77 +433,77 @@
                 {/each}
               </div>
               <!-- ItemOption -->
-            {:else if opt.items && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if isItemOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <select
                 id={opt.id}
                 on:change={e =>
                   select(
                     opt.id,
                     opt.items[
-                      e.target.selectedIndex -
-                        (opt.items.filter(itm => itm.default).length == 0
+                      e.currentTarget.selectedIndex -
+                        (opt.items.filter(itm => itm.default).length === 0
                           ? 1
                           : 0)
                     ]
                   )}
                 class:error={$requirementsNotMet.includes(opt.id)}
               >
-                {#if opt.items.filter(itm => itm.default).length == 0}
+                {#if opt.items.filter(itm => itm.default).length === 0}
                   <option value='-1' />
                 {/if}
                 {#each opt.items as item, i}
                   <option
                     value={i}
-                    selected={item.default || $selections[opt.id] == item}
+                    selected={item.default || $selections[opt.id] === item}
                   >{item.displayText}</option
                   >
                 {/each}
               </select>
               <!-- Text :D -->
-            {:else if opt.type === 'text' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if isTextOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
                 type='text'
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.target.value)}
-                on:keypress={e => select(opt.id, e.target.value)}
-                on:paste={e => select(opt.id, e.target.value)}
-                on:input={e => select(opt.id, e.target.value)}
+                on:change={e => select(opt.id, e.currentTarget.value)}
+                on:keypress={e => select(opt.id, e.currentTarget.value)}
+                on:paste={e => select(opt.id, e.currentTarget.value)}
+                on:input={e => select(opt.id, e.currentTarget.value)}
                 value={$selections[opt.id] || ``}
               />
-            {:else if opt.type === 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if isNumOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
                 type='number'
                 min='1'
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.target.value)}
-                on:keypress={e => select(opt.id, e.target.value)}
-                on:paste={e => select(opt.id, e.target.value)}
-                on:input={e => select(opt.id, e.target.value)}
-                value={getOrSetValue(opt.id, 1)}
+                on:change={e => select(opt.id, e.currentTarget.value)}
+                on:keypress={e => select(opt.id, e.currentTarget.value)}
+                on:paste={e => select(opt.id, e.currentTarget.value)}
+                on:input={e => select(opt.id, e.currentTarget.value)}
+                value={getOrSetValue(opt.id, '1')}
               />
             {:else if opt.type === 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
                 type='date'
                 id={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.target.value)}
+                on:change={e => select(opt.id, e.currentTarget.value)}
                 value={$selections[opt.id] || ``}
               />
-            {:else if opt.type === 'textLong' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if isTextLongOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <textarea
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.target.value)}
-                on:keypress={e => select(opt.id, e.target.value)}
-                on:paste={e => select(opt.id, e.target.value)}
-                on:input={e => select(opt.id, e.target.value)}
-                value={$selections[opt.id] || ``}
+                on:change={e => select(opt.id, e.currentTarget.value)}
+                on:keypress={e => select(opt.id, e.currentTarget.value)}
+                on:paste={e => select(opt.id, e.currentTarget.value)}
+                on:input={e => select(opt.id, e.currentTarget.value)}
+                value={String($selections[opt.id] || '')}
               />
             {/if}
           </div>
@@ -488,9 +512,10 @@
     </div>
   {/if}
   {#if $page?.multiselect}
-    <button class='button add' on:click={addMultiSelect($page.multiselect)}
-    ><p>Add Item</p></button
+    <button class='button add' on:click={() => addMultiSelect($page.multiselect)}
     >
+      <span>Add Item</span>
+    </button>
   {/if}
   {#each Object.keys(formattedEntries) as key (formattedEntries[key].id)}
     {#each formattedEntries[key].data as entry, i}
@@ -500,7 +525,10 @@
         <div
           class='delete material-icons no-select'
           title='Delete'
-          on:click={purgeMulti(key, i)}
+          role='button'
+          tabindex='0'
+          on:click={() => purgeMulti(key, i)}
+          on:keypress={(e) => e.key === 'Enter' && purgeMulti(key, i)}
         >
           delete
         </div>
@@ -511,9 +539,9 @@
   {#if $page?.finalPage}
     <div id='summary'>
       {#each Object.entries($selections) as [key, entry]}
-        {#if entry && (entry.summaryText || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
+        {#if entry && (isBaseData(entry) || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
           <div id='preview-{key}' class='summaryItem'>
-            {#if entry.summaryText}
+            {#if isBaseData(entry)}
               {entry.summaryText ||
               entry.key ||
               entry.displayText ||
@@ -558,7 +586,7 @@
       {/if}
     </div>
   {/if}
-</container>
+</section>
 
 <style>
     #options {

@@ -1,6 +1,5 @@
 import type {
   BaseData,
-  ButtonData,
   ImageFormatData,
   OptionImageData,
   Prereqs,
@@ -15,16 +14,19 @@ import { canvasManager } from './canvas-manager';
 import { saveMultiData, saveSelections } from './data-store';
 import { coupon, couponValue } from './coupon-manager';
 import { page } from './pages';
+import { isBaseData } from '$lib/conf/util';
 
 export const requirementsNotMet = writable([]);
-export const selections: Writable<any> = writable({});
-export const multiSelectEntries: Writable<any> = writable({});
+export const selections: Writable<{ [key: string]: string | & BaseData }> = writable({});
+export const multiSelectEntries: Writable<{ [key: string]: any[] }> = writable({});
 export const composite: Writable<any> = writable();
 export const itemTotal: Writable<number> = writable(0);
 export const shipping: Writable<number> = writable(0);
 export const totalCost: Writable<number> = writable(0);
 
-export const calculateTotal = (option: BaseData): number => {
+export const calculateTotal = (option: string | number | BaseData): number => {
+  if (!(option instanceof Object)) return 0;
+
   if ('cost' in option) {
     return option.cost;
   } else if ('values' in option) {
@@ -32,20 +34,20 @@ export const calculateTotal = (option: BaseData): number => {
       let selected = get(selections)[val.option];
       if (!selected) continue;
 
-      if (val.value.includes(selected.key)) {
+      if (isBaseData(selected) && val.value.includes(selected.key)) {
         return val.cost;
       }
     }
-  } else {
-    return 0;
   }
+
+  return 0;
 };
 
 const updateTotal = () => {
   let total = 0;
   let itmTotal = 0;
   let sel = get(selections);
-  Object.entries<BaseData>(sel).forEach(([key, val]: [string, BaseData]) => {
+  Object.entries(sel).forEach(([key, val]: [string, string | BaseData]) => {
     if (typeof val == 'object') {
       let value = calculateTotal(val);
       if (key == 'shipping') shipping.set(value);
@@ -56,7 +58,7 @@ const updateTotal = () => {
 
   Object.entries<any>(get(multiSelectEntries)).forEach(([key, entry]) => {
     const currentData = config.getMultiSelectData(key);
-    entry.forEach(multi => {
+    entry.forEach((multi: any) => {
       const sum = currentData.total(multi);
       total += sum;
       itmTotal += sum;
@@ -67,11 +69,11 @@ const updateTotal = () => {
 
   const coup = get(coupon);
   if (coup) {
-    let amount;
+    let amount: number;
     if (coup.target == 'all') amount = itmTotal + (coup.coupon ? 0 : get(shipping));
-    else amount = getQualifiedCost(sel[coup.target]);
+    else amount = getQualifiedCost(<BaseData>sel[coup.target]);
 
-    let discount = 0;
+    let discount: number;
     if (coup.coupon) { // X% off
       discount = amount * (coup.value / 100);
       discount = Math.round(discount * 100) / 100;
@@ -98,15 +100,15 @@ coupon.subscribe(updateTotal);
 
 export const selectItem = (
   optId: string,
-  value: BaseData | number | string,
+  value: BaseData | string,
   cascade: boolean = true
 ) => {
   let sel = get(selections);
   // console.log(`New value for ${optId}: `, value);
   const prev = sel[optId];
   sel[optId] = value;
-  if (typeof value == 'object') {
-    if (prev && 'key' in value && prev.key != value.key && 'reset' in value) {
+  if (typeof value === 'object') {
+    if (prev && typeof prev === 'object' && 'key' in value && prev.key != value.key && 'reset' in value) {
       for (let res of value.reset) {
         delete sel[res];
       }
@@ -156,10 +158,19 @@ export const unset = (optId: string) => {
 export const getValue = (
   optId: string,
   sourceData?: any
-): OptionImageData | ButtonData | string => {
+): BaseData | string => {
   return sourceData && sourceData[optId]
     ? sourceData[optId]
     : get(selections)[optId];
+};
+
+export const getDataValue = (optId: string,
+                             sourceData?: any): BaseData => {
+  const data = sourceData && sourceData[optId]
+    ? sourceData[optId]
+    : get(selections)[optId];
+
+  return data instanceof Object ? data : undefined;
 };
 
 export const selectMultiSelect = (optId: string, value: any) => {
@@ -174,7 +185,7 @@ export const getMultiSelect = (optId: string): any =>
 
 export const deleteMulti = (optId: string, multi: any) => {
   let entries = get(multiSelectEntries);
-  entries[optId] = entries[optId].filter(data => data != multi);
+  entries[optId] = entries[optId].filter((data: any) => data != multi);
   multiSelectEntries.set(entries);
 };
 
@@ -186,7 +197,7 @@ export const getQualifiedCost = (
   if (!option.values) return value;
 
   for (let check of option.values) {
-    let targetValue: OptionImageData | ButtonData | string = getValue(
+    let targetValue: BaseData | string = getValue(
       check.option,
       sourceData
     );
@@ -208,11 +219,12 @@ export const getQualifiedCost = (
 export const meetsPrereqs = (prereq: Prereqs): boolean => {
   if (!prereq) return true;
 
-  let value: OptionImageData | ButtonData | string = getValue(prereq.option);
-  if (typeof value != 'string') value = value?.key;
+  let value: BaseData | string = getValue(prereq.option);
+  if (typeof value === 'object') value = value?.key;
 
   if (!value) return false;
 
+  value = value + '';
   let result = prereq.value
     ? // Check if we have an included value
     prereq.value.includes(value)
@@ -267,19 +279,18 @@ export const getImage = (data: OptionImageData) => {
 
 // tree: '/imgs/Tree Layers/%type% %gen% %couple% %style1% TREE %color%.png',
 export const getTreeImage = (data: OptionImageData) => {
-  let treeFormat = config.imageFormats.tree
+  return config.imageFormats.tree
     .replace('%type%', getOrDefault(data, 'type'))
     .replace('%gen%', getOrDefault(data, 'gen'))
     .replace('%couple%', getOrDefault(data, 'couple'))
     .replace('%style1%', getOrDefault(data, 'style1'))
     .replace('%color%', getOrDefault(data, 'color'))
     .replace(/ {2,}/, ' ');
-  return treeFormat;
 };
 
 // leaf: '/imgs/Tree Layers/%type% %gen% %couple% %style1% LEAVES%chalk%.png',
 export const getLeavesImage = (data: OptionImageData) => {
-  let format = config.imageFormats.leaf
+  return config.imageFormats.leaf
     .replace('%type%', getOrDefault(data, 'type'))
     .replace('%gen%', getOrDefault(data, 'gen'))
     .replace('%couple%', getOrDefault(data, 'couple'))
@@ -287,17 +298,15 @@ export const getLeavesImage = (data: OptionImageData) => {
     .replace('%color%', getOrDefault(data, 'color'))
     .replace('%chalk%', getOrDefault(data, 'color') == 'CHALK' ? ' CHALK' : '')
     .replace(/ {2,}/, ' ');
-  return format;
 };
 
 // root: '/imgs/Tree Layers/ROOTS %gen% %type% %color%.png',
 export const getRootsImage = (data: OptionImageData) => {
-  let rootFormat = config.imageFormats.root
+  return config.imageFormats.root
     .replace('%type%', getOrDefault(data, 'type'))
     .replace('%gen%', getOrDefault(data, 'gen'))
     .replace('%color%', getOrDefault(data, 'color'))
     .replace(/ {2,}/, ' ');
-  return rootFormat;
 };
 
 const getImageData = (data: ImageFormatData, key: string) => {
@@ -344,7 +353,8 @@ export const getComposite = () => {
   let sel = get(selections);
   let comp = {};
   for (let key in sel) {
-    if (!(key in sel) || !sel[key]?.img) continue;
+    if (!(key in sel)) continue;
+    if (typeof sel[key] !== 'object' || !sel[key]?.img) continue;
 
     let obj = sel[key].img;
     for (let imgKey in obj) {

@@ -139,6 +139,7 @@ export class MultiSelectData {
     let final = this.format;
     for (const text of this.keys) {
       let obj = data[text];
+      if (!obj) obj = '';
       if (typeof obj == 'number' || typeof obj == 'string')
         final = final.replace(`%${text}%`, obj + '');
       else {

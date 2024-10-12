@@ -156,12 +156,12 @@
     justify-content: center;
     align-items: center;
     color: rgb(96, 57, 19);
-    padding: 0px 10px;
+    padding: 0 10px;
     margin: 0 9px;
     width: 82px;
     height: 38px;
     line-height: 1.2;
-    letter-spacing: 0px;
+    letter-spacing: 0;
     font-size: 18px;
     font-weight: bold;
   }

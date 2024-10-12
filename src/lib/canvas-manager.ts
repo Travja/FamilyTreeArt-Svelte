@@ -57,10 +57,11 @@ class CanvasManager {
     let tenW = canvas.width * 0.1;
     let tenH = canvas.height * 0.1;
     tree.width = canvas.width - (rootsExist ? tenW * 2 : 0);
+    const selection = select['nameLoc'];
     tree.height =
       canvas.height -
       (rootsExist ? tenH * 2 : 0) -
-      (select['nameLoc']?.position == 'center' ? tenH / 2 : 0);
+      (selection instanceof Object && selection?.position == 'center' ? tenH / 2 : 0);
 
     images.push(tree);
 
@@ -107,8 +108,12 @@ class CanvasManager {
 
   cacheText = {};
   resizeText = () => {
-    let el, elements, _i, _len, _results;
-    elements = document.getElementsByClassName('resize');
+    let el: string | number | SVGGraphicsElement,
+      elements: string | any[] | HTMLCollectionOf<SVGGraphicsElement>,
+      _i: number,
+      _len: number,
+      _results: any[];
+    elements = <HTMLCollectionOf<SVGGraphicsElement>>document.getElementsByClassName('resize');
     if (elements.length < 0) {
       return;
     }
@@ -117,10 +122,10 @@ class CanvasManager {
       el = elements[_i];
       if (!el.classList.contains('resizeGround')) {
         _results.push((el => {
-          let _results1;
+          let _results1: any[];
           let resizeText = () => {
             let font = window.getComputedStyle(el, null).getPropertyValue('font-size');
-            let elNewFontSize;
+            let elNewFontSize: string;
             elNewFontSize = (parseFloat(font.slice(0, -2)) - 1) + 'px';
             return el.style.fontSize = elNewFontSize;
           };
@@ -128,28 +133,28 @@ class CanvasManager {
           _results1 = [];
 
           el.style.fontSize = '';
-          while (el.scrollHeight > el.offsetHeight) {
+          while (el.scrollHeight > (<HTMLElement><never>el).offsetHeight) {
             _results1.push(resizeText());
           }
           return _results1;
         })(el));
       } else {
         let text = el.innerHTML;
-        let resize = (e) => {
-          let shrink = (elm) => {
+        let resize = (e: SVGGraphicsElement) => {
+          let shrink = (elm: SVGGraphicsElement) => {
             let font = window.getComputedStyle(elm, null).getPropertyValue('font-size');
             let elNewFontSize = (parseFloat(font.slice(0, -2)) - 0.25) + 'px';
             return elm.style.fontSize = elNewFontSize;
           };
 
-          if (this.cacheText[e] && (this.cacheText[e].length > text.length || e.getBBox().width < 85))
+          if (this.cacheText[e.id] && (this.cacheText[e.id].length > text.length || e.getBBox().width < 85))
             e.style.fontSize = '';
           while (e.getBBox().width > 95) {
             shrink(e);
           }
         };
         resize(el);
-        this.cacheText[el] = text;
+        this.cacheText[el.id] = text;
       }
     }
     return _results;

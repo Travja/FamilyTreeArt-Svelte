@@ -49,33 +49,33 @@
   <div id='item-wrapper'>
     <div id='item-builder'>
       <canvas
+        bind:this={$myCanvas}
+        height='819'
         id='builder-canvas'
         width='640'
-        height='819'
-        bind:this={$myCanvas}
       />
       <svg
-        id='svgBox'
-        height='100%'
-        width='100%'
-        viewBox='0 0 100 100'
-        preserveAspectRatio='none'
-        xmlns='http://www.w3.org/2000/svg'
         bind:this={$customSvg}
+        height='100%'
+        id='svgBox'
+        preserveAspectRatio='none'
+        viewBox='0 0 100 100'
+        width='100%'
+        xmlns='http://www.w3.org/2000/svg'
       >
         <defs>{@html svgStyle}</defs>
 
-        <foreignObject width='100%' height='100%'>
+        <foreignObject height='100%' width='100%'>
           <div
-            xmlns='http://www.w3.org/1999/xhtml'
             class='resize
 							        {$selections[`nameLoc`]?.position || `left`}
                       {$composite?.color?.toLowerCase()}
-                      {$composite?.color?.toLowerCase() != `chalk`
+                      {$composite?.color?.toLowerCase() !== `chalk`
               ? $selections[`familyFont`]?.font?.toLowerCase() || `mtype`
               : ``}'
             class:shift={!!$composite?.roots}
             id='familyWrapper'
+            xmlns='http://www.w3.org/1999/xhtml'
           >
             <div class='resize' id='familyText'>
               {$selections['familyName'] || ''}
@@ -83,15 +83,15 @@
             <div id='lineTwo'>{$selections['lineTwo'] || ''}</div>
           </div>
           <div
-            xmlns='http://www.w3.org/1999/xhtml'
             class='resize
 							        {$selections[`quoteLoc`]?.position || `right`}
                       {$composite?.color?.toLowerCase()}
-										  {$composite?.color?.toLowerCase() != `chalk`
+										  {$composite?.color?.toLowerCase() !== `chalk`
               ? $selections[`quoteFont`]?.font?.toLowerCase() || `mtype`
               : ``}'
             class:shift={!!$composite?.roots}
             id='quoteText'
+            xmlns='http://www.w3.org/1999/xhtml'
           >
             {$selections['quote'] || ''}
           </div>
@@ -99,12 +99,12 @@
 
         <!-- Path should be shifted if we are not showing roots -->
         <path
-          id='curve'
           class:shift={!$composite?.roots}
           d='M0,71.5
 								 C0,71.5 25,74 50,72 S
 								 85,71 100,72.5'
           fill='transparent'
+          id='curve'
         />
         <text x='50%'>
           <textPath
@@ -112,9 +112,9 @@
 													 resizeGround
 													 {$composite?.color?.toLowerCase()}
 													 {$selections[`groundFont`]?.font?.toLowerCase() || `mtype`}'
-            id='groundText'
-            href='#curve'
             font-family=', sans-serif'
+            href='#curve'
+            id='groundText'
           >
             {$selections['ground'] ||
             ($composite?.roots
@@ -129,7 +129,15 @@
         </div>
       {/if}
       {#if $selections['background']}
-        <div id='save' class='cover' on:click={saveTree}>Save Preview</div>
+        <div id='save'
+             class='cover'
+             role='button'
+             tabindex='0'
+             on:click={saveTree}
+             on:keypress={(e) => e.key === 'Enter' && saveTree()}
+        >
+          Save Preview
+        </div>
       {/if}
     </div>
     <div class='clear' />
@@ -151,18 +159,22 @@
           {@html config.pages[$currentPage].footer}
         </div>
       {/if}
-      {#if pageHelper.previousPage != -1}
+      {#if pageHelper.previousPage !== -1}
         <button id='back' on:click={pageHelper.gotoPreviousPage}
-        ><div>&laquo; Back</div></button
+        >
+          <span>&laquo; Back</span>
+        </button
         >
       {/if}
-      {#if pageHelper.nextPage != -1}
+      {#if pageHelper.nextPage !== -1}
         <button id='next' on:click={pageHelper.gotoNextPage}
-        ><div>Next &raquo;</div></button
+        >
+          <span>Next &raquo;</span>
+        </button
         >
       {/if}
     </div>
-    <div id='total' class='toggleable-cost' class:hidden={hideCost}>
+    <div class='toggleable-cost' class:hidden={hideCost} id='total'>
       <h3>Total: ${$totalCost.toFixed(2)}</h3>
     </div>
     <div class='clear' />
@@ -176,200 +188,200 @@
 </div>
 
 <style>
-  #contentWrapper {
-    position: relative;
-    flex-direction: row;
-    align-items: flex-start;
-    display: flex;
-    z-index: 5;
-    padding: 20px;
-    min-width: 743px;
-    margin: 0 auto 10px;
-    background-color: rgba(100, 100, 100, 0.1);
-  }
-
-  #item-wrapper {
-    position: sticky;
-    /*float: left;*/
-    top: 20px;
-    z-index: 10;
-    flex-grow: 0;
-    /*display: inline-block;*/
-    min-width: 230px;
-    /*width: 25vw;*/
-    width: 340px;
-    /*margin-right: 45px;*/
-  }
-
-  #item-builder {
-    position: relative;
-    width: 100%;
-    aspect-ratio: .7816;
-    min-height: 310px;
-    background-color: white;
-    box-shadow: inset -5px -5px 5px #ccc, inset 5px 5px 5px #ccc;
-    background-size: cover;
-    border-radius: 5px;
-    display: inline-block;
-  }
-
-  #builder-canvas {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  #configuration {
-    position: relative;
-    display: block;
-    /*text-align: right;*/
-    /*float: right;*/
-    flex-grow: 1;
-    flex-basis: 60%;
-    min-width: 490px;
-    /*max-width: 50%;*/
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: #cccccc;
-    border-radius: 10px;
-    box-shadow: #333 5px 5px 10px;
-    margin-left: 20px;
-    z-index: 15;
-  }
-
-  #quoteText,
-  #familyWrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  #familyWrapper,
-  #quoteText {
-    font-size: 0.21rem;
-    position: absolute;
-    word-wrap: normal;
-    height: 14%;
-    width: 35%;
-    z-index: 10;
-    text-align: center;
-  }
-
-  #lineTwo {
-    font-size: 0.87em;
-  }
-
-  @media screen and (max-width: 900px) {
     #contentWrapper {
-      flex-direction: column;
-      max-width: 100%;
-      min-width: 200px;
+        position: relative;
+        flex-direction: row;
+        align-items: flex-start;
+        display: flex;
+        z-index: 5;
+        padding: 20px;
+        min-width: 743px;
+        margin: 0 auto 10px;
+        background-color: rgba(100, 100, 100, 0.1);
     }
 
     #item-wrapper {
-      float: none;
-      margin: 0 auto;
+        position: sticky;
+        /*float: left;*/
+        top: 20px;
+        z-index: 10;
+        flex-grow: 0;
+        /*display: inline-block;*/
+        min-width: 230px;
+        /*width: 25vw;*/
+        width: 340px;
+        /*margin-right: 45px;*/
     }
 
-    #item-footer {
-      text-align: center;
-      font-size: 0.9em;
+    #item-builder {
+        position: relative;
+        width: 100%;
+        aspect-ratio: .7816;
+        min-height: 310px;
+        background-color: white;
+        box-shadow: inset -5px -5px 5px #ccc, inset 5px 5px 5px #ccc;
+        background-size: cover;
+        border-radius: 5px;
+        display: inline-block;
+    }
+
+    #builder-canvas {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
     #configuration {
-      margin: 10px;
-      min-width: 200px;
+        position: relative;
+        display: block;
+        /*text-align: right;*/
+        /*float: right;*/
+        flex-grow: 1;
+        flex-basis: 60%;
+        min-width: 490px;
+        /*max-width: 50%;*/
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: #cccccc;
+        border-radius: 10px;
+        box-shadow: #333 5px 5px 10px;
+        margin-left: 20px;
+        z-index: 15;
     }
-  }
 
-  #item-footer {
-    font-size: 0.9em;
-  }
+    #quoteText,
+    #familyWrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
 
-  /**SVG**/
-  svg {
-    color: black;
-    font-size: 0.2em;
-    position: absolute;
-    z-index: 10;
-    left: 0;
-    user-select: none;
-    opacity: 0;
-  }
+    #familyWrapper,
+    #quoteText {
+        font-size: 0.21rem;
+        position: absolute;
+        word-wrap: normal;
+        height: 14%;
+        width: 35%;
+        z-index: 10;
+        text-align: center;
+    }
 
-  text {
-    text-anchor: middle;
-  }
+    #lineTwo {
+        font-size: 0.87em;
+    }
 
-  textPath {
-    alignment-baseline: hanging;
-  }
+    @media screen and (max-width: 900px) {
+        #contentWrapper {
+            flex-direction: column;
+            max-width: 100%;
+            min-width: 200px;
+        }
 
-  /** Footer **/
-  #pageFooter,
-  .footer {
-    position: relative;
-    margin: 20px;
-  }
+        #item-wrapper {
+            float: none;
+            margin: 0 auto;
+        }
 
-  #next {
-    float: right;
-    margin-left: 20px;
-  }
+        #item-footer {
+            text-align: center;
+            font-size: 0.9em;
+        }
 
-  #back {
-    float: left;
-    margin-right: 20px;
-  }
+        #configuration {
+            margin: 10px;
+            min-width: 200px;
+        }
+    }
 
-  #total {
-    display: block;
-    min-width: 100px;
-    max-width: 200px;
-    text-align: center;
-    margin: 20px auto;
-  }
+    #item-footer {
+        font-size: 0.9em;
+    }
 
-  .toggleable-cost.hidden,
-  .toggleable-cost.hidden * {
-    height: 0;
-    width: 0;
-    padding: 0;
-    margin: 0;
-  }
+    /**SVG**/
+    svg {
+        color: black;
+        font-size: 0.2em;
+        position: absolute;
+        z-index: 10;
+        left: 0;
+        user-select: none;
+        opacity: 0;
+    }
 
-  .cover {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    font-size: 1.5em;
+    text {
+        text-anchor: middle;
+    }
 
-    backdrop-filter: blur(5px);
-    background: rgba(255, 255, 255, 0.4);
-  }
+    textPath {
+        alignment-baseline: hanging;
+    }
 
-  #save {
-    position: relative;
-    z-index: 20;
-    border: 3px dashed black;
-    opacity: 0;
-    transition: opacity 0.25s ease-in-out;
-  }
+    /** Footer **/
+    #pageFooter,
+    .footer {
+        position: relative;
+        margin: 20px;
+    }
 
-  #save:hover {
-    cursor: pointer;
-    opacity: 1;
-  }
+    #next {
+        float: right;
+        margin-left: 20px;
+    }
 
-  #skip {
-    display: block;
-    margin: 0 auto;
-    text-align: center;
-  }
+    #back {
+        float: left;
+        margin-right: 20px;
+    }
+
+    #total {
+        display: block;
+        min-width: 100px;
+        max-width: 200px;
+        text-align: center;
+        margin: 20px auto;
+    }
+
+    .toggleable-cost.hidden,
+    .toggleable-cost.hidden * {
+        height: 0;
+        width: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    .cover {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        font-size: 1.5em;
+
+        backdrop-filter: blur(5px);
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    #save {
+        position: relative;
+        z-index: 20;
+        border: 3px dashed black;
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+    }
+
+    #save:hover {
+        cursor: pointer;
+        opacity: 1;
+    }
+
+    #skip {
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+    }
 </style>
