@@ -96,7 +96,7 @@
 
   const addMultiSelect = (multi: MultiSelectData) => {
     let data = { id: {} };
-    for (let key of multi.keys) {
+    for (const key of multi.keys) {
       data[key] = getValue(key);
       unset(key);
     }
@@ -294,7 +294,7 @@
                             >
                               <div class='optText'>
                                 {#if gImg.placeholder}
-                                  {#if getQualifiedCost(gImg) == -1}
+                                  {#if getQualifiedCost(gImg) === -1}
                                     {@html gImg.placeholder}
                                   {:else}
                                     {@html gImg.displayText.replace(
@@ -335,7 +335,7 @@
                       >
                         <div class='optText'>
                           {#if img.placeholder}
-                            {#if getQualifiedCost(img) == -1}
+                            {#if getQualifiedCost(img) === -1}
                               {@html img.placeholder}
                             {:else}
                               {@html img.displayText.replace(
@@ -389,7 +389,7 @@
                     >
                       <div class='optText'>
                         {#if button.placeholder}
-                          {#if getQualifiedCost(button) == -1}
+                          {#if getQualifiedCost(button) === -1}
                             {@html button.placeholder}
                           {:else}
                             {@html button.displayText.replace(
@@ -436,7 +436,7 @@
                 {/each}
               </select>
               <!-- Text :D -->
-            {:else if opt.type == 'text' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if opt.type === 'text' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
                 type='text'
                 id={opt.id}
@@ -448,7 +448,7 @@
                 on:input={e => select(opt.id, e.target.value)}
                 value={$selections[opt.id] || ``}
               />
-            {:else if opt.type == 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if opt.type === 'number' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
                 type='number'
                 min='1'
@@ -461,7 +461,7 @@
                 on:input={e => select(opt.id, e.target.value)}
                 value={getOrSetValue(opt.id, 1)}
               />
-            {:else if opt.type == 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if opt.type === 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <input
                 type='date'
                 id={opt.id}
@@ -469,7 +469,7 @@
                 on:change={e => select(opt.id, e.target.value)}
                 value={$selections[opt.id] || ``}
               />
-            {:else if opt.type == 'textLong' && (!opt.prereq || meetsPrereqs(opt.prereq))}
+            {:else if opt.type === 'textLong' && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <textarea
                 id={opt.id}
                 placeholder={opt.placeholder}

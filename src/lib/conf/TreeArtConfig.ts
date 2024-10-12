@@ -166,7 +166,6 @@ export class MultiSelectData {
           if (!obj.value.includes(data[obj.option].key)) continue;
           if ('cost' in obj && obj.cost) {
             cost += obj.cost;
-            continue;
           }
         }
       }

@@ -219,10 +219,9 @@ export const meetsPrereqs = (prereq: Prereqs): boolean => {
     : // Or that we are properly using an excluded value
     prereq.not_value && !prereq.not_value.includes(value);
 
-  // Check the and recursively
+  // Check the 'and' recursively
   if (prereq.and) result = result && meetsPrereqs(prereq.and);
-
-  // Check the or recursively
+  // Check the 'or' recursively
   if (prereq.or) result = result || meetsPrereqs(prereq.or);
 
   // Return our result
@@ -230,8 +229,8 @@ export const meetsPrereqs = (prereq: Prereqs): boolean => {
 };
 
 export const requirementsMet = (page: TreeArtPage): boolean => {
-  let reqs = [];
-  for (let opt of page.options) {
+  const reqs = [];
+  for (const opt of page.options) {
     if (
       (!opt.prereq || meetsPrereqs(opt.prereq)) &&
       opt.required &&
