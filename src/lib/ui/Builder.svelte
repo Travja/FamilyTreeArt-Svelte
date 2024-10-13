@@ -26,7 +26,7 @@
         },
         250);
     });
-    canvasManager.processImg();
+    canvasManager.processImg(true);
   });
 
   onDestroy(() => {
