@@ -45,16 +45,8 @@ class Api {
           'Content-Type': 'application/json'
         }
       })
-        .then(res => {
-          if (res.status != 201 && res.status != 200) {
-            resolve([false, res.status]);
-          }
-          resolve([true, res.status]);
-        })
-        .catch(e => {
-          console.error(e);
-          resolve([false, -1]);
-        });
+        .then(res => resolve([res.status === 201 || res.status === 200, res.status]), _ => resolve([false, -1]))
+        .catch(_ => resolve([false, -1]));
     });
   };
 }

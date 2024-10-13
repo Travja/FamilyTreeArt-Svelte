@@ -1127,7 +1127,7 @@ config.addPage(
             default: true,
             onselect: () => {
               const pg = get(page);
-              const selectedQuote = <BaseData>get(selections)['quoteLoc'];
+              const selectedQuote = <BaseData>get(selections).quoteLoc;
               if (selectedQuote?.key != 'left') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
               selectItem('quoteLoc', quoteOpt.buttons[1], false);
@@ -1139,7 +1139,7 @@ config.addPage(
             key: 'right',
             onselect: () => {
               const pg = get(page);
-              const selectedQuote = <BaseData>get(selections)['quoteLoc'];
+              const selectedQuote = <BaseData>get(selections).quoteLoc;
               if (selectedQuote?.key != 'right') return;
               const quoteOpt: ButtonOption = <ButtonOption>pg.options[6];
               selectItem('quoteLoc', quoteOpt.buttons[0], false);

@@ -6,12 +6,11 @@ import { canvasManager } from './canvas-manager';
 import { saveMultiData, saveSelections } from './data-store';
 import { coupon, couponValue } from './coupon-manager';
 import { page } from './pages';
-import { isBaseData } from '$lib/conf/util';
 import type { BaseData, ImageFormatData, OptionImageData, Prereqs, RootData } from '../types/data';
 import type { TextOption } from '../types/options';
 
 export const requirementsNotMet = writable([]);
-export const selections: Writable<{ [key: string]: string | BaseData }> =
+export const selections: Writable<{ [key: string]: string | & BaseData }> =
   writable({});
 export const multiSelectEntries: Writable<{
   [key: string]: { [key: string]: BaseData | number | string }[]

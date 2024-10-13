@@ -35,8 +35,8 @@
     }
   });
 
-  const generateItem = (data: BaseData): components["schemas"]["item"] => {
-    let item: components["schemas"]["item"] = {
+  const generateItem = (data: BaseData): components['schemas']['item'] => {
+    let item: components['schemas']['item'] = {
       name: '',
       quantity: '0',
       unit_amount: {
@@ -266,17 +266,17 @@
 {/if}
 
 <style>
-  #checkout, #pay-later {
-    width: 55%;
-    text-align: center;
-    margin: 0 auto;
-  }
+    #checkout, #pay-later {
+        width: 55%;
+        text-align: center;
+        margin: 0 auto;
+    }
 
-  #customForm {
-    margin: 0 auto;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+    #customForm {
+        margin: 0 auto;
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 </style>

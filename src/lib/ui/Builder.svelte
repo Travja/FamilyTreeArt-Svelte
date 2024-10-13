@@ -9,6 +9,7 @@
   import { canvasManager, customSvg, loading, myCanvas } from '$lib/canvas-manager';
   import PayPalWidget from '$lib/ui/PayPalWidget.svelte';
   import CouponBox from '$lib/ui/CouponBox.svelte';
+  import { isBaseData } from '$lib/conf/util.js';
 
   export let pageHelper: PageHelper;
 
@@ -68,10 +69,10 @@
         <foreignObject height='100%' width='100%'>
           <div
             class='resize
-							        {$selections[`nameLoc`]?.position || `left`}
+							        {isBaseData($selections.nameLoc) && $selections.nameLoc?.position || `left`}
                       {$composite?.color?.toLowerCase()}
                       {$composite?.color?.toLowerCase() !== `chalk`
-              ? $selections[`familyFont`]?.font?.toLowerCase() || `mtype`
+              ? isBaseData($selections.familyFont) && $selections.familyFont?.font?.toLowerCase() || `mtype`
               : ``}'
             class:shift={!!$composite?.roots}
             id='familyWrapper'
@@ -84,10 +85,10 @@
           </div>
           <div
             class='resize
-							        {$selections[`quoteLoc`]?.position || `right`}
+							        {isBaseData($selections.quoteLoc) && $selections.quoteLoc?.position || `right`}
                       {$composite?.color?.toLowerCase()}
 										  {$composite?.color?.toLowerCase() !== `chalk`
-              ? $selections[`quoteFont`]?.font?.toLowerCase() || `mtype`
+              ? isBaseData($selections.quoteFont) && $selections.quoteFont?.font?.toLowerCase() || `mtype`
               : ``}'
             class:shift={!!$composite?.roots}
             id='quoteText'
@@ -111,7 +112,7 @@
             class='resize
 													 resizeGround
 													 {$composite?.color?.toLowerCase()}
-													 {$selections[`groundFont`]?.font?.toLowerCase() || `mtype`}'
+													 {isBaseData($selections.groundFont) && $selections.groundFont?.font?.toLowerCase() || `mtype`}'
             font-family=', sans-serif'
             href='#curve'
             id='groundText'
@@ -128,7 +129,7 @@
           <span>Creating...</span>
         </div>
       {/if}
-      {#if $selections['background']}
+      {#if $selections.background}
         <div id='save'
              class='cover'
              role='button'
