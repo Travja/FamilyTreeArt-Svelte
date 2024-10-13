@@ -1,10 +1,11 @@
 <script lang='ts'>
   import Builder from '$lib/ui/Builder.svelte';
-  import { page, PageHelper } from '$lib/pages';
+  import { currentPage, page, PageHelper } from '$lib/pages';
   import ShopPage from '$lib/pages/ShopPage.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { deleteCache, hasPreviousSelections, loadPrevious } from '$lib/data-store';
   import { slide } from 'svelte/transition';
+  import { multiSelectEntries, selections } from '$lib/interpreter';
 
   let shopComponent: ShopPage;
   let pageHelper: PageHelper = new PageHelper();
@@ -18,7 +19,12 @@
 
   const proceed = (load = false) => {
     if (load) loadPrevious();
-    else deleteCache();
+    else {
+      currentPage.set(0);
+      selections.set({});
+      multiSelectEntries.set({});
+      deleteCache();
+    }
     hasPrevious = false;
   };
 </script>
