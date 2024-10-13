@@ -1,3 +1,5 @@
+import type { ValueInformation } from '../types/data';
+
 export class MultiSelectData {
   display: string;
   id: string;
@@ -42,11 +44,21 @@ export class MultiSelectData {
     let cost = 0;
     for (let val of Object.values<any>(data)) {
       if (typeof val == 'object' && 'values' in val) {
-        for (const obj of val.values) {
-          // TODO: Multi-select values aren't taken into account here, so
-          //  shipping costs don't get updated properly when additional
-          //  prints have a frame while the main print does not
-          if (!obj.value.includes(data[obj.option].key)) continue;
+        const values: ValueInformation[] = val.values;
+        for (const obj of values) {
+          let contains = false;
+          // If the option is an array, check each option,
+          // if it's just a string, we can use the existing code below
+          if (obj.option instanceof Array) {
+            for (const option of obj.option) {
+              if (option in data[val.key]) {
+                contains = true;
+                break;
+              }
+            }
+          } else contains = obj.value.includes(data[obj.option].key);
+
+          if (!contains) continue;
           if ('cost' in obj && obj.cost) {
             cost += obj.cost;
           }

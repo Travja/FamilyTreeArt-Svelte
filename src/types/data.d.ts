@@ -82,7 +82,7 @@ export interface Prereqs {
 }
 
 export interface ValueInformation {
-  option: string;
-  value: any[];
+  option: string | string[];
+  value: string[];
   cost: number;
 }

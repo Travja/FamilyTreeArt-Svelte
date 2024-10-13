@@ -2609,7 +2609,7 @@ config.addPage(
             summaryText: 'Standard Shipping 3-10 Days',
             values: [
               {
-                option: 'frame',
+                option: ['frame', 'addFrame'],
                 value: [
                   'natural_barnwood',
                   'white_barnwood',
@@ -2643,7 +2643,7 @@ config.addPage(
             summaryText: '2 Day Shipping',
             values: [
               {
-                option: 'frame',
+                option: ['frame', 'addFrame'],
                 value: [
                   'natural_barnwood',
                   'white_barnwood',
@@ -2677,7 +2677,7 @@ config.addPage(
             summaryText: '1 Day Shipping',
             values: [
               {
-                option: 'frame',
+                option: ['frame', 'addFrame'],
                 value: [
                   'natural_barnwood',
                   'white_barnwood',

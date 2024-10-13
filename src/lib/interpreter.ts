@@ -7,19 +7,15 @@ import { saveMultiData, saveSelections } from './data-store';
 import { coupon, couponValue } from './coupon-manager';
 import { page } from './pages';
 import { isBaseData } from '$lib/conf/util';
-import type {
-  BaseData,
-  ImageFormatData,
-  OptionImageData,
-  Prereqs,
-  RootData
-} from '../types/data';
+import type { BaseData, ImageFormatData, OptionImageData, Prereqs, RootData } from '../types/data';
 import type { TextOption } from '../types/options';
 
 export const requirementsNotMet = writable([]);
 export const selections: Writable<{ [key: string]: string | BaseData }> =
   writable({});
-export const multiSelectEntries: Writable<{ [key: string]: any[] }> = writable(
+export const multiSelectEntries: Writable<{
+  [key: string]: { [key: string]: BaseData | number | string }[]
+}> = writable(
   {}
 );
 export const composite: Writable<any> = writable();
@@ -34,12 +30,16 @@ export const calculateTotal = (option: string | number | BaseData): number => {
     return option.cost;
   } else if ('values' in option) {
     for (const val of option.values) {
-      let selected = get(selections)[val.option];
+      let selected: & BaseData;
+      if (val.option instanceof Array) {
+        for (const opt of val.option) {
+          selected = getOptionByList(opt, val.value);
+          if (selected) break;
+        }
+      } else selected = getOptionByList(val.option, val.value);
       if (!selected) continue;
 
-      if (isBaseData(selected) && val.value.includes(selected.key)) {
-        return val.cost;
-      }
+      return val.cost;
     }
   }
 
@@ -167,6 +167,41 @@ export const unset = (optId: string) => {
   }
 };
 
+export const getOptionByList = (optId: string, keys: string[], sourceData?: any) => {
+  if (sourceData && sourceData[optId]) {
+    let option = sourceData[optId];
+    let key = option.value;
+    if (keys.includes(key)) {
+      return option;
+    }
+  }
+
+  const selectionOption = get(selections)[optId];
+  if (selectionOption) {
+    let key = typeof selectionOption === 'string' ? selectionOption : selectionOption.key;
+    if (keys.includes(key)) {
+      return selectionOption;
+    }
+  }
+
+  const multiSelectOptions = get(multiSelectEntries);
+  for (const multiSelect of Object.values(multiSelectOptions)) {
+    for (const multiSelectOption of multiSelect) {
+      if (optId in multiSelectOption) {
+        const multiOption = multiSelectOption[optId];
+        if (typeof multiOption === 'object') {
+          let key = multiOption.key;
+          if (keys.includes(key)) {
+            return multiOption;
+          }
+        } else if (typeof multiOption === 'string' && keys.includes(multiOption)) {
+          return multiOption;
+        }
+      }
+    }
+  }
+};
+
 export const getValue = (
   optId: string,
   sourceData?: any
@@ -209,17 +244,17 @@ export const getQualifiedCost = (
   if (!option.values) return value;
 
   for (let check of option.values) {
-    let targetValue: BaseData | string = getValue(check.option, sourceData);
-    // console.log('Target value: ' + targetValue);
+    let targetValue: & BaseData;
+    if (check.option instanceof Array) {
+      for (const opt of check.option) {
+        targetValue = getOptionByList(opt, check.value, sourceData);
+        if (targetValue) break;
+      }
+    } else targetValue = getOptionByList(check.option, check.value, sourceData);
     if (!targetValue) continue;
 
-    if (
-      (typeof targetValue == 'string' && check.value.includes(targetValue)) ||
-      (typeof targetValue == 'object' && check.value.includes(targetValue.key))
-    ) {
-      value = check.cost;
-      break;
-    }
+    value = check.cost;
+    break;
   }
 
   return value;
@@ -236,9 +271,9 @@ export const meetsPrereqs = (prereq: Prereqs): boolean => {
   value = value + '';
   let result = prereq.value
     ? // Check if we have an included value
-      prereq.value.includes(value)
+    prereq.value.includes(value)
     : // Or that we are properly using an excluded value
-      prereq.not_value && !prereq.not_value.includes(value);
+    prereq.not_value && !prereq.not_value.includes(value);
 
   // Check the 'and' recursively
   if (prereq.and) result = result && meetsPrereqs(prereq.and);
