@@ -69,10 +69,10 @@
         <foreignObject height='100%' width='100%'>
           <div
             class='resize
-							        {isBaseData($selections.nameLoc) && $selections.nameLoc?.position || `left`}
+							        {isBaseData($selections.nameLoc) ? $selections.nameLoc?.position || `left` : `left`}
                       {$composite?.color?.toLowerCase()}
                       {$composite?.color?.toLowerCase() !== `chalk`
-              ? isBaseData($selections.familyFont) && $selections.familyFont?.font?.toLowerCase() || `mtype`
+              ? isBaseData($selections.familyFont) ? $selections.familyFont?.font?.toLowerCase() || `mtype` : `mtype`
               : ``}'
             class:shift={!!$composite?.roots}
             id='familyWrapper'
@@ -85,10 +85,10 @@
           </div>
           <div
             class='resize
-							        {isBaseData($selections.quoteLoc) && $selections.quoteLoc?.position || `right`}
+							        {isBaseData($selections.quoteLoc) ? $selections.quoteLoc?.position || `right` : `right`}
                       {$composite?.color?.toLowerCase()}
 										  {$composite?.color?.toLowerCase() !== `chalk`
-              ? isBaseData($selections.quoteFont) && $selections.quoteFont?.font?.toLowerCase() || `mtype`
+              ? isBaseData($selections.quoteFont) ? $selections.quoteFont?.font?.toLowerCase() || `mtype` : `mtype`
               : ``}'
             class:shift={!!$composite?.roots}
             id='quoteText'
@@ -112,7 +112,7 @@
             class='resize
 													 resizeGround
 													 {$composite?.color?.toLowerCase()}
-													 {isBaseData($selections.groundFont) && $selections.groundFont?.font?.toLowerCase() || `mtype`}'
+													 {isBaseData($selections.groundFont) ? $selections.groundFont?.font?.toLowerCase() || `mtype` : `mtype`}'
             font-family=', sans-serif'
             href='#curve'
             id='groundText'
@@ -311,6 +311,10 @@
         left: 0;
         user-select: none;
         opacity: 0;
+    }
+
+    foreignObject {
+        position: relative;
     }
 
     text {

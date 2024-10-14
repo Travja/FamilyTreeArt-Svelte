@@ -133,12 +133,17 @@ export const svgStyle = `
 	}
 	
 	.center {
-		bottom: 7%;
-    left: 30%;
+		bottom: 3%;
+		left: 50%;
+		transform: translateX(-50%);
 	}
 	
 	.mtype-script.center {
-		bottom: 6%;
+		bottom: 4%;
+	}
+	
+	.papyrus.center, .papyrus8.center {
+	bottom: 2%;
 	}
 	
 	#curve.shift {

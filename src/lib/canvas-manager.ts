@@ -28,6 +28,7 @@ class CanvasManager {
       return;
 
     this.previousCompositeString = compositeString;
+    console.log(composite);
     loading.set(true);
     this.lastUpdate = new Date().getTime();
     if (this.time) window.clearTimeout(this.time);
