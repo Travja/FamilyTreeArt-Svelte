@@ -265,7 +265,9 @@ export const meetsPrereqs = (prereq: Prereqs): boolean => {
   let value: BaseData | string = getValue(prereq.option);
   if (typeof value === 'object') value = value?.key;
 
-  if (!value) return false;
+  if (!value) {
+    return prereq.value?.length === 0;
+  }
 
   value = value + '';
   let result = prereq.value

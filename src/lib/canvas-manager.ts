@@ -28,7 +28,6 @@ class CanvasManager {
       return;
 
     this.previousCompositeString = compositeString;
-    console.log(composite);
     loading.set(true);
     this.lastUpdate = new Date().getTime();
     if (this.time) window.clearTimeout(this.time);
@@ -160,8 +159,8 @@ class CanvasManager {
         );
       } else {
         let text = el.innerHTML;
-        let resize = (e: SVGGraphicsElement) => {
-          let shrink = (elm: SVGGraphicsElement) => {
+        const resize = (e: SVGGraphicsElement) => {
+          const shrink = (elm: SVGGraphicsElement) => {
             let font = window
               .getComputedStyle(elm, null)
               .getPropertyValue('font-size');

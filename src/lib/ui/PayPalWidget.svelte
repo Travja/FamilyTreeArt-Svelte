@@ -239,7 +239,7 @@
   </div>
 {:else}
   <hr />
-  <h3 class='center'>Please enter your Shipping Information</h3>
+  <h3 class='centered'>Please enter your Shipping Information</h3>
   <form id='customForm' on:submit|preventDefault={submitCustom}>
     <FancyInput id='payer-name' required={true} bind:value={payerName}>Name</FancyInput>
     <FancyInput id='payer-email'

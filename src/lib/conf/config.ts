@@ -420,7 +420,7 @@ config.addPage(
     title: 'Do you have a small family?',
     intro:
       'Small family trees can be filled out by adding additional branches with birthdates. Wedding dates can also be included.<br/><h4>You can double the number of branches on your tree by adding birthdate branches.</h4><br/>' +
-      '<table class="center"><tr>' +
+      '<table class="centered"><tr>' +
       '<td>Small Family</td><td>Date Branches Added</td><td>Small Family with Leaves*</td><td>Small Family with dates and Leaves*</td>' +
       '</tr><tr>' +
       '<td><img class="imgOption" src="/imgs/Option Examples/Small Family.jpg" alt="Small Family"/></td>' +
@@ -1151,7 +1151,11 @@ config.addPage(
             key: 'center',
             prereq: {
               option: 'type',
-              value: ['ancestry', 'descendant']
+              value: ['ancestry', 'descendant'],
+              and: {
+                option: 'ground',
+                value: []
+              }
             },
             reset: ['ground']
           }
@@ -1281,8 +1285,24 @@ config.addPage(
           },
           {
             displayText: 'Papyrus',
-            font: 'Papyrus9',
+            font: 'Papyrus',
             key: 'papyrus'
+          }
+        ]
+      },
+      {
+        name: 'Flat Ground',
+        type: 'button',
+        id: 'flatGround',
+        buttons: [
+          {
+            displayText: 'Yes',
+            key: 'yes',
+          },
+          {
+            displayText: 'No',
+            key: 'no',
+            default: true
           }
         ]
       }
@@ -1981,7 +2001,11 @@ config.addPage(
       ],
       quantifier: 'addQty',
       format: '%addQty%x %addPrintType% - %addPrintSize%%addFrame%',
-      paypal: '%addPrintType% - %addPrintSize%%addFrame%'
+      paypal: '%addPrintType% - %addPrintSize%%addFrame%',
+      prereq: {
+        option: 'addPrintSize',
+        value: ['8x10', '11x14', '16x20', '20x24', '24x30']
+      }
     }),
     options: [
       {

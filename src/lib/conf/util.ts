@@ -6,6 +6,10 @@ import type {
   TextOption
 } from '../../types/options';
 
+export const hasSummaryText = (opt: any): opt is BaseData => {
+  return 'summaryText' in opt;
+}
+
 export const isBaseData = (opt: any): opt is BaseData => {
   return opt instanceof Object && ('summaryText' in opt || 'default' in opt || 'key' in opt);
 };

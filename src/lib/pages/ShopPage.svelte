@@ -1,8 +1,6 @@
 <!--suppress XmlDuplicatedId -->
 <script lang='ts'>
-  import type {
-    TreeArtPage
-  } from '$lib/conf/TreeArtConfig';
+  import type { TreeArtPage } from '$lib/conf/TreeArtConfig';
   import {
     calculateTotal,
     deleteMulti,
@@ -22,10 +20,10 @@
   import { onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
   import { currentPage, page } from '../pages';
-  import type { Unsubscriber } from 'svelte/store';
+  import { get, type Unsubscriber } from 'svelte/store';
   import { coupon, couponValue } from '$lib/coupon-manager';
   import {
-    isBaseData,
+    hasSummaryText,
     isButtonOption,
     isGroupData,
     isImageOption,
@@ -47,6 +45,7 @@
   let cPage = -1;
   let destroyed = false;
   let checked = false;
+  let showAdd = false;
 
   let localOpt: any;
   let currentData: MultiSelectData;
@@ -61,12 +60,14 @@
       cPage = p;
       checked = false;
       destroyed = false;
+      showAdd = false;
       destroyMulti(config.pages[previousPage]);
       updateMulti(config.pages[p]?.multiselect);
     });
     unTwo = page.subscribe((pg) => {
       if (!pg) return;
       checkSelections(pg);
+      checkAddButton(pg.multiselect);
     });
     loading = false;
   });
@@ -89,6 +90,10 @@
 
   const select = (optId: string, value: string | BaseData) => {
     selectItem(optId, value);
+    checked = false;
+    failsafe = 0;
+    checkSelections(get(page));
+    checkAddButton(get(page)?.multiselect);
     options = [...options];
   };
 
@@ -100,6 +105,21 @@
     }
 
     return val;
+  };
+
+  const checkAddButton = (multi: MultiSelectData) => {
+    const isMulti = multi && multi.keys && multi.keys.length > 0;
+    if (!isMulti) return false;
+
+    showAdd = meetsPrereqs(multi.prereq);
+  };
+
+  const clearPendingMulti = (multi: MultiSelectData) => {
+    if (!multi) return;
+    for (const key of multi.keys) {
+      unset(key);
+    }
+    options = [...options];
   };
 
   const addMultiSelect = (multi: MultiSelectData) => {
@@ -240,7 +260,6 @@
             selected = img;
             selectedValid = true;
           }
-
         }
       } else if (opt.type === 'number' && !selected) selectItem(opt.id, '1');
 
@@ -508,11 +527,17 @@
       {/each}
     </div>
   {/if}
-  {#if $page?.multiselect}
-    <button class='button add' on:click={() => addMultiSelect($page.multiselect)}
-    >
-      <span>Add Item</span>
-    </button>
+  {#if showAdd}
+    <div class='flex-2'>
+      <button class='button delete-btn' on:click={() => clearPendingMulti($page.multiselect)}
+      >
+        <span>Clear Above</span>
+      </button>
+      <button class='button add' on:click={() => addMultiSelect($page.multiselect)}
+      >
+        <span>Add to Cart</span>
+      </button>
+    </div>
   {/if}
   {#each Object.keys(formattedEntries) as key (formattedEntries[key].id)}
     {#each formattedEntries[key].data as entry, i}
@@ -536,9 +561,9 @@
   {#if $page?.finalPage}
     <div id='summary'>
       {#each Object.entries($selections) as [key, entry]}
-        {#if entry && (isBaseData(entry) || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
+        {#if entry && (hasSummaryText(entry) || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
           <div id='preview-{key}' class='summaryItem'>
-            {#if isBaseData(entry)}
+            {#if hasSummaryText(entry)}
               {entry.summaryText ||
               entry.key ||
               entry.displayText ||
@@ -684,7 +709,13 @@
 
     .add {
         float: right;
-        margin-right: 20px;
+        /*background-color: limegreen;*/
+        border-width: 4px;
+    }
+
+    .delete-btn {
+        /*background-color: #ff5252;*/
+        border: 4px solid #bb4444;
     }
 
     .multi {

@@ -101,9 +101,9 @@
         <!-- Path should be shifted if we are not showing roots -->
         <path
           class:shift={!$composite?.roots}
-          d='M0,71.5
+          d='{isBaseData($selections.flatGround) && $selections.flatGround?.key === `yes` ? `M0,71.5 100,71.5` : `M0,71.5
 								 C0,71.5 25,74 50,72 S
-								 85,71 100,72.5'
+								 85,71 100,72.5`}'
           fill='transparent'
           id='curve'
         />
@@ -168,11 +168,9 @@
         >
       {/if}
       {#if pageHelper.nextPage !== -1}
-        <button id='next' on:click={pageHelper.gotoNextPage}
-        >
-          <span>Next &raquo;</span>
-        </button
-        >
+        <button id='next' on:click={pageHelper.gotoNextPage}>
+            <span>Next &raquo;</span>
+        </button>
       {/if}
     </div>
     <div class='toggleable-cost' class:hidden={hideCost} id='total'>

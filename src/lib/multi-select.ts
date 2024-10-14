@@ -1,4 +1,4 @@
-import type { ValueInformation } from '../types/data';
+import type { Prereqs, ValueInformation } from '../types/data';
 
 export class MultiSelectData {
   display: string;
@@ -7,6 +7,7 @@ export class MultiSelectData {
   quantifier: string;
   format: string;
   paypal: string;
+  prereq: Prereqs;
 
   constructor(data: MultiSelectCreate) {
     this.display = data.display;
@@ -15,6 +16,7 @@ export class MultiSelectData {
     this.quantifier = data.quantifier;
     this.format = data.format;
     this.paypal = data.paypal;
+    this.prereq = data.prereq;
   }
 
   parseText = (data: any): string => {
@@ -86,4 +88,5 @@ export interface MultiSelectCreate {
   quantifier: string;
   format: string;
   paypal: string;
+  prereq: Prereqs;
 }

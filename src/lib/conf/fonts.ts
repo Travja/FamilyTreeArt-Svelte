@@ -52,7 +52,6 @@ export const svgStyle = `
 	
 	.papyrus {
 		font-family: 'Papyrus';
-		font-size: 1rem;
 	}
 	
 	.papyrus8 {
@@ -72,6 +71,10 @@ export const svgStyle = `
 	.script {
 		font-family: 'Script';
 	}
+
+  .mtype-script {
+  transform: translateY(-15%);
+  }
 
 	.mtype-script > div:first-child {
 		font-family: 'Script';
@@ -111,17 +114,13 @@ export const svgStyle = `
 		text-align: center;
 		/*background-color: #dd9900;*/
 	}
-
-	#lineTwo {
-		font-size: 0.78em;
-	}
 	
 	.left.shift, .right.shift {
-    top: 50%;
+    top: 54%;
 	}
 	
 	.left, .right {
-    top: 67%;
+    top: 70%;
 	}
 	
 	.left {
@@ -143,7 +142,7 @@ export const svgStyle = `
 	}
 	
 	.papyrus.center, .papyrus8.center {
-	bottom: 2%;
+	  bottom: 2%;
 	}
 	
 	#curve.shift {
