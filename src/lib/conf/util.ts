@@ -7,7 +7,7 @@ import type {
 } from '../../types/options';
 
 export const hasSummaryText = (opt: any): opt is BaseData => {
-  return 'summaryText' in opt;
+  return opt instanceof Object && 'summaryText' in opt;
 }
 
 export const isBaseData = (opt: any): opt is BaseData => {
