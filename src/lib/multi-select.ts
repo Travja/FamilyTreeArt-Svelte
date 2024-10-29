@@ -73,7 +73,7 @@ export class MultiSelectData {
   formatPaypal = (data: any): string => {
     let str = this.paypal;
     for (let [key, val] of Object.entries<any>(data)) {
-      const replaceVal = val.placeholder || val.displayText;
+      const replaceVal = val ? val.placeholder || val.displayText : '';
       str = str.replace(`%${key}%`, replaceVal);
     }
 
