@@ -1,4 +1,6 @@
 <script lang='ts'>
+  import { run, preventDefault } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
   import type {
     CreateOrderRequestBody,
@@ -18,7 +20,7 @@
   import type { components } from '@paypal/paypal-js/types/apis/openapi/checkout_orders_v2';
   import type { BaseData } from '../../types/data';
 
-  let paypal: PayPalNamespace;
+  let paypal: PayPalNamespace = $state();
   const style = { // https://developer.paypal.com/docs/checkout/standard/customize/buttons-style-guide/
     color: 'gold',
     shape: 'rect',
@@ -128,7 +130,7 @@
     return payload;
   };
 
-  let setup = false;
+  let setup = $state(false);
   const setupPayPal = () => {
     if (setup) return;
     setup = true;
@@ -182,25 +184,27 @@
       });
   };
 
-  $: if ($totalCost > 0) {
-    if (paypal)
-      setTimeout(setupPayPal, 500);
-  } else {
-    setup = false;
-  }
+  run(() => {
+    if ($totalCost > 0) {
+      if (paypal)
+        setTimeout(setupPayPal, 500);
+    } else {
+      setup = false;
+    }
+  });
 
-  let payerName: string;
-  let payerEmail: string;
-  let payerAddress: string;
-  let payerAddressTwo: string;
-  let payerCity: string;
-  let payerState: string;
-  let payerZip: string;
-  let payerCountryCode: string;
+  let payerName: string = $state();
+  let payerEmail: string = $state();
+  let payerAddress: string = $state();
+  let payerAddressTwo: string = $state();
+  let payerCity: string = $state();
+  let payerState: string = $state();
+  let payerZip: string = $state();
+  let payerCountryCode: string = $state();
 
-  let processing = false;
-  let dots = '';
-  let error = '';
+  let processing = $state(false);
+  let dots = $state('');
+  let error = $state('');
   const submitCustom = (): void => {
     let shippingInfo = {
       payerName,
@@ -240,7 +244,7 @@
 {:else}
   <hr />
   <h3 class='centered'>Please enter your Shipping Information</h3>
-  <form id='customForm' on:submit|preventDefault={submitCustom}>
+  <form id='customForm' onsubmit={preventDefault(submitCustom)}>
     <FancyInput id='payer-name' required={true} bind:value={payerName}>Name</FancyInput>
     <FancyInput id='payer-email'
                 pattern={'[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$'}

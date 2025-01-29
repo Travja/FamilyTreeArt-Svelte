@@ -7,9 +7,9 @@
   import { slide } from 'svelte/transition';
   import { multiSelectEntries, selections } from '$lib/interpreter';
 
-  let shopComponent: ShopPage;
+  let shopComponent: ShopPage = $state();
   let pageHelper: PageHelper = new PageHelper();
-  let hasPrevious = false;
+  let hasPrevious = $state(false);
 
   onMount(() => hasPrevious = hasPreviousSelections());
 
@@ -44,8 +44,8 @@
       It looks like you have a previous tree in progress.
       You can load your previous tree or start a new one.
     </p>
-    <button on:click={() => proceed(true)}>Load</button>
-    <button on:click={() => proceed()}>New</button>
+    <button onclick={() => proceed(true)}>Load</button>
+    <button onclick={() => proceed()}>New</button>
   </div>
 {/if}
 

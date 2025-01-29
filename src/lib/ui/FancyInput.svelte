@@ -1,16 +1,31 @@
 <script lang='ts'>
-  export let id: string;
-  export let value: string;
-  export let required = false;
-  export let pattern: string | undefined = undefined;
-  export let title: string | undefined = undefined;
-  let focused = false;
-  let regex: RegExp;
+  import { run } from 'svelte/legacy';
 
-  $:
+  interface Props {
+    id: string;
+    value: string;
+    required?: boolean;
+    pattern?: string | undefined;
+    title?: string | undefined;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    id,
+    value = $bindable(),
+    required = false,
+    pattern = undefined,
+    title = undefined,
+    children
+  }: Props = $props();
+  let focused = $state(false);
+  let regex: RegExp = $state();
+
+  run(() => {
     if (pattern) {
-      regex = new RegExp(pattern);
-    }
+        regex = new RegExp(pattern);
+      }
+  });
 
   /**
    * Shows a custom validity message
@@ -33,17 +48,17 @@
 <div class='input-wrapper' class:filled={value} class:focused={focused}>
   <div class='input'>
     <input bind:value={value} {id}
-           on:blur={() => focused = false}
-           on:focus={() => focused = true}
-           on:input={e => invalid(e)}
-           on:invalid={e => invalid(e)}
+           onblur={() => focused = false}
+           onfocus={() => focused = true}
+           oninput={e => invalid(e)}
+           oninvalid={e => invalid(e)}
            {pattern}
            placeholder=' '
            {required}
            {title} />
   </div>
   <label for={id}>
-    <slot />
+    {@render children?.()}
   </label>
 </div>
 
@@ -57,11 +72,11 @@
         transition: border 0.2s ease-in-out;
     }
 
-    .input-wrapper:has(input:invalid:not(:placeholder-shown)) {
+    .input-wrapper:has(:global(input:invalid:not(:placeholder-shown))) {
         border: 2px solid red;
     }
 
-    .input-wrapper:has(input:valid:not(:placeholder-shown)) {
+    .input-wrapper:has(:global(input:valid:not(:placeholder-shown))) {
         border: 2px solid #77a34f;
     }
 

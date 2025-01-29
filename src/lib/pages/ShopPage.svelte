@@ -36,19 +36,19 @@
   import type { MultiSelectData } from '$lib/multi-select';
   import type { BaseData } from '../../types/data';
 
-  let loading = true;
-  let options: (ImageOption | ButtonOption | ItemOption | TextOption)[];
-  let numOptions: any = {};
-  let formattedEntries = {};
+  let loading = $state(true);
+  let options: (ImageOption | ButtonOption | ItemOption | TextOption)[] = $state();
+  let numOptions: any = $state({});
+  let formattedEntries = $state({});
   let failsafe = 0;
   let previousPage = -1;
   let cPage = -1;
   let destroyed = false;
   let checked = false;
-  let showAdd = false;
+  let showAdd = $state(false);
 
-  let localOpt: any;
-  let currentData: MultiSelectData;
+  let localOpt: any = $state();
+  let currentData: MultiSelectData = $state();
 
   let unOne: Unsubscriber;
   let unTwo: Unsubscriber;
@@ -322,8 +322,8 @@
                               )}'
                               role='button'
                               tabindex='0'
-                              on:click={() => select(opt.id, gImg)}
-                              on:keypress={(e) => e.key === 'Enter' && select(opt.id, gImg)}
+                              onclick={() => select(opt.id, gImg)}
+                              onkeypress={(e) => e.key === 'Enter' && select(opt.id, gImg)}
                               class:selected={getDataValue(opt.id)?.key === gImg.key}
                             >
                               <div class='optText'>
@@ -366,8 +366,8 @@
                         )}'
                         role='button'
                         tabindex='0'
-                        on:click={() => select(opt.id, img)}
-                        on:keypress={(e) => e.key === 'Enter' && select(opt.id, img)}
+                        onclick={() => select(opt.id, img)}
+                        onkeypress={(e) => e.key === 'Enter' && select(opt.id, img)}
                         class:selected={getDataValue(opt.id)?.key === img.key}
                       >
                         <div class='optText'>
@@ -423,8 +423,8 @@
                       )} textButton'
                       role='button'
                       tabindex='0'
-                      on:click={() => select(opt.id, button)}
-                      on:keypress={(e) => e.key === 'Enter' && select(opt.id, button)}
+                      onclick={() => select(opt.id, button)}
+                      onkeypress={(e) => e.key === 'Enter' && select(opt.id, button)}
                       class:selected={getDataValue(opt.id)?.key === button.key}
                     >
                       <div class='optText'>
@@ -452,7 +452,7 @@
             {:else if isItemOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
               <select
                 id={opt.id}
-                on:change={e =>
+                onchange={e =>
                   select(
                     opt.id,
                     opt.items[
@@ -465,7 +465,7 @@
                 class:error={$requirementsNotMet.includes(opt.id)}
               >
                 {#if opt.items.filter(itm => itm.default).length === 0}
-                  <option value='-1' />
+                  <option value='-1'></option>
                 {/if}
                 {#each opt.items as item, i}
                   <option
@@ -482,10 +482,10 @@
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.currentTarget.value)}
-                on:keypress={e => select(opt.id, e.currentTarget.value)}
-                on:paste={e => select(opt.id, e.currentTarget.value)}
-                on:input={e => select(opt.id, e.currentTarget.value)}
+                onchange={e => select(opt.id, e.currentTarget.value)}
+                onkeypress={e => select(opt.id, e.currentTarget.value)}
+                onpaste={e => select(opt.id, e.currentTarget.value)}
+                oninput={e => select(opt.id, e.currentTarget.value)}
                 value={$selections[opt.id] || ``}
               />
             {:else if isNumOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
@@ -495,10 +495,10 @@
                 id={opt.id}
                 placeholder={opt.placeholder}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.currentTarget.value)}
-                on:keypress={e => select(opt.id, e.currentTarget.value)}
-                on:paste={e => select(opt.id, e.currentTarget.value)}
-                on:input={e => select(opt.id, e.currentTarget.value)}
+                onchange={e => select(opt.id, e.currentTarget.value)}
+                onkeypress={e => select(opt.id, e.currentTarget.value)}
+                onpaste={e => select(opt.id, e.currentTarget.value)}
+                oninput={e => select(opt.id, e.currentTarget.value)}
                 value={getOrSetValue(opt.id, '1')}
               />
             {:else if opt.type === 'date' && (!opt.prereq || meetsPrereqs(opt.prereq))}
@@ -506,7 +506,7 @@
                 type='date'
                 id={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.currentTarget.value)}
+                onchange={e => select(opt.id, e.currentTarget.value)}
                 value={$selections[opt.id] || ``}
               />
             {:else if isTextLongOption(opt) && (!opt.prereq || meetsPrereqs(opt.prereq))}
@@ -515,12 +515,12 @@
                 placeholder={opt.placeholder}
                 class={opt.id}
                 class:error={$requirementsNotMet.includes(opt.id)}
-                on:change={e => select(opt.id, e.currentTarget.value)}
-                on:keypress={e => select(opt.id, e.currentTarget.value)}
-                on:paste={e => select(opt.id, e.currentTarget.value)}
-                on:input={e => select(opt.id, e.currentTarget.value)}
+                onchange={e => select(opt.id, e.currentTarget.value)}
+                onkeypress={e => select(opt.id, e.currentTarget.value)}
+                onpaste={e => select(opt.id, e.currentTarget.value)}
+                oninput={e => select(opt.id, e.currentTarget.value)}
                 value={String($selections[opt.id] || '')}
-              />
+></textarea>
             {/if}
           </div>
         {/if}
@@ -529,11 +529,11 @@
   {/if}
   {#if showAdd}
     <div class='flex-2'>
-      <button class='button delete-btn' on:click={() => clearPendingMulti($page.multiselect)}
+      <button class='button delete-btn' onclick={() => clearPendingMulti($page.multiselect)}
       >
         <span>Clear Above</span>
       </button>
-      <button class='button add' on:click={() => addMultiSelect($page.multiselect)}
+      <button class='button add' onclick={() => addMultiSelect($page.multiselect)}
       >
         <span>Add to Cart</span>
       </button>
@@ -549,8 +549,8 @@
           title='Delete'
           role='button'
           tabindex='0'
-          on:click={() => purgeMulti(key, i)}
-          on:keypress={(e) => e.key === 'Enter' && purgeMulti(key, i)}
+          onclick={() => purgeMulti(key, i)}
+          onkeypress={(e) => e.key === 'Enter' && purgeMulti(key, i)}
         >
           delete
         </div>

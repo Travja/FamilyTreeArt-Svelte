@@ -3,8 +3,8 @@
   import { api } from '../api';
   import type { Coupon, CouponData } from '../../types/coupon';
 
-  let code = '';
-  let error = '';
+  let code = $state('');
+  let error = $state('');
   let coupon: Coupon;
 
   const checkCoupon = (e) => {
@@ -33,10 +33,10 @@
   <div id="couponErr">{error}</div>
   <div id="inputGroup">
     <input id="couponBox" placeholder="Enter Coupon/Certificate Code"
-           on:keypress={checkCoupon}
+           onkeypress={checkCoupon}
            bind:value={code}>
     <button id="applyCoupon"
-            on:click={checkCoupon}>
+            onclick={checkCoupon}>
       Apply
     </button>
   </div>

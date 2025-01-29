@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
 
-  export let data;
+  let { data } = $props();
 
   onMount(() => {
     localStorage.removeItem('tree-selections');

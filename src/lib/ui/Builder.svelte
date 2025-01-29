@@ -11,7 +11,12 @@
   import CouponBox from '$lib/ui/CouponBox.svelte';
   import { isBaseData } from '$lib/conf/util.js';
 
-  export let pageHelper: PageHelper;
+  interface Props {
+    pageHelper: PageHelper;
+    children?: import('svelte').Snippet;
+  }
+
+  let { pageHelper, children }: Props = $props();
 
   let hideCost = false;
 
@@ -54,7 +59,7 @@
         height='819'
         id='builder-canvas'
         width='640'
-      />
+></canvas>
       <svg
         bind:this={$customSvg}
         height='100%'
@@ -134,22 +139,22 @@
              class='cover'
              role='button'
              tabindex='0'
-             on:click={saveTree}
-             on:keypress={(e) => e.key === 'Enter' && saveTree()}
+             onclick={saveTree}
+             onkeypress={(e) => e.key === 'Enter' && saveTree()}
         >
           Save Preview
         </div>
       {/if}
     </div>
-    <div class='clear' />
+    <div class='clear'></div>
     <div id='item-footer'>
       This is only a representation to help you select design elements. Your
       tree, like your family, will be unique!
     </div>
   </div>
   <div id='configuration'>
-    <slot />
-    <div class='clear' />
+    {@render children?.()}
+    <div class='clear'></div>
     <div id='pageFooter'>
       {#if pageHelper.error !== ''}
         <div id='error'>{pageHelper.error}</div>
@@ -161,14 +166,14 @@
         </div>
       {/if}
       {#if pageHelper.previousPage !== -1}
-        <button id='back' on:click={pageHelper.gotoPreviousPage}
+        <button id='back' onclick={pageHelper.gotoPreviousPage}
         >
           <span>&laquo; Back</span>
         </button
         >
       {/if}
       {#if pageHelper.nextPage !== -1}
-        <button id='next' on:click={pageHelper.gotoNextPage}>
+        <button id='next' onclick={pageHelper.gotoNextPage}>
             <span>Next &raquo;</span>
         </button>
       {/if}
@@ -176,12 +181,12 @@
     <div class='toggleable-cost' class:hidden={hideCost} id='total'>
       <h3>Total: ${$totalCost.toFixed(2)}</h3>
     </div>
-    <div class='clear' />
+    <div class='clear'></div>
     {#if $page?.finalPage}
       <CouponBox />
       <PayPalWidget />
     {:else if $visitedLast}
-      <button id='skip' on:click={() => currentPage.set(pageHelper.pageCount - 1)}>Jump to Cart</button>
+      <button id='skip' onclick={() => currentPage.set(pageHelper.pageCount - 1)}>Jump to Cart</button>
     {/if}
   </div>
 </div>
