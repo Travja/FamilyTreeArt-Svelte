@@ -1,0 +1,1 @@
+import{f as t,l as u,g as l,u as o}from"./CAcDOI3n.js";function c(e){throw new Error("https://svelte.dev/e/lifecycle_outside_component")}function a(e){t===null&&c(),u&&t.l!==null?f(t).m.push(e):l(()=>{const n=o(e);if(typeof n=="function")return n})}function s(e){t===null&&c(),a(()=>()=>o(e))}function f(e){var n=e.l;return n.u??(n.u={a:[],b:[],m:[]})}export{s as a,a as o};
