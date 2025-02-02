@@ -9,10 +9,10 @@ export const currentPage: Writable<number> = writable(0);
 export const visitedLast: Writable<boolean> = writable(false);
 
 export class PageHelper {
-  public nextPage: number = -1;
-  public previousPage: number = -1;
-  public pageCount: number = 0;
-  public error: string = '';
+  public nextPage: number = $state(-1);
+  public previousPage: number = $state(-1);
+  public pageCount: number = $state(0);
+  public error: string = $state('');
   unsubIdx: Unsubscriber;
   selSub: Unsubscriber;
 

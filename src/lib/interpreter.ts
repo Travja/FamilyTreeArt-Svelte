@@ -5,7 +5,7 @@ import { get, writable } from 'svelte/store';
 import { canvasManager } from './canvas-manager';
 import { saveMultiData, saveSelections } from './data-store';
 import { coupon, couponValue } from './coupon-manager';
-import { page } from './pages';
+import { page } from './pages.svelte';
 import type { BaseData, ImageFormatData, OptionImageData, Prereqs, RootData } from '../types/data';
 import type { TextOption } from '../types/options';
 

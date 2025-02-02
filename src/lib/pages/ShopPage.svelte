@@ -19,7 +19,7 @@
   } from '$lib/interpreter';
   import { onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
-  import { currentPage, page } from '../pages';
+  import { currentPage, page } from '../pages.svelte';
   import { get, type Unsubscriber } from 'svelte/store';
   import { coupon, couponValue } from '$lib/coupon-manager';
   import {
@@ -46,9 +46,6 @@
   let destroyed = false;
   let checked = false;
   let showAdd = $state(false);
-
-  let localOpt: any = $state();
-  let currentData: MultiSelectData = $state();
 
   let unOne: Unsubscriber;
   let unTwo: Unsubscriber;
@@ -520,7 +517,7 @@
                 onpaste={e => select(opt.id, e.currentTarget.value)}
                 oninput={e => select(opt.id, e.currentTarget.value)}
                 value={String($selections[opt.id] || '')}
-></textarea>
+              ></textarea>
             {/if}
           </div>
         {/if}
@@ -561,8 +558,8 @@
   {#if $page?.finalPage}
     <div id='summary'>
       {#each Object.entries($selections) as [key, entry]}
-        {#if entry && (hasSummaryText(entry) || (typeof entry == 'string' && (localOpt = config.getOption(key))?.display))}
-          <div id='preview-{key}' class='summaryItem'>
+        {#if entry && (hasSummaryText(entry) || (typeof entry == 'string' && config.getOption(key)?.display))}
+          <div id='preview' class='summaryItem'>
             {#if hasSummaryText(entry)}
               {entry.summaryText ||
               entry.key ||
@@ -576,8 +573,8 @@
                 .toFixed(2)
                 .replace(/[.,]00$/, '')}
               </div>
-            {:else if typeof entry == 'string' && (localOpt = config.getOption(key))?.display}
-              {localOpt.display || ''}{format(entry)}
+            {:else if typeof entry == 'string' && config.getOption(key)?.display}
+              {config.getOption(key)?.display || ''}{format(entry)}
             {/if}
           </div>
         {/if}
@@ -585,13 +582,13 @@
 
       {#each Object.entries($multiSelectEntries) as [key, entry]}
         <span>
-          {(currentData = config.getMultiSelectData(key)).display}
+          {config.getMultiSelectData(key).display}
           {#each entry as multi}
             <div class='summaryItem'>
-              {currentData.parseText(multi)}
+              {config.getMultiSelectData(key).parseText(multi)}
               <div class='summaryPrice'
-                   class:hidden={!currentData.total(multi)}>
-                ${currentData.total(multi)?.toFixed(2).replace(/[.,]00$/, '')}
+                   class:hidden={!config.getMultiSelectData(key).total(multi)}>
+                ${config.getMultiSelectData(key).total(multi)?.toFixed(2).replace(/[.,]00$/, '')}
               </div>
             </div>
           {/each}

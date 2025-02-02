@@ -1,6 +1,6 @@
 <script lang='ts'>
   import Builder from '$lib/ui/Builder.svelte';
-  import { currentPage, page, PageHelper } from '$lib/pages';
+  import { currentPage, page, PageHelper } from '$lib/pages.svelte';
   import ShopPage from '$lib/pages/ShopPage.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { deleteCache, hasPreviousSelections, loadPrevious } from '$lib/data-store';
@@ -50,9 +50,9 @@
 {/if}
 
 <style>
-  .load-previous {
-    text-align: center;
-    background-color: rgba(100, 100, 100, 0.1);
-    padding: 5em;
-  }
+    .load-previous {
+        text-align: center;
+        background-color: rgba(100, 100, 100, 0.1);
+        padding: 5em;
+    }
 </style>

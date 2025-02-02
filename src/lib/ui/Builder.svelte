@@ -1,8 +1,8 @@
 <script lang='ts'>
   import { onDestroy, onMount } from 'svelte';
   import { config } from '$lib/conf/config';
-  import { composite, selections, totalCost } from '$lib/interpreter';
-  import { currentPage, page, PageHelper, visitedLast } from '$lib/pages';
+  import { selections, totalCost } from '$lib/interpreter';
+  import { currentPage, page, PageHelper, visitedLast } from '$lib/pages.svelte';
   import { svgStyle } from '$lib/conf/fonts';
   import type { Unsubscriber } from 'svelte/store';
   import { fade } from 'svelte/transition';
@@ -59,7 +59,7 @@
         height='819'
         id='builder-canvas'
         width='640'
-></canvas>
+      ></canvas>
       <svg
         bind:this={$customSvg}
         height='100%'
@@ -72,14 +72,14 @@
         <defs>{@html svgStyle}</defs>
 
         <foreignObject height='100%' width='100%'>
+          <!--          {$composite?.color?.toLowerCase()}-->
+          <!--          {$composite?.color?.toLowerCase() !== `chalk`-->
+          <!--  ? isBaseData($selections.familyFont) ? $selections.familyFont?.font?.toLowerCase() || `mtype` : `mtype`-->
+          <!--  : ``}'-->
+          <!--            class:shift={!!$composite?.roots}-->
           <div
             class='resize
-							        {isBaseData($selections.nameLoc) ? $selections.nameLoc?.position || `left` : `left`}
-                      {$composite?.color?.toLowerCase()}
-                      {$composite?.color?.toLowerCase() !== `chalk`
-              ? isBaseData($selections.familyFont) ? $selections.familyFont?.font?.toLowerCase() || `mtype` : `mtype`
-              : ``}'
-            class:shift={!!$composite?.roots}
+							        {isBaseData($selections.nameLoc) ? $selections.nameLoc?.position || `left` : `left`}'
             id='familyWrapper'
             xmlns='http://www.w3.org/1999/xhtml'
           >
@@ -88,14 +88,14 @@
             </div>
             <div id='lineTwo'>{$selections['lineTwo'] || ''}</div>
           </div>
+          <!--          {$composite?.color?.toLowerCase()}-->
+          <!--				  {$composite?.color?.toLowerCase() !== `chalk`-->
+          <!--  ? isBaseData($selections.quoteFont) ? $selections.quoteFont?.font?.toLowerCase() || `mtype` : `mtype`-->
+          <!--  : ``}'-->
+          <!--class:shift={!!$composite?.roots}-->
           <div
             class='resize
-							        {isBaseData($selections.quoteLoc) ? $selections.quoteLoc?.position || `right` : `right`}
-                      {$composite?.color?.toLowerCase()}
-										  {$composite?.color?.toLowerCase() !== `chalk`
-              ? isBaseData($selections.quoteFont) ? $selections.quoteFont?.font?.toLowerCase() || `mtype` : `mtype`
-              : ``}'
-            class:shift={!!$composite?.roots}
+							        {isBaseData($selections.quoteLoc) ? $selections.quoteLoc?.position || `right` : `right`}'
             id='quoteText'
             xmlns='http://www.w3.org/1999/xhtml'
           >
@@ -104,8 +104,8 @@
         </foreignObject>
 
         <!-- Path should be shifted if we are not showing roots -->
+        <!--          class:shift={!$composite?.roots}-->
         <path
-          class:shift={!$composite?.roots}
           d='{isBaseData($selections.flatGround) && $selections.flatGround?.key === `yes` ? `M0,71.5 100,71.5` : `M0,71.5
 								 C0,71.5 25,74 50,72 S
 								 85,71 100,72.5`}'
@@ -113,19 +113,19 @@
           id='curve'
         />
         <text x='50%'>
+          <!--{$composite?.color?.toLowerCase()}-->
+          <!--{isBaseData($selections.groundFont) ? $selections.groundFont?.font?.toLowerCase() || `mtype` : `mtype`}'-->
           <textPath
             class='resize
-													 resizeGround
-													 {$composite?.color?.toLowerCase()}
-													 {isBaseData($selections.groundFont) ? $selections.groundFont?.font?.toLowerCase() || `mtype` : `mtype`}'
+													 resizeGround'
             font-family=', sans-serif'
             href='#curve'
             id='groundText'
           >
-            {$selections['ground'] ||
-            ($composite?.roots
-              ? 'This is the ground. It can be a quote, family names, scripture, or favorite saying.'
-              : '')}
+            <!--{$selections['ground'] ||-->
+            <!--($composite?.roots-->
+            <!--  ? 'This is the ground. It can be a quote, family names, scripture, or favorite saying.'-->
+            <!--  : '')}-->
           </textPath>
         </text>
       </svg>
@@ -174,7 +174,7 @@
       {/if}
       {#if pageHelper.nextPage !== -1}
         <button id='next' onclick={pageHelper.gotoNextPage}>
-            <span>Next &raquo;</span>
+          <span>Next &raquo;</span>
         </button>
       {/if}
     </div>

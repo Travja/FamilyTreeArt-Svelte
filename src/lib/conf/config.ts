@@ -1,6 +1,6 @@
 import { TreeArtConfig, TreeArtPage, TreeType } from './TreeArtConfig';
 import { get } from 'svelte/store';
-import { page } from '$lib/pages';
+import { page } from '$lib/pages.svelte';
 import { selections, selectItem } from '../interpreter';
 import type { BaseData } from '../../types/data';
 import type { ButtonOption } from '../../types/options';

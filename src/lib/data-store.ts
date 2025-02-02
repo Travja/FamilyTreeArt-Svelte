@@ -1,6 +1,6 @@
 import { multiSelectEntries, selections } from './interpreter';
 import { get } from 'svelte/store';
-import { currentPage, visitedLast } from './pages';
+import { currentPage, visitedLast } from './pages.svelte';
 
 currentPage.subscribe(page => {
   if (typeof window == 'undefined' || !localStorage) return;
@@ -38,7 +38,7 @@ export const hasPreviousSelections = (): boolean => {
 
 export const loadPrevious = (): void => {
   if (typeof window == 'undefined') return;
-  currentPage.set(parseInt(localStorage.getItem('furthest-page')) || 0);
+  currentPage.set(Math.max(parseInt(localStorage.getItem('furthest-page')) || 0, 0));
   if (localStorage.getItem('visited-last'))
     visitedLast.set(localStorage.getItem('visited-last') == 'true');
 

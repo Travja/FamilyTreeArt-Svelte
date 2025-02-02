@@ -1,12 +1,6 @@
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
-import {
-  getComposite,
-  getLeavesImage,
-  getRootsImage,
-  getTreeImage,
-  selections
-} from './interpreter';
+import { getComposite, getLeavesImage, getRootsImage, getTreeImage, selections } from './interpreter';
 
 export const myCanvas: Writable<HTMLCanvasElement> = writable();
 export const customSvg: Writable<SVGElement> = writable();
@@ -42,6 +36,8 @@ class CanvasManager {
 
   renderCanvas = async (composite: any) => {
     let canvas = get(myCanvas);
+    if (!canvas) return;
+
     let select = get(selections);
 
     delete composite.use;
